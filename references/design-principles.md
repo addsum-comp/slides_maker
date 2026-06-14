@@ -91,6 +91,16 @@ as much as the words on it. Design is not optional polish; it is half the job.
   box (the deckkit `chip`/`callout` helpers bake this in; for boxes you draw yourself,
   inset text ~0.15 in from the edges, more at the top of a titled card). Cramped text
   touching a rounded corner reads as unfinished even when nothing overflows.
+- **Even bullet rhythm needs a consistent line count.** A list looks evenly spaced only
+  when every item occupies the *same* number of lines. The moment one item wraps to two
+  lines (or the layout estimator merely *thinks* it wraps), that item claims an extra
+  line-height of vertical space, so the gap before the *next* item looks bigger than the
+  others — the "uneven last gap" tell. This is a line-count mismatch, never a `gap` value to
+  nudge. Fix it at the source: keep list items to a consistent length — ideally each
+  comfortably on one line (well under the column width), with no single item sitting right on
+  the wrap boundary. If an item genuinely must wrap, let *all* peers wrap (uniform rhythm) or
+  give it its own element. Because text height in pptx is only truly knowable by rendering,
+  *check the PNG*: if one gap is larger, shorten the item above it until the rhythm is even.
 - **Diagram shapes stay inside their container.** When you draw a native diagram into a
   card/panel (e.g. nodes in a box, icons around a hub, items flanking a centre), every
   shape must sit *inside* that frame with a margin — a block escaping the card edge (or an

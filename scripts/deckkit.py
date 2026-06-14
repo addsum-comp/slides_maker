@@ -203,13 +203,35 @@ def _disp_len(s):
     return n
 
 
+# Chars-per-line estimates over-count narrow glyphs (ASCII digits/spaces/dashes, CJK
+# punctuation) by ~1-2 units, so an item one char over the wrap threshold gets a phantom
+# extra line. This slack absorbs that systematic bias toward the renderer's tighter packing,
+# without risking overlap (the heuristic only ever over-counts these glyphs, never under).
+_WRAP_SLACK = 2
+
+
 def bullet(slide, x, y, w, items, size=17, gap=0.26, marker=BLUE, lead_c=DEEP, body_c=SLATE):
     """Square-marker bullets. items = list of (lead, rest); keep both terse.
     Returns the bottom y, so a caller can place the next element (e.g. a callout)
-    below the list without overlapping it. The wrap/height estimate SCALES with `size`
-    (chars-per-line and line height both follow the font), but text height in pptx is
-    only truly knowable by rendering — so verify the PNG and nudge `gap` if a long item
-    wraps more than expected. (At the default size=17 this matches the prior behaviour.)"""
+    below the list without overlapping it.
+
+    EVEN RHYTHM depends on every item occupying the SAME line count. Each marker is
+    placed by advancing the cursor `line_h * nlines + gap`, where `nlines` is *estimated*
+    from a chars-per-line heuristic — and that estimate is only accurate to ~±1-2 chars
+    near the wrap boundary, erring BOTH ways:
+      • undershoot (estimate < actual lines) → the next bullet OVERLAPS the wrapped text;
+      • overshoot  (estimate > actual lines) → a PHANTOM blank line is reserved, so the
+        next bullet drops an extra line-height and the gap before it looks uneven.
+    Overshoot bites mixed CJK+Latin strings hardest: `_disp_len` counts every CJK glyph
+    as width-2, but CJK punctuation, ASCII digits, spaces and dashes render NARROWER, so a
+    line sitting one char over the threshold gets rounded up to a 2nd line the renderer
+    never produces. The small `_WRAP_SLACK` below absorbs that systematic over-count.
+    DURABLE FIX is content, not tuning: for an even-looking list keep items to a CONSISTENT
+    line count — ideally each comfortably under one line (well below the column width) — or
+    accept that a genuinely-wrapping item gets a larger following gap. The estimate can't be
+    exact without rendering, so ALWAYS verify the PNG; if the rhythm is uneven the cause is
+    an estimate↔render line-count mismatch — fix the offending item's LENGTH, not `gap`.
+    (At the default size=17 this matches the prior behaviour.)"""
     cy = y
     cpl = max(6, int((w - 0.22) * 136.0 / size))  # chars/line in the real text width (after the marker indent)
     line_h = size / 72.0 * 1.12              # line height in inches, scaled to font size
@@ -218,7 +240,10 @@ def bullet(slide, x, y, w, items, size=17, gap=0.26, marker=BLUE, lead_c=DEEP, b
         text(slide, x + 0.22, cy - 0.02, w - 0.22, 0.6,
              [[(lead, size, lead_c, True, False), (rest, size, body_c, False, False)]],
              space_after=0, line_spacing=1.02)
-        nlines = max(1, -(-_disp_len(lead + rest) // cpl))   # CJK-aware (wide glyphs = 2)
+        # CJK-aware width (wide glyphs = 2), minus a small slack so a borderline item the
+        # renderer packs onto one line doesn't reserve a phantom 2nd line (uneven gap).
+        eff = max(1, _disp_len(lead + rest) - _WRAP_SLACK)
+        nlines = max(1, -(-eff // cpl))
         cy += line_h * nlines + gap
     return cy
 
