@@ -1,3 +1,11 @@
+<p align="center">
+  <img src="assets/cover.png" alt="slide-maker — design, redesign &amp; critique presentation-grade decks" width="100%">
+</p>
+
+<p align="center">
+  <b>English</b> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ja.md">日本語</a> · <a href="README.ko.md">한국어</a> · <a href="README.es.md">Español</a>
+</p>
+
 # slide-maker — design & operating guide
 
 This document explains how the skill is built and how to reason about it — for the user
