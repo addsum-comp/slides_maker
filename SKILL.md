@@ -2,20 +2,17 @@
 name: slide-maker
 description: >-
   Build, redesign, and critique clean, presentation-grade slide decks (.pptx) for any
-  audience — research/lab meetings, work status updates, academic conference talks,
-  stakeholder readouts, thesis defenses, teaching. Use whenever the user wants to make,
+  audience — research/lab meetings, work status updates, conference talks, stakeholder
+  readouts, thesis defenses, teaching, webinars. Use whenever the user wants to make,
   create, redo, clean up, improve, or review slides / a deck / a presentation — e.g.
-  "make slides for my project", "build a deck from this code/paper/doc", "turn these
-  results into slides", "redesign this pptx", "my slides have too much text", "review my
-  deck and tell me what's weak". Works with or without a template (matches theirs,
-  else designs a clean one) and with or without source material (mines provided
-  code/docs/figures, else web-researches and drafts), in any language (e.g. English or
-  中文). Interviews first (template,
-  purpose & audience, source material, style), web-searches a named conference's
-  guidelines + official template, then runs an actor–critic loop until an independent
-  critic consents — then iterates on the user's feedback. Trigger even without the
-  words "skill", "deck", or "pptx" — e.g. "can you make some good slides for me",
-  "make a slide about X", "help me present this work".
+  "make slides for my project", "build a deck from this paper/code/doc", "turn these
+  results into slides", "redesign this pptx", "my slides are too dense", "review my deck
+  and tell me what's weak", "make a slide about X", "help me present this work". Works
+  with or without a template (matches theirs, else designs a clean one) and with or
+  without source material (mines provided code/docs/figures, else web-researches and
+  fact-checks), in any language (e.g. English or 中文). Interviews first, then runs an
+  actor–critic loop until an independent critic consents. Trigger even without the words
+  "skill", "deck", or "pptx".
 ---
 
 # Slide maker
@@ -64,6 +61,10 @@ you go, or for a brand-defining deck): build behind cheap **gates** — pick a *
 (2–3 styles shown as real rendered archetypes) → approve the *outline* → build the rest.
 The critic captures *quality*; the gates capture *preference*. Offer it in one line;
 never force it. See `references/collaborative-mode.md` (+ `scripts/archetypes.py`).
+
+**🔴 CHECKPOINT convention.** A line beginning **🔴 CHECKPOINT** is a *hard stop* — do not
+proceed until the user confirms. Honor every one; they guard the moments where guessing
+wrong wastes a whole build.
 
 ## Step 0 — Interview the user first (always)
 **Run this interview every time, from scratch — do not skip it because earlier
@@ -190,6 +191,7 @@ hand over the file. The four:
      then show the weakness list and confirm scope **before** rebuilding. Optimizing
      someone's existing deck rewards a diagnosis-led, scope-confirmed approach over a
      silent ground-up replacement.
+     > **🔴 CHECKPOINT** — show the diagnosis + proposed scope and get the user's OK before rebuilding their deck.
 
 4. **Style.** "How do you want it to look and feel?" Offer these (applies to *every*
    purpose):
@@ -269,6 +271,7 @@ authors' actual emphasis, not a plausible-sounding paraphrase. Reuse their figur
   full-year metric is last year's, label it as such and add a current-year update rather
   than presenting old data as current. Then confirm the outline with the user before
   building the full deck (cheaper to correct an outline than a finished deck).
+  > **🔴 CHECKPOINT** — get the user's OK on the outline before building the full deck.
 
 ## Step 2 — Set up the canvas
 **First, decide where the deck lands.** Deliver each deck as one self-contained
@@ -279,6 +282,7 @@ output path and `render_deck.sh`'s out-dir there from the start (no need to copy
 files around at the end). **Before the first save, confirm `~/Downloads` exists; if
 it doesn't, ask the user where they'd like outputs** and use that location instead —
 don't silently dump into `/tmp`. You'll remind them to open it in step 6.
+> **🔴 CHECKPOINT** — if `~/Downloads` is missing, ask where to save before writing any file.
 
 **Keep the per-deck build script (`build_<deck>.py`) in that same folder, beside the
 `.pptx`.** The build script — not the rendered file — is the *source of truth* for the
@@ -580,6 +584,21 @@ mtime to your last build); if they have, **don't regenerate over it** — reconc
 in place). Never silently clobber edits you didn't make. Each round should make the deck
 more specifically theirs (their emphasis, their wording, their priorities), not just
 generically "better".
+
+## Anti-patterns — never do this
+A checkable red-flag list; if a draft does any of these, stop and fix it before shipping:
+- **Never invent** numbers, results, citations, or figures the source doesn't state (the
+  one allowed exception is *flagged* forward-looking content).
+- **Never skip the interview**, and **never assume** the topic/content, template, style,
+  or — for a brand-new user with no footprint — a domain (ask the subject openly).
+- **Never present last year's data as current** on a deck dated this year — ground to today.
+- **Never act as your own final critic** — an independent critic must consent; **never ship
+  a partially-rendered or contested-blocker deck silently** (surface the disagreement).
+- **Never clobber the user's hand-edits** — reconcile before regenerating over their file.
+- **Never** ship a wall-of-text slide, a partial-cropped/redrawn source figure, a cine GIF
+  reduced to one frame, meaning carried by colour alone, or text below ~4.5:1 contrast.
+- **Never** paste Unicode super/subscripts (ᴴ ᵀ ᵣ); **never** build a "generic conference"
+  deck (research the venue); **never** let the deck drift between languages.
 
 ## Files
 - `scripts/deckkit.py` — import this; build helpers for both template & blank decks.

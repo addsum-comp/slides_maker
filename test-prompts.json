@@ -1,0 +1,5 @@
+[
+  {"id": 1, "prompt": "帮我把这篇论文做成学术会议的演讲幻灯片（论文在 ~/work/paper.pdf）", "expected": "Interviews first (venue→research it, template, style); reads the paper deeply; builds ~6-9 slide talk reusing the paper's own figures; runs the critic loop to consent.", "path": "happy"},
+  {"id": 2, "prompt": "make me some slides about our Q3 results for the leadership team", "expected": "Identifies purpose = exec/stakeholder readout; interviews (template/source/style); leads with outcome+ask, crisp corporate design (design-by-purpose); critic loop.", "path": "ambiguous-purpose"},
+  {"id": 3, "prompt": "make a teaching deck on diffusion models, no materials, in English", "expected": "No-source branch: drafts outline, web-searches to fact-check incl. current-date grounding, confirms outline; teaching rubric (objectives→build→recap); minimal/diagram-heavy.", "path": "no-source"}
+]
