@@ -35,6 +35,9 @@ use them as a throwaway mood sketch, then confirm with a real rendered slide.)
    bullets+callout slide, a diagram slide, and a data/figure slide. Same content,
    only the style differs → an honest, apples-to-apples comparison that shows how the
    user's *real* slide types will look, not just a pretty cover.
+   - **Render previews into a disposable location** — a `_directions/` subfolder of the
+     deck folder (or a temp dir), each direction's style module + preview deck + render
+     PNGs together — so the whole set can be removed in one step once the user picks (step 6).
 3. **Run a quick critic on each preview first** (don't spend the user's attention on
    issues a critic would catch — show decent options).
 4. Render all directions, present them (a contact sheet / the PNGs), and collect
@@ -49,9 +52,14 @@ use them as a throwaway mood sketch, then confirm with a real rendered slide.)
      A blend ("B's palette with A's serif") is a valid D too. Never force one of your three.
 5. Apply knobs — or a "D" free-text intention — by editing/creating the **style module**
    (a tweak = change a constant + re-render the archetypes — cheap) until the user consents.
-6. On consent, the chosen module becomes the deck's `style.py`. **Optionally persist
-   it** to `~/.claude/slide-templates/<name>/` (profile.md + the style module) so it's
-   a reusable registered template next time — collaborative mode *grows the registry*.
+6. On consent: **(a)** the chosen module becomes the deck's `style.py`; **(b)** optionally
+   persist it to `~/.claude/slide-templates/<name>/` (profile.md + the style module) so it's
+   a reusable registered template next time — collaborative mode *grows the registry*; then
+   **(c) delete the throwaway preview artifacts** — the whole `_directions/` preview folder
+   (every direction's preview deck + render PNGs) and the *rejected* directions' style
+   modules — keeping only the chosen `style.py` (and the registry copy, if persisted). The
+   previews were scaffolding for the choice; don't leave demo decks littering the user's
+   Downloads. Then continue to Gate B/C and build the **full** deck in the chosen style.
 
 ### Gate B — Outline
 Present the slide-by-slide **takeaways / arc** (cheap text, from step 3 of the main
@@ -67,6 +75,9 @@ Build the **full** deck in the approved direction — single-author by default, 
 ## Principles that keep it cheap and robust
 - **Truthful previews:** pptx-render, so approve == ship; the chosen style IS the
   build style. No translation step.
+- **Previews are disposable:** once the user picks, delete the preview decks and the
+  rejected modules — only the chosen `style.py` and the real deck survive. Clean up after
+  the choice; never hand back a folder full of demo options alongside the deliverable.
 - **Diff-based iteration:** freeze what the user approved; change only what they
   flagged; show before/after. Don't re-litigate settled gates.
 - **Knobs over rebuilds:** parameterize the style module so visual tweaks re-render a

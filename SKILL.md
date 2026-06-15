@@ -140,7 +140,9 @@ from before the full build. The four:
        as a style module, render the same archetypes, and show it alongside (iterate until
        they consent), rather than forcing one of your three guesses. The three are only your
        opening proposals; the author's own intention always outranks them. The
-       chosen/synthesized module becomes the deck's `style.py`.
+       chosen/synthesized module becomes the deck's `style.py`. **Once they pick, delete the
+       throwaway preview decks + rejected modules** (keep only the chosen style), then build
+       the full deck in it — don't leave demo options littering Downloads.
      - *Picks design-one* → build a single look shaped to purpose, as above.
      This offer is **skippable, never forced** — a brand-new from-scratch deck is exactly
      when showing options pays off, but a user in a hurry can decline in one click.
