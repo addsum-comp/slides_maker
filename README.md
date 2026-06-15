@@ -136,7 +136,7 @@ The interview (step 0, Q3 especially) routes the request:
 
 ## Known limitations (we're honest about these)
 
-- **Text height is estimated, not measured.** python-pptx can't know rendered text height, so `bullet`/`callout` heights are scaled estimates — the render loop (step 5) is how overflow is caught. Always look at the PNGs.
+- **Text height is *measured*, but the renderer has the final say.** `bullet`/`callout` line counts are computed from the real font's glyph metrics (Pillow) — not a chars-per-inch guess — so boxes fit the rendered text closely. The render loop (step 5) stays the backstop for residual cases (a substituted font, kerning, exotic scripts). Always look at the PNGs.
 - **Animation can't be previewed statically.** Renders show the final built state only; the build *order* is verified in real PowerPoint and described to the user at hand-off.
 - **RTL scripts (Arabic/Hebrew)** are a known weak spot — no bidi reflow.
 - **Posters** are supported only minimally; the skill is tuned for talks.

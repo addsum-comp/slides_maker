@@ -186,28 +186,122 @@ def arrow_label(slide, x, y, w, h, label, color=BLUE, size=9, lab_c=None, box_w=
 
 
 # ================================================================= components
+def _is_wide(o):
+    """True for CJK / full-width code points — their glyph advance is ≈ one em."""
+    return (0x1100 <= o <= 0x115F or 0x2E80 <= o <= 0xA4CF or 0xAC00 <= o <= 0xD7A3
+            or 0xF900 <= o <= 0xFAFF or 0xFE30 <= o <= 0xFE4F or 0xFF00 <= o <= 0xFF60
+            or 0xFFE0 <= o <= 0xFFE6 or 0x20000 <= o <= 0x3FFFD)
+
+
 def _disp_len(s):
-    """Display width in 'Latin-char' units: CJK / full-width glyphs count as 2.
-    The chars-per-line heuristics (cpl) assume Latin width; without this, Chinese/
-    Japanese/Korean text under-counts lines, so auto-height boxes wrap more than
-    estimated and overlap. Counting wide glyphs as 2 makes those estimates correct."""
-    n = 0
-    for ch in s:
-        o = ord(ch)
-        if (0x1100 <= o <= 0x115F or 0x2E80 <= o <= 0xA4CF or 0xAC00 <= o <= 0xD7A3
-                or 0xF900 <= o <= 0xFAFF or 0xFE30 <= o <= 0xFE4F or 0xFF00 <= o <= 0xFF60
-                or 0xFFE0 <= o <= 0xFFE6 or 0x20000 <= o <= 0x3FFFD):
-            n += 2
-        else:
-            n += 1
-    return n
+    """Display width in 'Latin-char' units: CJK / full-width glyphs count as 2. Used only by
+    the heuristic FALLBACK in `_measure_lines`; the primary path measures real glyph
+    advances. Counting wide glyphs as 2 keeps that fallback safe for CJK text."""
+    return sum(2 if _is_wide(ord(ch)) else 1 for ch in s)
 
 
 # Chars-per-line estimates over-count narrow glyphs (ASCII digits/spaces/dashes, CJK
-# punctuation) by ~1-2 units, so an item one char over the wrap threshold gets a phantom
-# extra line. This slack absorbs that systematic bias toward the renderer's tighter packing,
-# without risking overlap (the heuristic only ever over-counts these glyphs, never under).
+# punctuation), so an item one char over the wrap threshold gets a phantom extra line. This
+# slack absorbs that bias. It is now only used by the heuristic FALLBACK below — the primary
+# path (`_measure_lines`) measures real glyph advances and needs no slack.
 _WRAP_SLACK = 2
+
+# ---- accurate text measurement (real glyph metrics, with a heuristic fallback) ----
+_MEAS_PREC = 4                 # load fonts at size*PREC px for sub-point precision
+_FONT_PATH_CACHE = {}
+_PIL_FONT_CACHE = {}
+
+
+def _font_file(name, bold=False):
+    """Resolve a font family name to a file path (cached). Returns None if unresolvable."""
+    key = (name, bold)
+    if key not in _FONT_PATH_CACHE:
+        try:
+            from matplotlib import font_manager as _fm
+            _FONT_PATH_CACHE[key] = _fm.findfont(
+                _fm.FontProperties(family=name, weight=("bold" if bold else "normal")))
+        except Exception:
+            _FONT_PATH_CACHE[key] = None
+    return _FONT_PATH_CACHE[key]
+
+
+def _pil_font(name, size_pt, bold=False):
+    """A cached Pillow font for `name` at `size_pt` (loaded at size*PREC px)."""
+    key = (name, bold, round(size_pt, 2))
+    f = _PIL_FONT_CACHE.get(key)
+    if f is None:
+        from PIL import ImageFont
+        f = ImageFont.truetype(_font_file(name, bold), max(1, int(round(size_pt * _MEAS_PREC))))
+        _PIL_FONT_CACHE[key] = f
+    return f
+
+
+def _lines_heuristic(text, size_pt, avail_in):
+    """Chars-per-line line-count estimate — the fallback when measurement isn't available."""
+    cpl = max(6, int(avail_in * 136.0 / size_pt))
+    eff = max(1, _disp_len(text) - _WRAP_SLACK)
+    return max(1, -(-eff // cpl))
+
+
+def _measure_lines(runs, size_pt, avail_in, font=None):
+    """How many lines styled text wraps to — MEASURED, not estimated.
+
+    `runs` = [(text, bold), ...] set at `size_pt` within `avail_in` inches of usable width.
+    Narrow runs are measured with the REAL Latin font's glyph advances (Pillow, the bold
+    parts measured bold); CJK / full-width glyphs are one em (= size_pt) by definition.
+    A greedy line-breaker then counts wraps, breaking at spaces, between CJK glyphs, and at
+    CJK↔Latin boundaries (Latin words stay whole). Because it uses the same font metrics the
+    renderer does, the count matches the rendered layout far more closely than a chars-per-
+    line guess. Falls back to `_lines_heuristic` if Pillow or the font can't be loaded — so a
+    build never breaks over measurement. Lazy-imports Pillow/matplotlib."""
+    fontname = font or FONT
+    flat = "".join(t for t, _ in runs)
+    if not flat:
+        return 1
+    avail = max(1.0, avail_in * 72.0)                       # usable width, in points
+    try:
+        fonts = {b: _pil_font(fontname, size_pt, b) for b in (False, True)}
+        getlen = lambda s, b: fonts[b].getlength(s) / _MEAS_PREC
+        getlen("x", False)                                  # probe — raises if unusable
+    except Exception:
+        return _lines_heuristic(flat, size_pt, avail_in)
+
+    items = []                                              # (width_pt, kind): 'w'ord 's'pace 'c'jk
+    for text, bold in runs:
+        word = []
+        for ch in text:
+            if ch == " ":
+                if word:
+                    items.append((getlen("".join(word), bold), "w")); word = []
+                items.append((getlen(" ", bold), "s"))
+            elif _is_wide(ord(ch)):
+                if word:
+                    items.append((getlen("".join(word), bold), "w")); word = []
+                items.append((float(size_pt), "c"))
+            else:
+                word.append(ch)
+        if word:
+            items.append((getlen("".join(word), bold), "w"))
+
+    x = 0.0
+    lines = 1
+    for w, kind in items:
+        if kind == "s":                                     # a space never forces a wrap
+            if x > 0:
+                x += w
+            continue
+        if w > avail:                                       # token alone wider than the line
+            if x > 0:
+                lines += 1
+            n = int(w // avail)
+            lines += n
+            x = w - n * avail
+            continue
+        if x + w > avail and x > 0:
+            lines += 1
+            x = 0.0
+        x += w
+    return max(1, lines)
 
 
 def bullet(slide, x, y, w, items, size=17, gap=0.26, marker=BLUE, lead_c=DEEP, body_c=SLATE):
@@ -215,44 +309,36 @@ def bullet(slide, x, y, w, items, size=17, gap=0.26, marker=BLUE, lead_c=DEEP, b
     Returns the bottom y, so a caller can place the next element (e.g. a callout)
     below the list without overlapping it.
 
-    EVEN RHYTHM depends on every item occupying the SAME line count. Each marker is
-    placed by advancing the cursor `line_h * nlines + gap`, where `nlines` is *estimated*
-    from a chars-per-line heuristic — and that estimate is only accurate to ~±1-2 chars
-    near the wrap boundary, erring BOTH ways:
-      • undershoot (estimate < actual lines) → the next bullet OVERLAPS the wrapped text;
-      • overshoot  (estimate > actual lines) → a PHANTOM blank line is reserved, so the
-        next bullet drops an extra line-height and the gap before it looks uneven.
-    Overshoot bites mixed CJK+Latin strings hardest: `_disp_len` counts every CJK glyph
-    as width-2, but CJK punctuation, ASCII digits, spaces and dashes render NARROWER, so a
-    line sitting one char over the threshold gets rounded up to a 2nd line the renderer
-    never produces. The small `_WRAP_SLACK` below absorbs that systematic over-count.
-    DURABLE FIX is content, not tuning: for an even-looking list keep items to a CONSISTENT
-    line count — ideally each comfortably under one line (well below the column width) — or
-    accept that a genuinely-wrapping item gets a larger following gap. The estimate can't be
-    exact without rendering, so ALWAYS verify the PNG; if the rhythm is uneven the cause is
-    an estimate↔render line-count mismatch — fix the offending item's LENGTH, not `gap`.
-    (At the default size=17 this matches the prior behaviour.)"""
+    EVEN RHYTHM depends on every item occupying the SAME line count. Each marker is placed
+    by advancing the cursor `line_h * nlines + gap`, where `nlines` is now MEASURED from the
+    real font's glyph advances (`_measure_lines` — Latin runs via Pillow, the bold lead
+    measured bold, CJK as one em), so it matches what the renderer actually lays out. This
+    removes the old heuristic's two failure modes near the wrap boundary — undershoot
+    (next bullet OVERLAPS the wrapped text) and overshoot (a PHANTOM blank line is reserved,
+    so the gap before the next bullet looks uneven). If Pillow/the font can't load, it falls
+    back to the chars-per-line heuristic. STILL TRUE regardless: an item that genuinely wraps
+    to 2 lines takes more vertical space than its 1-line peers, so for an even-looking list
+    keep items to a CONSISTENT line count (ideally each comfortably on one line). As always,
+    verify the PNG. (At the default size=17 this matches the prior behaviour.)"""
     cy = y
-    cpl = max(6, int((w - 0.22) * 136.0 / size))  # chars/line in the real text width (after the marker indent)
     line_h = size / 72.0 * 1.12              # line height in inches, scaled to font size
     for lead, rest in items:
         box(slide, x, cy + 0.07, 0.09, 0.09, fill=marker)
         text(slide, x + 0.22, cy - 0.02, w - 0.22, 0.6,
              [[(lead, size, lead_c, True, False), (rest, size, body_c, False, False)]],
              space_after=0, line_spacing=1.02)
-        # CJK-aware width (wide glyphs = 2), minus a small slack so a borderline item the
-        # renderer packs onto one line doesn't reserve a phantom 2nd line (uneven gap).
-        eff = max(1, _disp_len(lead + rest) - _WRAP_SLACK)
-        nlines = max(1, -(-eff // cpl))
+        # MEASURED line count (real glyph metrics; bold lead measured bold) so the marker
+        # advance matches the renderer's layout — no phantom or missing lines.
+        nlines = _measure_lines([(lead, True), (rest, False)], size, w - 0.22)
         cy += line_h * nlines + gap
     return cy
 
 
 def callout(slide, x, y, w, h, label, body, label_c=MAGENTA, fill=TINT, body_c=DEEP):
-    # auto-grow height so the body never spills outside the box, with comfortable
-    # interior padding (~12 chars/inch at 12.5pt; label + body share the wrap width).
-    cpl = max(8, int((w - 0.5) * 12))
-    nlines = max(1, -(-(_disp_len(label) + 2 + _disp_len(body)) // cpl))   # CJK-aware
+    # auto-grow height so the body never spills outside the box. The label + body share one
+    # wrap width; nlines is MEASURED from real glyph metrics (label measured bold) so the
+    # box fits the rendered text rather than a chars-per-inch guess.
+    nlines = _measure_lines([(label + "  ", True), (body, False)], 12.5, w - 0.44)
     h = max(h, 0.36 + 0.245 * nlines)
     box(slide, x, y, w, h, fill=fill, round=True)
     rad = 0.08 * min(w, h)                                   # inset the accent bar so its square
