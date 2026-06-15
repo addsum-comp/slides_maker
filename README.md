@@ -6,28 +6,46 @@
   <b>English</b> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ja.md">日本語</a> · <a href="README.ko.md">한국어</a> · <a href="README.es.md">Español</a>
 </p>
 
-# slide-maker — design & operating guide
+# slide-maker
 
-This document explains how the skill is built and how to reason about it — for the user
-(you) and for anyone maintaining it. The model that *runs* the skill reads `SKILL.md`
-and the `references/`; this README is the map above them.
+> **Build, redesign, and critique presentation-grade `.pptx` decks** — for any audience, in any language, with or without a template or source material.
 
----
+Most AI tools make slides the way they make text: in one shot, from a guess, without ever *looking* at what they produced. **slide-maker works like a senior presentation designer instead.** It asks what you actually need, stays strictly faithful to your source, and refuses to call a deck "done" until an *independent critic* has reviewed the rendered slides. What you get back is a real, editable PowerPoint file you own — not a screenshot, not a web app you're locked into.
 
-## 1. What it is
-
-A skill that builds, redesigns, and critiques presentation-grade `.pptx` decks for any
-audience, in any language, with or without a template, with or without source material.
-Its one belief: **a slide is a visual aid for a speaker, not a document to be read** —
-so every decision optimizes for "understood in seconds."
-
-It is deliberately **interview-first** and **critic-gated**: it asks before it assumes,
-and it does not trust its own output — an independent critic must consent before a deck
-is "done."
+One belief drives every decision: **a slide is a visual aid for a speaker, not a document to be read** — so everything optimizes for *understood in seconds*.
 
 ---
 
-## 2. The core pipeline (auto mode)
+## Why it's different
+
+Three quiet disciplines separate it from the usual ways of making slides:
+
+- **It interviews before it builds.** Purpose, audience, source, style, language — gathered up front, never assumed. No more decks that confidently answer the wrong question.
+- **It can't fabricate your work.** Every number, claim, and figure must trace back to your source; the single exception — forward-looking content — is flagged as the model's own addition. An expert audience spots an invented result instantly, so it doesn't invent them.
+- **It checks its own pixels — with a second set of eyes.** `python-pptx` writes blind: overflow, contrast, and glyph bugs only appear once rendered. So every deck is rendered to images and an **independent critic subagent must consent** before hand-off. The builder doesn't get to mark its own homework.
+
+### slide-maker vs. the usual ways to make slides
+
+<sub>✓ yes&nbsp;&nbsp;·&nbsp;&nbsp;~ partial / depends&nbsp;&nbsp;·&nbsp;&nbsp;✗ no</sub>
+
+| What you get | One-shot AI prompt | Web slide tools | By hand (PPT / `python-pptx`) | **slide-maker** |
+|---|:--:|:--:|:--:|:--:|
+| Asks your goal & audience *before* building | ✗ | ~ | ✓ | **✓** |
+| Stays faithful to your source — no invented numbers | ~ | ~ | ✓ | **✓** |
+| Independent critic checks the **rendered** slides | ✗ | ✗ | ✗ | **✓** |
+| Design tuned to the *purpose* (defense ≠ pitch ≠ lecture) | ~ | ~ | ✓ | **✓** |
+| Real, editable `.pptx` you own — no lock-in | ~ | ~ | ✓ | **✓** |
+| Any language — incl. CJK & real equation typography | ~ | ~ | ✓ | **✓** |
+| Reproducible build + safe re-editing | ✗ | ~ | ✓ | **✓** |
+| Fast to a *polished* deck | ~ | ✓ | ✗ | **✓** |
+
+The others can all make slides. slide-maker is the one that **asks, stays faithful, and checks the result** — while still handing you a file you completely own.
+
+---
+
+## How it works — one disciplined loop
+
+> **Interview → Understand → Build → Render &amp; critique ⟲ → Hand off**
 
 Every deck flows through seven steps (`SKILL.md` is the authoritative spec):
 
@@ -41,24 +59,51 @@ Every deck flows through seven steps (`SKILL.md` is the authoritative spec):
 | **5 — Render + critic loop** | Render to PNGs and *look*; then an **independent critic subagent** returns JSON (consent / revise + per-slide fixes). Loop until consent. | python-pptx writes blind — overflow/contrast/glyph bugs only show in pixels. You are not the judge of your own work. |
 | **6 — Hand off + iterate** | Show the user, give the folder path, explain editability + the two change-lanes, fold in feedback. | The deck is theirs to own and keep tweaking — safely. |
 
-**The actor–critic loop is the quality engine.** Its *weight* scales to stakes (one
-critic for a lab meeting; a 2–3-critic parallel panel with different lenses for a
-conference/defense/pitch), but the loop itself is non-negotiable.
+**The actor–critic loop is the quality engine.** Its *weight* scales to the stakes — one critic for a lab meeting, a 2–3-critic panel with different lenses for a conference, defense, or pitch — but the loop itself is never skipped.
+
+### Two modes
+
+- **Auto (default):** interview → build → critic loop to a high bar → show. The critic captures *quality*.
+- **Collaborative (opt-in):** adds cheap **approval gates** — pick a *direction* from real rendered options → approve the *outline* → build the rest. The gates capture *preference* (taste), which a critic can't read. Designing from scratch, it shows you **3 distinct directions** — plus a *"describe your own"* — to choose from before it commits.
 
 ---
 
-## 3. Two modes
+## What it can do
 
-- **Auto (default):** interview → build → critic loop to a high bar → show. The critic
-  captures *quality*.
-- **Collaborative (opt-in):** adds cheap **approval gates** — pick a *direction* (2–3
-  real rendered archetype slides) → approve the *outline* → build the rest. The gates
-  capture *preference* (taste), which a critic can't read. Same engine underneath; it
-  only adds approvals. (`references/collaborative-mode.md`, `scripts/archetypes.py`.)
+- **Build from anything — or nothing.** A paper, codebase, doc, or existing slides → a deck. No material? It drafts from expertise and **web-searches to ground and fact-check** every claim.
+- **Redesign your existing deck.** It diagnoses first, confirms scope, then rebuilds reusing your content and figures — never a silent ground-up replacement.
+- **Match a look you like.** Hand it an example and it reproduces the *style* — grid, palette, typography, motifs — in its own build.
+- **Speak your audience's language.** Any language, held consistently throughout, with proper **CJK typography** and real **LaTeX-quality equations**.
+- **Respect the venue.** For a conference talk it identifies and researches the venue — format, aspect ratio, official template, audience — before building.
+- **Scale to big decks.** 15+ slides → optional section fan-out with a shared style, parallel authoring, and a critic panel.
+- **Hand off cleanly.** A self-contained folder, speaker notes, optional animation, and a reproducible build script so you can keep editing safely.
 
 ---
 
-## 4. Scenario map — which path a request takes
+## Try it
+
+slide-maker is an **Agent Skill** — it runs in Claude Code and other Agent-Skills-compatible runtimes. You don't run commands to use it; you just **ask**, and the skill takes over (starting with the interview).
+
+```bash
+# 1. Install (Claude Code path shown; any Agent-Skills runtime works)
+git clone https://github.com/dong845/slides_maker ~/.claude/skills/slide-maker
+
+# 2. One-time toolchain check (python-pptx, LibreOffice, matplotlib, …)
+bash ~/.claude/skills/slide-maker/scripts/check_env.sh
+```
+
+Then just ask your agent:
+
+> *"Make a 12-minute conference talk from paper.pdf."*
+> *"My deck is too dense — redesign it."*
+> *"A lecture on diffusion models, in 中文 — clean and diagram-heavy."*
+> *"Turn this repo into an investor pitch."*
+
+Your finished deck lands in `~/Downloads/<deck-name>/` — the `.pptx`, a `render/` of slide PNGs, and the build script that made it.
+
+---
+
+## Which path your request takes
 
 The interview (step 0, Q3 especially) routes the request:
 
@@ -77,19 +122,41 @@ The interview (step 0, Q3 especially) routes the request:
 
 ---
 
-## 5. File map
+## Design principles baked into the skill
+
+1. **Requirements over artifacts.** A template, an old deck, or the model's taste are *inputs*, not instructions. When they conflict with the stated requirement, the requirement wins.
+2. **Strict fidelity.** Every claim/number/figure traces to the source. The one exception is clearly-flagged forward-looking content.
+3. **Independent critique.** A separate agent judges the rendered pixels — its independence is what makes "consent" mean something.
+4. **Parallelize gathering, never understanding.** Fan out reading/asset-prep; one mind holds the through-line.
+5. **Purpose-fit design.** A defense, an exec readout, and a lecture should not look alike.
+6. **One language, held throughout.**
+7. **The script is the source of truth; the `.pptx` is an artifact.** Reproducible, and safe to iterate without losing the user's edits.
+
+---
+
+## Known limitations (we're honest about these)
+
+- **Text height is estimated, not measured.** python-pptx can't know rendered text height, so `bullet`/`callout` heights are scaled estimates — the render loop (step 5) is how overflow is caught. Always look at the PNGs.
+- **Animation can't be previewed statically.** Renders show the final built state only; the build *order* is verified in real PowerPoint and described to the user at hand-off.
+- **RTL scripts (Arabic/Hebrew)** are a known weak spot — no bidi reflow.
+- **Posters** are supported only minimally; the skill is tuned for talks.
+- **Fonts aren't embedded** (python-pptx limitation) — any non-standard/CJK font dependency is flagged at hand-off.
+
+---
+
+## Toolchain
+
+`python-pptx`, `pymupdf` (render), `matplotlib` + `Pillow` (equations/charts), and LibreOffice (`soffice`) for rendering. Run `bash scripts/check_env.sh` once on a new machine; it prints the exact fix for anything missing.
+
+<details>
+<summary><b>Repository map</b> (for contributors)</summary>
 
 **Spine**
 - `SKILL.md` — the operating instructions the model follows (steps 0–6, the rules).
 
 **Engine (`scripts/`)**
-- `deckkit.py` — the build kit: text/shape/component helpers (`bullet`, `callout`,
-  `chip`, `arrow`, `modbox`, `hrule`), equations (`eq_par`, `equation_png`),
-  `speaker_notes`, contrast check, palette/fonts (incl. CJK `EAFONT`), template reuse
-  (`open_template`, `content_slide`) and the no-template chrome (`blank_deck`,
-  `title_bar`, `footer`). Import it; don't re-derive primitives.
-- `render_deck.sh` — `.pptx` → one PNG per slide (LibreOffice → PDF → PNG). Cross-platform;
-  uses a private LibreOffice profile so parallel/coexisting renders don't collide.
+- `deckkit.py` — the build kit: text/shape/component helpers (`bullet`, `callout`, `chip`, `arrow`, `modbox`, `hrule`), equations (`eq_par`, `equation_png`), `speaker_notes`, contrast check, palette/fonts (incl. CJK `EAFONT`), template reuse (`open_template`, `content_slide`) and the no-template chrome (`blank_deck`, `title_bar`, `footer`). Import it; don't re-derive primitives.
+- `render_deck.sh` — `.pptx` → one PNG per slide (LibreOffice → PDF → PNG). Cross-platform; uses a private LibreOffice profile so parallel/coexisting renders don't collide.
 - `check_env.sh` — one-time preflight for the toolchain.
 - `anim.py` — injects PowerPoint build/animation timing XML python-pptx can't write.
 - `assemble.py` — combine parallel-authored section modules into one deck (no fragile merge).
@@ -104,51 +171,10 @@ The interview (step 0, Q3 especially) routes the request:
 - `references/design-principles.md` — the craft and the "why."
 
 **Per-scenario references**
-- `design-by-purpose.md` · `animation.md` · `multilingual.md` · `font-guidance.md` ·
-  `style-analysis.md` · `redesign-existing-deck.md` · `collaborative-mode.md` ·
-  `large-deck-orchestration.md` · `handoff-and-iteration.md`
+- `design-by-purpose.md` · `animation.md` · `multilingual.md` · `font-guidance.md` · `style-analysis.md` · `redesign-existing-deck.md` · `collaborative-mode.md` · `large-deck-orchestration.md` · `handoff-and-iteration.md`
 - `examples/` — worked build script, the shared-style + section-module convention.
 
 **External (not part of the skill)**
-- `~/.claude/slide-templates/` — the user's personal template registry; read for choices,
-  write new profiles to it. Empty for a new user.
+- `~/.claude/slide-templates/` — the user's personal template registry; read for choices, write new profiles to it. Empty for a new user.
 
----
-
-## 6. Design principles baked into the skill
-
-1. **Requirements over artifacts.** A template, an old deck, or the model's taste are
-   *inputs*, not instructions. When they conflict with the stated requirement, the
-   requirement wins.
-2. **Strict fidelity.** Every claim/number/figure traces to the source. The one exception
-   is clearly-flagged forward-looking content.
-3. **Independent critique.** A separate agent judges the rendered pixels — its
-   independence is what makes "consent" mean something.
-4. **Parallelize gathering, never understanding.** Fan out reading/asset-prep; one mind
-   holds the through-line.
-5. **Purpose-fit design.** A defense, an exec readout, and a lecture should not look alike.
-6. **One language, held throughout.**
-7. **The script is the source of truth; the `.pptx` is an artifact.** Reproducible, and
-   safe to iterate without losing the user's edits.
-
----
-
-## 7. Known limitations (be honest about these)
-
-- **Text height is estimated, not measured.** python-pptx can't know rendered text height,
-  so `bullet`/`callout` heights are scaled estimates — the render loop (step 5) is how
-  overflow is caught. Always look at the PNGs.
-- **Animation can't be previewed statically.** Renders show the final built state only;
-  the build *order* is verified in real PowerPoint and described to the user at hand-off.
-- **RTL scripts (Arabic/Hebrew)** are a known weak spot — no bidi reflow.
-- **Posters** are supported only minimally; the skill is tuned for talks.
-- **Fonts aren't embedded** (python-pptx limitation) — flag any non-standard/CJK font
-  dependency at hand-off.
-
----
-
-## 8. Toolchain
-
-`python-pptx`, `pymupdf` (render), `matplotlib` + `Pillow` (equations/charts), and
-LibreOffice (`soffice`) for rendering. Run `bash scripts/check_env.sh` once on a new
-machine; it prints the exact fix for anything missing.
+</details>
