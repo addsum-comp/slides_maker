@@ -32,6 +32,7 @@ Three quiet disciplines separate it from the usual ways of making slides:
 |---|:--:|:--:|:--:|:--:|
 | Asks your goal & audience *before* building | ✗ | ~ | ✓ | **✓** |
 | Stays faithful to your source — no invented numbers | ~ | ~ | ✓ | **✓** |
+| Uses your source's own figures — auto-cropped from the PDF, not redrawn | ✗ | ✗ | ~ | **✓** |
 | Independent critic checks the **rendered** slides | ✗ | ✗ | ✗ | **✓** |
 | Design tuned to the *purpose* (defense ≠ pitch ≠ lecture) | ~ | ~ | ✓ | **✓** |
 | Real, editable `.pptx` you own — no lock-in | ~ | ~ | ✓ | **✓** |
@@ -55,7 +56,7 @@ Every deck flows through seven steps (`SKILL.md` is the authoritative spec):
 | **1 — Understand** | Read all source deeply; write a **comprehension brief** (one-sentence message, contributions, method essence, what each figure/table is *for*, limitations). | A deck that looks right but misreads the work fools no expert. Faithfulness starts here. |
 | **2 — Canvas** | Decide output folder (`~/Downloads/<deck>/`), load template *or* design a purpose-fit look; set palette/fonts (incl. CJK `EAFONT`). | Branding lives on layouts; design should signal the right *kind* of document before a word is read. |
 | **3 — Plan** | Slide count scales to the time budget (~1/min): short talk ~6–9, longer talk/lecture/defense/job-talk ~10–20+. One idea each, takeaway-first, arc shaped to the purpose; ~15+ → section fan-out (step 4). | Cheap to fix an outline; expensive to fix a finished deck. |
-| **4 — Build** | One build script using `deckkit` helpers. Whole source figures, gutters, rotating accents, real equations, one language, optional builds/animation, speaker notes. | python-pptx is fast; one script run, one coherent author. |
+| **4 — Build** | One build script using `deckkit` helpers. Whole source figures, gutters, rotating accents, real equations, one language, purposeful builds/animation (a default pass), speaker notes. | python-pptx is fast; one script run, one coherent author. |
 | **5 — Render + critic loop** | Render to PNGs and *look*; then an **independent critic subagent** returns JSON (consent / revise + per-slide fixes). Loop until consent. | python-pptx writes blind — overflow/contrast/glyph bugs only show in pixels. You are not the judge of your own work. |
 | **6 — Hand off + iterate** | Show the user, give the folder path, explain editability + the two change-lanes, fold in feedback. | The deck is theirs to own and keep tweaking — safely. |
 
@@ -71,12 +72,13 @@ Every deck flows through seven steps (`SKILL.md` is the authoritative spec):
 ## What it can do
 
 - **Build from anything — or nothing.** A paper, codebase, doc, or existing slides → a deck. No material? It drafts from expertise and **web-searches to ground and fact-check** every claim.
+- **Uses your real figures, precisely.** It pulls the source's own figures **straight from the paper/PDF** — auto-detected by caption and cropped to the figure's true extent (legend and axes intact), shown *whole* rather than redrawn or chopped. Dense comparison grids can be reassembled to just the columns that matter; suspect crops are flagged for a look.
 - **Redesign your existing deck.** It diagnoses first, confirms scope, then rebuilds reusing your content and figures — never a silent ground-up replacement.
 - **Match a look you like.** Hand it an example and it reproduces the *style* — grid, palette, typography, motifs — in its own build.
 - **Speak your audience's language.** Any language, held consistently throughout, with proper **CJK typography** and real **LaTeX-quality equations**.
 - **Respect the venue.** For a conference talk it identifies and researches the venue — format, aspect ratio, official template, audience — before building.
 - **Scale to big decks.** 15+ slides → optional section fan-out with a shared style, parallel authoring, and a critic panel.
-- **Hand off cleanly.** A self-contained folder, speaker notes, optional animation, and a reproducible build script so you can keep editing safely.
+- **Hand off cleanly.** A self-contained folder, speaker notes, purposeful animation, and a reproducible build script so you can keep editing safely.
 
 ---
 
@@ -136,7 +138,7 @@ The interview (step 0, Q3 especially) routes the request:
 
 ## Toolchain
 
-`python-pptx`, `pymupdf` (render), `matplotlib` + `Pillow` (equations/charts), and LibreOffice (`soffice`) for rendering. Run `bash scripts/check_env.sh` once on a new machine; it prints the exact fix for anything missing.
+`python-pptx`, `pymupdf` (render + figure extraction), `matplotlib` + `Pillow` (equations/charts/figure cropping), and LibreOffice (`soffice`) for rendering. Run `bash scripts/check_env.sh` once on a new machine; it prints the exact fix for anything missing.
 
 <details>
 <summary><b>Repository map</b> (for contributors)</summary>
@@ -152,6 +154,8 @@ The interview (step 0, Q3 especially) routes the request:
 - `assemble.py` — combine parallel-authored section modules into one deck (no fragile merge).
 - `archetypes.py` — build the same preview slides per direction for the collaborative gate.
 - `inspect_template.py` — print a template's layouts/placeholders/logos.
+- `extract_pdf.py` — pull a figure *out* of a source PDF: `figures`/`figure`/`autofig` **auto-detect and crop figures precisely from the paper** (caption-anchored + snap-to-content, with validity checks), plus manual page/region/embedded-image extraction.
+- `crop_helper.py` — operate on an image *by looking, not guessing*: `grid` (ruler overlay), `crop`/`--snap`, `trim` (snap-to-content; removes background without clipping a legend/axis, light or dark bg), `panel` (reassemble chosen columns/rows of a dense comparison grid).
 - `extract_deck.py` — pull text/tables/figures *out* of an existing deck (redesign + reconcile).
 - `export_notes.py` — export a deck's speaker notes to a plain-text rehearsal script.
 

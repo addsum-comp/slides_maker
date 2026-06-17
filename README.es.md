@@ -32,6 +32,7 @@ Tres disciplinas discretas la separan de las formas habituales de hacer diaposit
 |---|:--:|:--:|:--:|:--:|
 | Pregunta tu objetivo y tu audiencia *antes* de construir | ✗ | ~ | ✓ | **✓** |
 | Se mantiene fiel a tu fuente — sin cifras inventadas | ~ | ~ | ✓ | **✓** |
+| Usa las propias figuras de tu fuente — recortadas automáticamente del PDF, no redibujadas | ✗ | ✗ | ~ | **✓** |
 | Un crítico independiente revisa las diapositivas **renderizadas** | ✗ | ✗ | ✗ | **✓** |
 | Diseño ajustado al *propósito* (defensa ≠ pitch ≠ clase) | ~ | ~ | ✓ | **✓** |
 | Un `.pptx` real y editable que te pertenece — sin ataduras | ~ | ~ | ✓ | **✓** |
@@ -55,7 +56,7 @@ Cada presentación recorre siete pasos (`SKILL.md` es la especificación de refe
 | **1 — Comprender** | Lee todo el material a fondo; redacta un **resumen de comprensión** (mensaje en una frase, aportaciones, esencia del método, para qué sirve cada figura/tabla, limitaciones). | Una presentación que se ve bien pero malinterpreta el trabajo no engaña a ningún experto. La fidelidad empieza aquí. |
 | **2 — Lienzo** | Decide la carpeta de salida (`~/Downloads/<deck>/`), carga la plantilla *o* diseña un aspecto adecuado al propósito; fija paleta/fuentes (incl. CJK `EAFONT`). | La identidad de marca vive en los diseños; el diseño debe señalar el *tipo* de documento correcto antes de leer una sola palabra. |
 | **3 — Planificar** | El número de diapositivas se ajusta al tiempo disponible (~1/min): charla corta ~6–9, charla más larga/clase/defensa/job-talk ~10–20+. Una idea por diapositiva, con la conclusión primero, y un arco moldeado al propósito; ~15+ → despliegue por secciones (paso 4). | Corregir un guion es barato; corregir una presentación terminada es caro. |
-| **4 — Construir** | Un único script de construcción con los ayudantes de `deckkit`. Figuras de origen completas, márgenes, acentos rotativos, ecuaciones reales, un solo idioma, builds/animación opcionales, notas del orador. | python-pptx es rápido; una sola ejecución del script, un autor coherente. |
+| **4 — Construir** | Un único script de construcción con los ayudantes de `deckkit`. Figuras de origen completas, márgenes, acentos rotativos, ecuaciones reales, un solo idioma, builds/animación con propósito (una pasada por defecto), notas del orador. | python-pptx es rápido; una sola ejecución del script, un autor coherente. |
 | **5 — Renderizar + bucle del crítico** | Renderiza a PNGs y *mira*; luego un **subagente crítico independiente** devuelve JSON (consentimiento / revisar + correcciones por diapositiva). Repite hasta obtener el consentimiento. | python-pptx escribe a ciegas — los errores de desbordamiento/contraste/glifos solo se ven en los píxeles. Tú no juzgas tu propio trabajo. |
 | **6 — Entregar + iterar** | Muestra el resultado al usuario, le da la ruta de la carpeta, le explica la editabilidad + los dos carriles de cambios e incorpora su feedback. | La presentación es suya, para conservarla y seguir ajustándola — con seguridad. |
 
@@ -71,12 +72,13 @@ Cada presentación recorre siete pasos (`SKILL.md` es la especificación de refe
 ## Lo que puede hacer
 
 - **Construir a partir de cualquier cosa — o de nada.** Un artículo, un código base, un documento o diapositivas existentes → una presentación. ¿No tienes material? Redacta a partir de su experiencia y **busca en la web para fundamentar y verificar** cada afirmación.
+- **Usa tus figuras reales, con precisión.** Extrae las propias figuras de la fuente **directamente del artículo/PDF** — detectadas automáticamente por el pie de figura y recortadas a la extensión real de la figura (leyenda y ejes intactos), mostradas *enteras* en lugar de redibujadas o cortadas. Las cuadrículas de comparación densas pueden reensamblarse para mostrar solo las columnas que importan; los recortes dudosos se señalan para que les eches un vistazo.
 - **Rediseñar tu presentación actual.** Primero diagnostica, confirma el alcance y luego reconstruye reutilizando tu contenido y tus figuras — nunca un reemplazo silencioso desde cero.
 - **Reproducir un aspecto que te guste.** Pásale un ejemplo y reproduce el *estilo* — retícula, paleta, tipografía, motivos — en su propia construcción.
 - **Hablar el idioma de tu audiencia.** Cualquier idioma, mantenido con coherencia de principio a fin, con **tipografía CJK** correcta y **ecuaciones reales con calidad LaTeX**.
 - **Respetar la sede.** Para una charla de conferencia, identifica e investiga la sede — formato, relación de aspecto, plantilla oficial, audiencia — antes de construir.
 - **Escalar a presentaciones grandes.** Más de 15 diapositivas → despliegue opcional por secciones con un estilo compartido, autoría en paralelo y un panel de críticos.
-- **Entregar de forma limpia.** Una carpeta autocontenida, notas del orador, animación opcional y un script de construcción reproducible para que puedas seguir editando con seguridad.
+- **Entregar de forma limpia.** Una carpeta autocontenida, notas del orador, animación con propósito y un script de construcción reproducible para que puedas seguir editando con seguridad.
 
 ---
 
@@ -136,7 +138,7 @@ La entrevista (paso 0, especialmente la P3) encamina la solicitud:
 
 ## Cadena de herramientas
 
-`python-pptx`, `pymupdf` (renderizado), `matplotlib` + `Pillow` (ecuaciones/gráficos) y LibreOffice (`soffice`) para el renderizado. Ejecuta `bash scripts/check_env.sh` una vez en una máquina nueva; imprime la corrección exacta para cualquier cosa que falte.
+`python-pptx`, `pymupdf` (renderizado + extracción de figuras), `matplotlib` + `Pillow` (ecuaciones/gráficos/recorte de figuras) y LibreOffice (`soffice`) para el renderizado. Ejecuta `bash scripts/check_env.sh` una vez en una máquina nueva; imprime la corrección exacta para cualquier cosa que falte.
 
 <details>
 <summary><b>Mapa del repositorio</b> (para colaboradores)</summary>
@@ -152,6 +154,8 @@ La entrevista (paso 0, especialmente la P3) encamina la solicitud:
 - `assemble.py` — combina módulos de sección creados en paralelo en una sola presentación (sin fusiones frágiles).
 - `archetypes.py` — construye las mismas diapositivas de previsualización por dirección para el punto de aprobación colaborativo.
 - `inspect_template.py` — imprime los diseños/marcadores de posición/logos de una plantilla.
+- `extract_pdf.py` — detecta y recorta figuras con precisión *de* un PDF de origen: `figures`/`figure`/`autofig` **detectan y recortan automáticamente las figuras del artículo** (ancladas al pie de figura + ajuste al contenido, con comprobaciones de validez), además de la extracción manual por página/región/imagen incrustada.
+- `crop_helper.py` — opera sobre una imagen *mirando, no adivinando*: `grid` (superposición de regla), `crop`/`--snap`, `trim` (ajuste al contenido; elimina el fondo sin recortar una leyenda/eje, con fondo claro u oscuro), `panel` (reensambla las columnas/filas elegidas de una cuadrícula de comparación densa).
 - `extract_deck.py` — extrae texto/tablas/figuras *de* una presentación existente (rediseño + reconciliación).
 - `export_notes.py` — exporta las notas del orador de una presentación a un guion de ensayo en texto plano.
 
