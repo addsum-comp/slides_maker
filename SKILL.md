@@ -591,13 +591,17 @@ Then run the **actor-critic loop** — this is the quality engine, and the criti
        **panel of 2–3 critics in parallel with different lenses** (content/accuracy,
        design/layout, back-of-room audience), then **merge and de-dup** their findings —
        independent reviewers catch far more than one, in parallel at no extra
-       wall-clock. For a **large/sectioned deck**, add **per-section critics plus one
+       wall-clock. **Scale the panel *within* high-stakes by length & scope, not just
+       purpose:** a short single-paper talk (e.g. a ~10-min conference oral) takes the
+       **light** end — 2 critics, and **skip the arbiter pass** below; a long, career-
+       defining deck (a 45-min job talk, thesis defense, or investor pitch) earns the
+       **full** 2–3-critic panel **plus** that arbiter cross-validation. For a **large/sectioned deck**, add **per-section critics plus one
        whole-deck critic for coherence/arc/seams**, then — after the arbiter pass below —
        **route only the *promoted* findings** back to the section that owns each slide
        (see `references/large-deck-orchestration.md`). Keep
        every critic **independent** — it judges the rendered pixels, it doesn't
        co-design; that independence is what makes consent mean something.
-     - **Then cross-validate the findings before acting on them (high-stakes).** A
+     - **Then cross-validate the findings before acting on them (full-panel decks above).** A
        merged panel is still a *union* of opinions: a critic can flag a number as wrong
        when it's right, or demand a change that would crowd a slide already at its
        legibility floor — and merging alone acts on that blindly. So add **one parallel
