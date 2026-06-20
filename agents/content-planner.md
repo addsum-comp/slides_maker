@@ -135,10 +135,10 @@ concrete pattern and the balance:
   spaced** (derive from a grid: `columns` for a row, `rows` for a vertical stack; don't
   eyeball). Centre any lone glyph/icon in its box.
 - **Image fit (per slide).** For every slide with an image, state the **`fit`**: `contain`
-  whenever the image's subject or all its parts must stay whole (a full rocket, a multi-object
-  scene, a figure); `cover` only for edge-tolerant texture/atmosphere. Never plan a `cover`
-  crop that would slice the subject — if a frame's shape fights the subject, plan to shrink it
-  or generate at that aspect ratio.
+  whenever the image's subject or all its parts must stay whole (a whole object, a
+  multi-element scene, a figure); `cover` only for edge-tolerant texture/atmosphere. Never plan
+  a `cover` crop that would slice the subject — if a frame's shape fights the subject, plan to
+  shrink it or generate at that aspect ratio.
 - Follow `design-principles.md` for the craft and `design-by-purpose.md` for the look the
   purpose calls for (crisp/corporate status update, sober/formal defense, bold/on-brand
   pitch, warm/clear lecture). The deck should *signal the right kind of document* before a
@@ -167,8 +167,13 @@ not by counting:
   generated image where evidence belongs (source figures, data charts, screenshots, logos,
   anything traceable stays real). **When a plate has a subject, plan it so the subject stays
   whole** — note the `fit` (usually `contain`) and prompt for the subject centred with margin
-  so a crop can't cut it (a rocket reduced to its tail, planets shown as slivers = the failure
-  to avoid). See `image-generation.md`.
+  so a crop can't cut it (the subject reduced to a sliver = the failure to avoid). **For real,
+  known subjects, note the facts the generator gets wrong** — relative sizes/proportions (when
+  real objects appear together, draw them to scale), count, colour, arrangement — so the prompt
+  can state them and the result be verified; if that factual relationship *is* the point of
+  the visual, a prompted-and-verified generated plate is fine, or **draw it natively** (deckkit
+  shapes / a chart) for guaranteed control — just never plan to ship an unverified one. See
+  `image-generation.md`.
 - **Image style is part of the design — derive it from purpose + topic.** Decide **one
   coherent art-direction for the whole deck** (palette, medium, mood, level of realism,
   motif, where to leave calm space for text) that fits *this* purpose and subject — e.g. a

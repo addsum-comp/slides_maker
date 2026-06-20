@@ -86,9 +86,9 @@ Prefer real or deterministic assets instead when the visual carries evidence:
 the overflow; `fit="contain"` shows the whole image, letterboxed. The deciding question is
 whether the image has a **subject the slide depends on**:
 - **`fit="contain"`** whenever the subject — or all its parts — must stay fully visible: a
-  rocket that should read as a whole rocket, a scene of several objects (e.g. Earth + Moon +
-  Mars that must each show completely), a figure or screenshot whose edges matter. `cover`
-  would slice the subject (a rocket reduced to its tail, planets shown as slivers).
+  object that must read as a whole, a scene of several items that must each show completely, a
+  figure or screenshot whose edges matter. `cover` would slice the subject (leaving only part
+  of the object in frame).
 - **`fit="cover"`** only for edge-tolerant **texture, atmosphere, or backgrounds** where any
   crop is fine and there's no single subject to lose.
 - If `contain` letterboxes too much, **shrink/zoom the placement or regenerate the plate at
@@ -124,6 +124,30 @@ would be generated without calling the API.
 
 Do not paste API keys into prompts, slide text, source files, or manifests. Keep the key in
 the environment (`OPENAI_API_KEY`) or the user's normal secret manager.
+
+## Real subjects must be factually right
+
+A generated image of **real, known things** must not be visibly *wrong*, even when it's
+"only decorative" — a teaching/explainer audience spots it instantly and it costs you
+credibility. Image models don't know real-world facts, so **state the ones that matter in
+the prompt and verify them in the render**:
+
+- **Relative size / proportion** — the classic failure. Two objects drawn the same size when
+  one is much bigger (a person as tall as a building; a phone the size of a laptop; a car drawn
+  the size of the truck beside it). Spell out the ratios in the prompt
+  (e.g. "A is about half the height of B").
+- **Count, colour, and arrangement** — the right number of items, the right colours for known
+  things, the right spatial order.
+- **Recognisable shape** — a real object should read as itself, not a mangled lookalike.
+
+A **carefully prompted + verified** generated image often gets it right — spell out the
+ratios, generate, then *measure/eyeball the result* and re-roll if it's wrong; a faithful
+generated plate keeps the richer textured look. **Only if it still won't comply after a try
+or two** — relative sizes are the usual offender — **draw it natively instead** (deckkit
+ovals/shapes at correct proportions, a matplotlib plot, real data): "compute/draw the real
+artifact" never fights the generator and gives exact control over sizes *and* label
+alignment. Either is fine when the factual relationship *is* the point — generated-and-verified
+for richness, native for guaranteed control; just never ship the unverified, wrong one.
 
 ## Prompt rules
 

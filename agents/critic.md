@@ -117,14 +117,23 @@ Do not just skim for the first few obvious issues. Run these passes:
      gap or arrow visibly longer than the next). Both read as careless — check arrow direction
      matches the layout and that gaps are even.
    - **A single glyph/icon off-centre** in its box (a "?", number, or mark sitting low or to
-     one side instead of optically centred).
+     one side instead of optically centred). On a **CJK deck**, an off-centre large mark is
+     usually a *full-width* punctuation glyph (`？！。`), which sits left-of-centre in its
+     advance — the fix is the **ASCII** form, not re-centring (see `multilingual.md`).
    - **Title accent crowded:** a subtitle/definition line jammed against the title's accent
      rule with no breathing gap.
    - **Image crops the subject:** a placed image (generated OR source) whose key subject is
-     sliced by the frame — a rocket reduced to its tail, planets shown as slivers, an object
-     cut at the edge. A `cover`-fit plate that loses its subject, or any image showing only
-     part of what it's meant to show, is a real finding — the fix is `contain`/shrink/regenerate,
-     not leaving it cropped. (This is easy to miss; look for it on every image slide.)
+     sliced by the frame — a figure, product, person, chart, or object cut off so only part of
+     it shows. A `cover`-fit plate that loses its subject, or any image showing only part of
+     what it's meant to show, is a real finding — the fix is `contain`/shrink/regenerate, not
+     leaving it cropped. (This is easy to miss; look for it on every image slide, any domain.)
+   - **Generated image is factually wrong about a real subject:** a generated plate of real,
+     known things that gets a *visible fact* wrong — wrong **relative sizes/proportions** (two
+     things drawn the wrong size relative to each other, e.g. a person as tall as a building),
+     wrong count, wrong colour, or an impossible arrangement. Obvious to a knowledgeable
+     audience; flag it even on a "decorative" plate — the fix is to specify the fact in the
+     prompt or **draw it natively** at correct proportions. Also flag a **label not aligned
+     under the image feature** it names (a caption sitting away from the part it points to).
    - **Text alignment inside filled boxes:** text in a callout / chip / takeaway bar / table
      cell should sit **optically centred** in its box (or intentionally aligned) — text that
      hugs the bottom or top edge, or sits a few px below the vertical middle, reads as a

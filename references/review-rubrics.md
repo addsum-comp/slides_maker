@@ -74,11 +74,18 @@ Score each dimension; cite specific slides.
    point the way the flow moves (a *sideways* arrow between vertically-stacked boxes is wrong),
    and are repeated blocks/connectors **evenly spaced** (no gap or arrow longer than its
    peers)? On **image slides**, is the key subject **whole and uncropped** — not sliced by the
-   frame (a rocket reduced to its tail, planets shown as slivers, an object cut at the edge)?
+   frame (a figure, product, person, or object cut off so only part of it shows)?
    A `cover`-fit plate that loses its subject is a real finding (fix: `contain`/shrink/regenerate).
+   And is a **generated image of real things factually right** — correct **relative
+   sizes/proportions** (real objects drawn to scale relative to each other), count, colour,
+   and arrangement —
+   with any **labels aligned under the feature** they name? A visibly wrong fact in a
+   generated plate is a real finding even when it's "decorative" (fix: prompt the fact or draw
+   it natively).
    Is text inside filled boxes (callouts, chips, takeaway bars, cells) **optically
    centred**, not hugging an edge or sitting a touch low — **including a lone glyph or icon**
-   (a "?", a number, a mark), which must sit dead-centre in its box, not top-left or low?
+   (a "?", a number, a mark), which must sit dead-centre in its box, not top-left or low? (On a
+   CJK deck an off-centre large mark is usually full-width punctuation — the fix is the ASCII form.)
    Does a **subtitle / definition line under the title** leave a clear gap below the accent
    rule rather than jamming against it? Does colour vary with intent,
    or is everything one monotone accent? Is the closing slide named for its purpose

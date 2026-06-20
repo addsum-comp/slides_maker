@@ -110,6 +110,10 @@ as much as the words on it. Design is not optional polish; it is half the job.
   mark) inside a box must be *optically centred*: give the textbox the **same x/y/w/h as the
   box**, `anchor=MIDDLE`, `align=CENTER` — and then **check the render**, since a single glyph
   off-centre is obvious. Don't offset the textbox or rely on default top-left placement.
+  **Gotcha — full-width CJK punctuation won't centre as a standalone glyph.** A full-width
+  mark (`？！。：`) renders left-of-centre *within its own advance*, so even with `align=CENTER`
+  it looks pushed left. For a lone large mark use the **ASCII** form (`?`, `!`) so it centres;
+  full-width punctuation is correct only *inside running CJK text*, not as a centred single glyph.
 - **Even bullet rhythm needs a consistent line count.** A list looks evenly spaced only
   when every item occupies the *same* number of lines. The moment one item wraps to two
   lines, it claims an extra line-height of vertical space, so the gap before the *next* item
@@ -153,15 +157,24 @@ as much as the words on it. Design is not optional polish; it is half the job.
   gap** rather than eyeballing positions.
 - **Image `fit`: never crop the subject out.** `fit="cover"` fills a frame by cropping the
   overflow — fine for edge-tolerant texture, atmosphere, or backgrounds, but it will happily
-  slice off the very thing the image is *about* (a rocket reduced to its tail; planets shown
-  only as slivers). Use **`fit="contain"` whenever the image's subject — or all its parts —
-  must stay fully visible**: a figure, a whole object, a multi-element scene (several planets,
-  a full rocket), anything whose meaning needs the whole. If `contain` letterboxes too much,
+  slice off the very thing the image is *about* (the subject cut down to a sliver; a key
+  object left out of frame). Use **`fit="contain"` whenever the image's subject — or all its
+  parts — must stay fully visible**: a figure, a whole object, a product shot, a multi-element
+  scene (several items that must each show), anything whose meaning needs the whole. If
+  `contain` letterboxes too much,
   **shrink/zoom the placement or regenerate at the frame's aspect ratio** — never switch to
   `cover` and crop the subject away. **After placing *any* image (generated or source),
   re-view the slide and confirm the key subject isn't cut off** — the same look-after-you-place
   rule used for cropped figures, applied to every `picture()`. A full-bleed `cover` plate is
   only safe when its subject sits well inside the central safe area.
+- **Align labels under the image feature they describe.** When captions/labels annotate parts
+  of an image (items in a row, regions of a diagram, stages of a process, parts of a product),
+  put each label *directly under (or beside) the thing it names* — a label far from the part it
+  points to reads as disconnected. Measure the feature's position in the placed image and centre
+  the label on it.
+  If the features are **bunched** so labels would collide, **spread them** — place (or
+  regenerate) the image wider/at the band's aspect so each feature has room for its label —
+  rather than cramming labels under a clump.
 - **Let the hero breathe.** When a figure *is* the point of the slide (results, an
   ablation, an architecture), give it the slide — enlarge it and reduce competing
   text to one caption + one takeaway, rather than shrinking it to make room for

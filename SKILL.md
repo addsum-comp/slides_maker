@@ -593,7 +593,7 @@ A few rules that matter (see `references/design-principles.md`):
   eyeballing. Centre a lone glyph/icon (a "?", a number) with the textbox at the box's exact
   rect, `anchor=MIDDLE`, `align=CENTER`.
 - **Image `fit` — never crop the subject out.** Use `picture(..., fit="contain")` whenever the
-  image's subject or all its parts must stay visible (a whole rocket, a multi-object scene, a
+  image's subject or all its parts must stay visible (a whole object, a multi-element scene, a
   figure); reserve `fit="cover"` for edge-tolerant texture/atmosphere only. If `contain`
   letterboxes too much, shrink/zoom or regenerate at the frame's aspect ratio — don't crop the
   subject with `cover`. After placing *any* image, re-view the slide and confirm the subject
@@ -677,6 +677,22 @@ slide). python-pptx writes blind — overflow, low contrast, a callout on the fo
 or a missing glyph only show up in the image. Fix mechanical issues and re-render.
 (First time on a machine, or a render errors? `bash scripts/check_env.sh` verifies
 LibreOffice + the python deps and prints the fix for anything missing.)
+
+**Render self-check — scan EVERY slide for these before handing to the critic** (they're
+invisible in the build code and only appear in the pixels; catching them yourself saves a
+critic round — full rationale in `references/design-principles.md`):
+- **Overflow / contrast / footer / glyphs** — no clipped or spilling text, ≥4.5:1 contrast,
+  nothing jammed on the footer, no tofu/missing glyphs.
+- **Balance** — split panels and their flanking margins equal; repeated blocks/connectors
+  evenly spaced; elements aligned to a grid, nothing lopsided.
+- **Diagrams** — arrows point the way the flow moves (down/up between stacked boxes); a lone
+  glyph/icon optically centred (ASCII, not full-width, for a centred mark on a CJK deck).
+- **Titles** — a subtitle/definition line has a clear gap below the title's accent rule.
+- **Images** — the key **subject is whole, not cropped** (`contain` vs `cover`); a generated
+  image of real things is **factually right** (relative size/proportion, count, colour); any
+  **labels sit under the feature** they name.
+- **Motion & images by taste** — what's there earns its place (emphasises/engages/guides),
+  nothing thoughtless; what's plain is fine.
 **On native Windows (PowerShell / cmd) there is no bash — call the Python entry points
 directly: `python scripts\render_deck.py <deck.pptx>` and `python scripts\check_env.py`.**
 The `.sh` files are just shims that forward to those `.py` scripts, so macOS / Linux /

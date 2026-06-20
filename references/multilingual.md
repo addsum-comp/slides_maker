@@ -69,7 +69,10 @@ and tell the user which font the deck expects.
 - **No true italic.** CJK fonts fake italic by slanting — it looks wrong. Emphasize with
   **weight, colour, or size**, never italic, for CJK runs. (Latin runs can still italic.)
 - **Full-width punctuation.** Use 。，、：；（）「」 — don't add Latin spaces around them,
-  and don't end CJK sentences with a Latin period.
+  and don't end CJK sentences with a Latin period. **But for a lone, centred large mark** (a
+  "?" in a box, a standalone "!"), use the **ASCII** form: a full-width `？！` sits
+  left-of-centre within its advance and won't optically centre. Full-width is for *running*
+  CJK text, not a centred single glyph.
 - **Line-breaking.** CJK wraps at any character (no spaces needed) — fine, but give text
   boxes a little more room and consider `line_spacing` ~1.1–1.2; dense CJK at tight
   leading is hard to read.
