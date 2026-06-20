@@ -669,7 +669,8 @@ def table(slide, x, y, w, rows, col_w=None, header=True, highlight=None,
 
     NOTE: keep cells terse — it's a slide, not a spreadsheet. A cell long enough to wrap
     past `row_h` will grow the row, so verify the render. For a *trend*, prefer a chart
-    (`equation_png`/matplotlib or the paper-figures skill); a table is for exact values."""
+    (`equation_png`/matplotlib or a dedicated figure-making workflow, if available);
+    a table is for exact values."""
     ncol = max(len(r) for r in rows)
     nrow = len(rows)
     col_w = col_w or [w / ncol] * ncol
@@ -848,9 +849,21 @@ def add_slide(prs):
     return prs.slides.add_slide(prs.slide_layouts[6])
 
 
-def title_bar(slide, title, kicker="", accent=MAGENTA, title_c=DEEP, w_in=10.0):
+def _slide_size(slide):
+    """Return the slide's real width/height in inches."""
+    prs = slide.part.package.presentation_part.presentation
+    return prs.slide_width / 914400, prs.slide_height / 914400
+
+
+def title_bar(slide, title, kicker="", accent=MAGENTA, title_c=DEEP, w_in=None):
     """Lightweight slide chrome for the no-template branch: optional kicker, title,
-    and a short accent rule. Pair with footer()."""
+    and a short accent rule. Pair with footer().
+
+    By default this reads the actual deck width from ``slide`` so it works on
+    widescreen templates, custom ``blank_deck(w_in, h_in)`` sizes, and posters.
+    Pass ``w_in`` only when deliberately overriding that geometry."""
+    if w_in is None:
+        w_in, _ = _slide_size(slide)
     if kicker:
         text(slide, 0.55, 0.30, w_in - 1.1, 0.3, [[(kicker.upper(), 11, BLUE, True, False)]], space_after=0)
         ty = 0.54
@@ -860,8 +873,15 @@ def title_bar(slide, title, kicker="", accent=MAGENTA, title_c=DEEP, w_in=10.0):
     box(slide, 0.57, ty + 0.62, 1.1, 0.045, fill=accent)
 
 
-def footer(slide, tag="", page=None, w_in=10.0, h_in=5.625):
-    """Footer tag (left) + optional page number (right) for the no-template branch."""
+def footer(slide, tag="", page=None, w_in=None, h_in=None):
+    """Footer tag (left) + optional page number (right) for the no-template branch.
+
+    Defaults to the actual deck size, so custom-sized decks don't end up with a
+    page number stranded at the old 10x5.625 coordinate."""
+    if w_in is None or h_in is None:
+        sw, sh = _slide_size(slide)
+        w_in = sw if w_in is None else w_in
+        h_in = sh if h_in is None else h_in
     if tag:
         text(slide, 0.55, h_in - 0.35, 6.0, 0.3, [[(tag, 8, MUTE, False, False)]], space_after=0)
     if page is not None:

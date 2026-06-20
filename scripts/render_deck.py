@@ -74,6 +74,13 @@ def die(msg, code=1):
     sys.exit(code)
 
 
+def _tail(text, limit=4000):
+    text = (text or "").strip()
+    if len(text) <= limit:
+        return text
+    return "...<truncated>...\n" + text[-limit:]
+
+
 def main(argv):
     if not argv:
         die("usage: python render_deck.py /path/to/deck.pptx [out_dir]")
@@ -111,13 +118,28 @@ def main(argv):
             "-env:UserInstallation=" + Path(profile).as_uri(),
             "--headless", "--convert-to", "pdf", "--outdir", out, pptx,
         ]
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     finally:
         shutil.rmtree(profile, ignore_errors=True)
 
     pdf = os.path.join(out, os.path.splitext(os.path.basename(pptx))[0] + ".pdf")
     if not os.path.isfile(pdf):
-        die("LibreOffice produced no PDF from {} — close any open copy and check the file.".format(pptx))
+        detail = [
+            "LibreOffice produced no PDF from {}.".format(pptx),
+            "Command: " + " ".join(cmd),
+            "Exit code: {}".format(result.returncode),
+        ]
+        stdout = _tail(result.stdout)
+        stderr = _tail(result.stderr)
+        if stdout:
+            detail.append("stdout:\n" + stdout)
+        if stderr:
+            detail.append("stderr:\n" + stderr)
+        detail.append(
+            "Check that the file opens, close any open copy, and in sandboxed runtimes "
+            "rerun the render with the permissions needed for LibreOffice."
+        )
+        die("\n".join(detail))
 
     try:
         import fitz  # pymupdf

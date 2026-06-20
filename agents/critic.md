@@ -32,9 +32,10 @@ something.
 - The **motion manifest** (usually provided): one line per slide — `build: <reveals>` or
   `static: <why>`, plus whether the deck-wide transition is on. Use it to judge whether
   motion was *designed*, since you can't watch it. **Motion is a required design pass, so do
-  check it** (rubric dimension "Motion & pacing"): flag (deck-level) if the manifest is
-  **absent or shows no purposeful motion at all** (no builds anywhere *and* no deck-wide
-  transition, with no stated reason) — that usually means nobody considered pacing. And per
+  check it** (rubric dimension "Motion & pacing"): flag a deck-level process issue if the
+  manifest is **absent**, or if it shows no builds and no deck-wide transition **with no
+  stated reason**. Do **not** flag an intentionally plain/static deck just because it has no
+  motion; the question is whether the choice was made thoughtfully. And per
   slide, flag a clear **build-candidate you can see in the pixels** — a multi-stage
   pipeline/diagram, a multi-part argument, or an evidence→takeaway slide — that the manifest
   marks `static` with no good reason, suggesting it would land better revealed step by step.

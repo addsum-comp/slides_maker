@@ -514,9 +514,9 @@ A few rules that matter (see `references/design-principles.md`):
 - **Data but no figure yet → make the chart, don't dump numbers.** If the source gives
   raw data (a CSV, a metrics table, logged numbers) but no plot, turn it into the chart
   that makes the comparison obvious rather than typing a wall of figures — generate it
-  with matplotlib, or for a publication-grade plot/table hand it to the **`paper-figures`**
-  sibling skill — then place the result *whole*, with a legend + takeaway, like any other
-  figure. A bare number table is the weakest way to show a trend.
+  with matplotlib or another available figure-making workflow — then place the result
+  *whole*, with a legend + takeaway, like any other figure. A bare number table is the
+  weakest way to show a trend.
 - **Concept needs a domain image → show the real thing, not an abstract icon.** When an
   idea has a concrete visual — a real data sample, a signal/waveform, a chart of the
   actual numbers, a map, a microscopy/medical-image patch, a sample UI, or a *transformed*
