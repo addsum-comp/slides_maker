@@ -32,7 +32,7 @@ Three quiet disciplines separate it from the usual ways of making slides:
 |---|:--:|:--:|:--:|:--:|
 | Asks your goal & audience *before* building | ✗ | ~ | ✓ | **✓** |
 | Stays faithful to your source — no invented numbers | ~ | ~ | ✓ | **✓** |
-| Uses your source's own figures — auto-cropped from the PDF, not redrawn | ✗ | ✗ | ~ | **✓** |
+| Uses your source's own figures & tables — auto-cropped from the PDF, not redrawn | ✗ | ✗ | ~ | **✓** |
 | Optional generated visual plates for polish, kept text-free and non-evidentiary | ~ | ✓ | ~ | **✓** |
 | Independent critic checks the **rendered** slides | ✗ | ✗ | ✗ | **✓** |
 | Design tuned to the *purpose* (defense ≠ pitch ≠ lecture) | ~ | ~ | ✓ | **✓** |
@@ -73,7 +73,7 @@ Every deck flows through seven steps (`SKILL.md` is the authoritative spec):
 ## What it can do
 
 - **Build from anything — or nothing.** A paper, codebase, doc, or existing slides → a deck. No material? It drafts from expertise and **web-searches to ground and fact-check** every claim.
-- **Uses your real figures, precisely.** It pulls the source's own figures **straight from the paper/PDF** — auto-detected by caption and cropped to the figure's true extent (legend and axes intact), shown *whole* rather than redrawn or chopped. Dense comparison grids can be reassembled to just the columns that matter; suspect crops are flagged for a look.
+- **Uses your real figures and tables, precisely.** It pulls the source's own figures *and tables* **straight from the paper/PDF** — auto-detected by caption (handling figures-captioned-below and tables-captioned-above, even on one page) and cropped to the true extent (legend, axes, all columns intact; no caption or page-header bleed), shown *whole* rather than redrawn or chopped. A **post-render pixel self-check** catches a clipped edge or bled-in caption and auto-corrects it before the crop ships; dense comparison grids can be reassembled to just the columns that matter.
 - **Can add generated visuals where they help.** For slides that need atmosphere, hero imagery, or conceptual polish rather than evidence, it can plan text-free image-generation prompts and place the selected assets reproducibly in the deck. In Codex it can use native imagegen; outside Codex it can use an optional OpenAI API helper with `OPENAI_API_KEY`. Real figures, charts, labels, and source evidence stay real and editable.
 - **Redesign your existing deck.** It diagnoses first, confirms scope, then rebuilds reusing your content and figures — never a silent ground-up replacement.
 - **Match a look you like.** Hand it an example and it reproduces the *style* — grid, palette, typography, motifs — in its own build.
@@ -154,7 +154,7 @@ The interview (step 0, Q3 especially) routes the request:
 - `SKILL.md` — the operating instructions the model follows (steps 0–6, the rules).
 
 **Engine (`scripts/`)**
-- `deckkit.py` — the build kit: text/shape/component helpers (`bullet`, `callout`, `chip`, `arrow`, `modbox`, `hrule`), layout/image helpers (`columns`/`rows` for equal split panels & stacks, `picture`), equations (`eq_par`, `equation_png`), `speaker_notes`, contrast check, palette/fonts (incl. CJK `EAFONT`), template reuse (`open_template`, `content_slide`) and the no-template chrome (`blank_deck`, `title_bar`, `footer`). Import it; don't re-derive primitives.
+- `deckkit.py` — the build kit: text/shape/component helpers (`bullet`, `callout`, `chip`, `arrow`, `modbox`, `hrule`), layout helpers (`columns`/`rows` for equal split panels & stacks, plus **measure-then-place** primitives — `content_band`, `bottom_callout` (footer-safe, grows up), `vstack` (equal gaps, no overlap, errors on overflow), and the `measure_*` helpers — so collisions surface at build time, not in the render), `picture`, `palette` (distinct, contrast-checked category fills — no gray-as-category), equations (`eq_par`, `equation_png`), `speaker_notes`, contrast check, brand colours/fonts (incl. CJK `EAFONT`), template reuse (`open_template`, `content_slide`) and the no-template chrome (`blank_deck`, `title_bar`, `footer`). Import it; don't re-derive primitives.
 - `install_skill.py` — terminal installer/import helper for Codex and Claude Code skill directories.
 - `requirements.txt` — Python package dependencies for terminal use.
 - `render_deck.sh` — `.pptx` → one PNG per slide (LibreOffice → PDF → PNG). Cross-platform; uses a private LibreOffice profile so parallel/coexisting renders don't collide.
@@ -165,7 +165,7 @@ The interview (step 0, Q3 especially) routes the request:
 - `image_prompts.py` — create prompt manifests and expected filenames for optional text-free generated visual plates.
 - `generate_images_openai.py` — optional OpenAI Images API fallback: reads `image_prompt_manifest.json` and writes `slide-XX.png` files when `OPENAI_API_KEY` is set.
 - `inspect_template.py` — print a template's layouts/placeholders/logos.
-- `extract_pdf.py` — pull a figure *out* of a source PDF: `figures`/`figure`/`autofig` **auto-detect and crop figures precisely from the paper** (caption-anchored + snap-to-content, with validity checks), plus manual page/region/embedded-image extraction.
+- `extract_pdf.py` — pull a **figure or table** *out* of a source PDF: `figures`/`figure`/`autofig` **auto-detect and crop them precisely from the paper** (per-kind caption convention so figures-below and tables-above both localise; snap-to-content; page chrome — running heads/folios — excluded; a borderless-table text-bbox fallback; and a **post-render pixel self-check** that flags / auto-corrects a clipped edge or bled-in caption), plus manual page/region/embedded-image extraction.
 - `crop_helper.py` — operate on an image *by looking, not guessing*: `grid` (ruler overlay), `crop`/`--snap`, `trim` (snap-to-content; removes background without clipping a legend/axis, light or dark bg), `panel` (reassemble chosen columns/rows of a dense comparison grid).
 - `extract_deck.py` — pull text/tables/figures *out* of an existing deck (redesign + reconcile).
 - `export_notes.py` — export a deck's speaker notes to a plain-text rehearsal script.

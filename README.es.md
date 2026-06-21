@@ -32,7 +32,7 @@ Tres disciplinas discretas la separan de las formas habituales de hacer diaposit
 |---|:--:|:--:|:--:|:--:|
 | Pregunta tu objetivo y tu audiencia *antes* de construir | ✗ | ~ | ✓ | **✓** |
 | Se mantiene fiel a tu fuente — sin cifras inventadas | ~ | ~ | ✓ | **✓** |
-| Usa las propias figuras de tu fuente — recortadas automáticamente del PDF, no redibujadas | ✗ | ✗ | ~ | **✓** |
+| Usa las propias figuras y tablas de tu fuente — recortadas automáticamente del PDF, no redibujadas | ✗ | ✗ | ~ | **✓** |
 | Un crítico independiente revisa las diapositivas **renderizadas** | ✗ | ✗ | ✗ | **✓** |
 | Diseño ajustado al *propósito* (defensa ≠ pitch ≠ clase) | ~ | ~ | ✓ | **✓** |
 | Un `.pptx` real y editable que te pertenece — sin ataduras | ~ | ~ | ✓ | **✓** |
@@ -72,7 +72,7 @@ Cada presentación recorre siete pasos (`SKILL.md` es la especificación de refe
 ## Lo que puede hacer
 
 - **Construir a partir de cualquier cosa — o de nada.** Un artículo, un código base, un documento o diapositivas existentes → una presentación. ¿No tienes material? Redacta a partir de su experiencia y **busca en la web para fundamentar y verificar** cada afirmación.
-- **Usa tus figuras reales, con precisión.** Extrae las propias figuras de la fuente **directamente del artículo/PDF** — detectadas automáticamente por el pie de figura y recortadas a la extensión real de la figura (leyenda y ejes intactos), mostradas *enteras* en lugar de redibujadas o cortadas. Las cuadrículas de comparación densas pueden reensamblarse para mostrar solo las columnas que importan; los recortes dudosos se señalan para que les eches un vistazo.
+- **Usa tus figuras y tablas reales, con precisión.** Extrae las propias figuras *y tablas* de la fuente **directamente del artículo/PDF** — detectadas automáticamente por el pie (figuras con pie debajo, tablas con título encima, incluso en la misma página) y recortadas a su extensión real (leyenda, ejes y todas las columnas intactos; sin colar el pie ni el encabezado de página), mostradas *enteras* en lugar de redibujadas o cortadas. Una **autocomprobación de píxeles tras el render** detecta y corrige un borde recortado o un pie colado antes de entregar el recorte; las cuadrículas de comparación densas pueden reensamblarse para mostrar solo las columnas que importan.
 - **Rediseñar tu presentación actual.** Primero diagnostica, confirma el alcance y luego reconstruye reutilizando tu contenido y tus figuras — nunca un reemplazo silencioso desde cero.
 - **Reproducir un aspecto que te guste.** Pásale un ejemplo y reproduce el *estilo* — retícula, paleta, tipografía, motivos — en su propia construcción.
 - **Hablar el idioma de tu audiencia.** Cualquier idioma, mantenido con coherencia de principio a fin, con **tipografía CJK** correcta y **ecuaciones reales con calidad LaTeX**.
@@ -147,14 +147,14 @@ La entrevista (paso 0, especialmente la P3) encamina la solicitud:
 - `SKILL.md` — las instrucciones de funcionamiento que sigue el modelo (pasos 0–6, las reglas).
 
 **Motor (`scripts/`)**
-- `deckkit.py` — el kit de construcción: ayudantes de texto/formas/componentes (`bullet`, `callout`, `chip`, `arrow`, `modbox`, `hrule`), ayudantes de maquetación/imagen (`columns`/`rows` para paneles divididos y apilados de igual tamaño, `picture`), ecuaciones (`eq_par`, `equation_png`), `speaker_notes`, comprobación de contraste, paleta/fuentes (incl. CJK `EAFONT`), reutilización de plantillas (`open_template`, `content_slide`) y el armazón sin plantilla (`blank_deck`, `title_bar`, `footer`). Impórtalo; no vuelvas a derivar las primitivas.
+- `deckkit.py` — el kit de construcción: ayudantes de texto/formas/componentes (`bullet`, `callout`, `chip`, `arrow`, `modbox`, `hrule`), ayudantes de maquetación (`columns`/`rows` para paneles divididos y apilados de igual tamaño, más las primitivas de **medir antes de colocar** — `content_band`, `bottom_callout` (anclado al pie, crece hacia arriba), `vstack` (espaciado igual, sin solapes, error si desborda) y los `measure_*` — para que las colisiones afloren al construir, no en el render), `picture`, `palette` (colores de categoría distintos y con contraste comprobado — sin gris como color de categoría), ecuaciones (`eq_par`, `equation_png`), `speaker_notes`, comprobación de contraste, colores de marca/fuentes (incl. CJK `EAFONT`), reutilización de plantillas (`open_template`, `content_slide`) y el armazón sin plantilla (`blank_deck`, `title_bar`, `footer`). Impórtalo; no vuelvas a derivar las primitivas.
 - `render_deck.sh` — `.pptx` → un PNG por diapositiva (LibreOffice → PDF → PNG). Multiplataforma; usa un perfil privado de LibreOffice para que los renderizados paralelos o simultáneos no colisionen.
 - `check_env.sh` — verificación previa única de la cadena de herramientas.
 - `anim.py` — inyecta el XML de temporización de builds/animación de PowerPoint que python-pptx no puede escribir.
 - `assemble.py` — combina módulos de sección creados en paralelo en una sola presentación (sin fusiones frágiles).
 - `archetypes.py` — construye las mismas diapositivas de previsualización por dirección para el punto de aprobación colaborativo.
 - `inspect_template.py` — imprime los diseños/marcadores de posición/logos de una plantilla.
-- `extract_pdf.py` — detecta y recorta figuras con precisión *de* un PDF de origen: `figures`/`figure`/`autofig` **detectan y recortan automáticamente las figuras del artículo** (ancladas al pie de figura + ajuste al contenido, con comprobaciones de validez), además de la extracción manual por página/región/imagen incrustada.
+- `extract_pdf.py` — extrae una **figura o tabla** *de* un PDF de origen con precisión: `figures`/`figure`/`autofig` **detectan y recortan automáticamente del artículo** (convención de pie por tipo, de modo que localiza tanto figuras-con-pie-debajo como tablas-con-título-encima; ajuste al contenido; excluye el cromo de página —encabezados/folios—; respaldo por caja de texto para tablas sin bordes; y una **autocomprobación de píxeles tras el render** que marca / autocorrige un borde recortado o un pie colado), además de la extracción manual por página/región/imagen incrustada.
 - `crop_helper.py` — opera sobre una imagen *mirando, no adivinando*: `grid` (superposición de regla), `crop`/`--snap`, `trim` (ajuste al contenido; elimina el fondo sin recortar una leyenda/eje, con fondo claro u oscuro), `panel` (reensambla las columnas/filas elegidas de una cuadrícula de comparación densa).
 - `extract_deck.py` — extrae texto/tablas/figuras *de* una presentación existente (rediseño + reconciliación).
 - `export_notes.py` — exporta las notas del orador de una presentación a un guion de ensayo en texto plano.
