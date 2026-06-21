@@ -4,6 +4,13 @@ Use generated images as optional visual plates, not as the source of truth. The 
 claims, labels, tables, charts, equations, and important annotations still belong in
 editable PowerPoint objects or faithful source figures.
 
+> **Generating a whole TEMPLATE (not just a per-slide plate)?** That's a different job — a
+> styled, **text-free** hero/divider illustration that becomes the deck's visual identity, with
+> native content reproduced to match it. See **`references/generated-template.md`** (Q1's
+> "generate a template with an image tool" branch). The text-free + fidelity rules below still
+> apply; the palette is then extracted from the image with `deckkit.palette_from_image` so
+> native blocks fit the generated look.
+
 ## Decide by taste and purpose — not by a rule or a quota
 Whether a slide gets a generated image is a **design call**, the same way motion is. Reach
 for a plate where your design sense says it will **emphasize** a point, make a slide **more

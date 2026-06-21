@@ -121,6 +121,43 @@ def palette(n, accents=None):
                           "gray for genuinely de-emphasised items)")
     return fills
 
+
+def palette_from_image(path, n=5, *, keep_neutrals=False):
+    """Extract ``n`` representative ACCENT colours from a generated template image, as
+    ``RGBColor``, most-frequent first.
+
+    This is the bridge that makes NATIVE content "fit a generated template": derive the
+    template's palette from its hero/divider image, set your ``style.py`` colours to it, and
+    every native card / chip / heading / motif comes out in the same hues — so the inserted
+    blocks read as part of the generated look rather than pasted on top. By default it skips
+    near-white and near-black (the background/ink, not accents) and the deck's *base* colour;
+    pass ``keep_neutrals=True`` to keep them. Deduplicates perceptually-close hues.
+
+        BASE = palette_from_image("assets/template_bg.png", 6)   # the template's own colours
+        ACCENTS = BASE                                           # native content now matches
+    """
+    from PIL import Image
+    from collections import Counter
+    im = Image.open(path).convert("RGB")
+    im.thumbnail((220, 220))
+    q = im.quantize(colors=64, method=Image.FASTOCTREE).convert("RGB")
+    out = []
+    for (r, g, b), _ in Counter(q.getdata()).most_common():
+        mx, mn = max(r, g, b), min(r, g, b)
+        if not keep_neutrals:
+            if mx > 236 and mn > 226:        # near-white background
+                continue
+            if mx < 30:                      # near-black ink
+                continue
+            if mx - mn < 22:                 # washed/near-gray, not an accent
+                continue
+        c = RGBColor(r, g, b)
+        if all(_rgb_dist(c, o) > 48 for o in out):   # keep hues visibly distinct
+            out.append(c)
+        if len(out) >= n:
+            break
+    return out
+
 FONT    = "Calibri"       # display font — cross-platform default (ships with MS Office,
                           # renders the same on Windows PowerPoint and macOS/Keynote).
 MONO    = "Consolas"      # code / filenames — Calibri's cross-platform monospace pair.

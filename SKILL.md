@@ -112,17 +112,19 @@ encouraged; assuming a domain for someone who gave you nothing is the failure to
 all four; a genuinely tiny ask (a single slide, a quick infographic) still needs purpose
 and content confirmed, but you may collapse template/style to a sensible default *stated
 in one line* ("I'll do a clean minimal look — say if you have a template") rather than a
-full prompt. Scaling ≠ skipping — never infer purpose or content. Three answers trigger a quick follow-up *after* the
+full prompt. Scaling ≠ skipping — never infer purpose or content. Some answers trigger a quick follow-up *after* the
 batch: *a conference talk* → ask which venue, then research it; *a new template* → they
 hand over the file; *"design a clean one" (no template)* → offer the **direction gate**
 (see Q1's design-one branch) — recommend showing **3** rendered style directions to pick
-from before the full build. The four:
+from before the full build; *"generate a template with an image tool"* → run the
+mini-interview + generation + feedback loop in `references/generated-template.md`, then **skip
+the direction gate** (the look is already decided). The four:
 
 1. **Template / brand.** First **list this user's registered templates** — check the
    host-appropriate registry (`~/.codex/slide-templates/` in Codex, `~/.claude/slide-templates/`
    in Claude Code; if only one exists, use it). Each subfolder is one template they've used before,
    with a `profile.md`). Offer those as choices, **plus** "a new template (I'll
-   provide one)" and "design a clean one." Then:
+   provide one)", "design a clean one", and **"generate a template with an image tool"**. Then:
    - *A registered template* → build on it using its saved `profile.md` (step 2).
    - *A new template* → they give a `.pptx`/brand; build on it, AND after profiling it
      (step 2) **save a new subfolder to the active template registry** (its
@@ -155,6 +157,31 @@ from before the full build. The four:
      - *Picks design-one* → build a single look shaped to purpose, as above.
      This offer is **skippable, never forced** — a brand-new from-scratch deck is exactly
      when showing options pays off, but a user in a hurry can decline in one click.
+   - *Generate a template with an image tool* → **a bespoke visual identity created with the
+     image tool** (a styled hero/divider illustration) and then reproduced natively so every
+     content block fits it — for a vivid, designed deck (a launch, a festival/event, a brand
+     deck, a playful pitch) where a clean default look isn't enough. **Follow
+     `references/generated-template.md`** — the short version:
+     1. **Gather what the look needs** (one extra mini-interview *now*, before generating): the
+        **scenario/topic** and any **brand colours**; **seed the look from the Style library** in
+        `generated-template.md` (proven styles — Memphis (the sample's), Swiss, Art Deco,
+        Vaporwave, Editorial, Risograph, …) by offering the **3–4 best-fit as options** (+
+        "describe your own" / "I'll provide a reference"); and invite the user to **drop in
+        reference images / a logo / mood material**. Then **tailor the chosen style** to the
+        scenario + brand before generating (the preset is a starting language, not a straitjacket).
+     2. **Generate the template** — a **text-free** full-bleed hero/divider illustration in that
+        style with a calm zone for the title (native imagegen in Codex, else
+        `scripts/generate_images_openai.py`), then **derive a matching `style.py`**: pull the
+        palette straight from the image with `deckkit.palette_from_image(...)` and define the
+        template's motif + component helpers, so **native content reuses the same colours,
+        decorations, and card/heading treatments** (this is what makes inserted blocks fit).
+     3. **Render a sample** (the cover + one real content slide) and **ask for feedback**:
+        > **🔴 CHECKPOINT** — show the generated template (hero + a sample content slide) and get the user's OK; iterate (regenerate the image / tune the palette/motifs) until they confirm.
+     4. After confirm, **the look is decided — so SKIP the 3-direction gate** (and any style
+        step); continue the rest of the interview (purpose, audience, source, language) normally.
+     5. Build to it: **dividers/cover use the generated image(s)** (native title on top),
+        **content slides are built natively in the derived `style.py`** so blocks/bullets/cards
+        match the template. Save the confirmed template to the registry so it's reusable.
 
    **Never hardcode or assume a specific institution's template.** This skill ships
    to anyone: a brand-new user has an *empty* registry, so they see only "provide one"
@@ -255,7 +282,8 @@ from before the full build. The four:
      offer **2–3 directions** as a lighter opt-in. Either way it's the same machinery
      (collaborative mode Gate A, `references/collaborative-mode.md` + `scripts/archetypes.py`):
      real rendered archetype slides the user picks from before the full build. **Skippable,
-     never forced.** A *provided* template means the look is already decided — don't offer it.
+     never forced.** A *provided* template **or a generated template** (Q1's image-tool branch)
+     means the look is already decided — **don't offer the gate** in those cases.
 
 **Language (decide it, then hold it).** A deck is written in **one language
 throughout** — default to the language the *user* writes in. **When the source
@@ -471,6 +499,8 @@ overflows the band; pass `(measure_callout(...)/measure_bullets(...)/measure_tex
 blocks), and the `measure_*` helpers to know a block's true height BEFORE placing it,
 `palette(n, ACCENTS)` (n **distinct, contrast-checked** category fills for a chip/card/stage
 sequence — warns if adjacent blocks aren't visibly different; never a gray filler),
+`palette_from_image(path, n)` (extract a **generated template's** palette from its image so
+native content matches it — the bridge for the image-tool template branch),
 `table` (booktabs data tables — highlight the key row to foreground the authors'
 comparison), `code_block` (monospace code panels with line-highlight),
 `hrule` (table rules), `equation_png` (formal LaTeX-style math via matplotlib) /
@@ -901,6 +931,10 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
   "design a clean one" branch (palette/density/layout/chrome tuned to the purpose).
 - `references/image-generation.md` — when and how to use native imagegen for optional
   text-free visual plates without compromising source fidelity or editability.
+- `references/generated-template.md` — Q1's **"generate a template with an image tool"** branch:
+  mini-interview → generate a text-free hero/divider illustration → derive a matching `style.py`
+  (palette via `palette_from_image`, motif + component helpers) → feedback gate → skip the
+  direction gate → build content natively so blocks fit the generated look; save to the registry.
 - `references/font-guidance.md` — pick portable fonts, avoid tofu, recover from missing
   fonts; brand-font and CJK pointers.
 - `references/animation.md` — when/why to animate, craft rules, and how to add

@@ -77,6 +77,7 @@ Every deck flows through seven steps (`SKILL.md` is the authoritative spec):
 - **Can add generated visuals where they help.** For slides that need atmosphere, hero imagery, or conceptual polish rather than evidence, it can plan text-free image-generation prompts and place the selected assets reproducibly in the deck. In Codex it can use native imagegen; outside Codex it can use an optional OpenAI API helper with `OPENAI_API_KEY`. Real figures, charts, labels, and source evidence stay real and editable.
 - **Redesign your existing deck.** It diagnoses first, confirms scope, then rebuilds reusing your content and figures — never a silent ground-up replacement.
 - **Match a look you like.** Hand it an example and it reproduces the *style* — grid, palette, typography, motifs — in its own build.
+- **Or generate a bespoke template with an image tool.** For a vivid, designed deck (a launch, an event, a brand deck), it generates a styled text-free hero/divider illustration, derives a matching palette + motif + component system from it, and **builds every content block natively to fit** — so the inserted cards, bullets, and badges read as part of the generated look, not pasted on.
 - **Speak your audience's language.** Any language, held consistently throughout, with proper **CJK typography** and real **LaTeX-quality equations**.
 - **Respect the venue.** For a conference talk it identifies and researches the venue — format, aspect ratio, official template, audience — before building.
 - **Scale to big decks.** 15+ slides → optional section fan-out with a shared style, parallel authoring, and a critic panel.
@@ -122,6 +123,7 @@ The interview (step 0, Q3 especially) routes the request:
 | A deck with no material | Build path; draft from expertise + web-search to ground, confirm outline |
 | To **improve their own** deck | **Redesign path** — diagnose first, confirm scope, rebuild reusing their content/figures (`references/redesign-existing-deck.md`) |
 | A deck **looking like an example** | Style-mimic — write a style brief, reproduce the look (`references/style-analysis.md`) |
+| A **generated, bespoke template** | Image-tool template — mini-interview → generate a styled hero/divider, derive a matching palette + components, build content natively to fit it (`references/generated-template.md`) |
 | A **conference** talk | Identify + web-research the venue (rules, template, audience), then build to it |
 | A **poster** | Scoped: single large canvas; craft rules hold but the skill is talk-tuned — confirm spec first |
 | A **non-English / CJK** deck | Set `EAFONT`, one-language discipline, CJK typography (`references/multilingual.md`) |
@@ -178,7 +180,7 @@ The interview (step 0, Q3 especially) routes the request:
 - `references/design-principles.md` — the craft and the "why."
 
 **Per-scenario references**
-- `design-by-purpose.md` · `image-generation.md` · `animation.md` · `multilingual.md` · `font-guidance.md` · `style-analysis.md` · `redesign-existing-deck.md` · `collaborative-mode.md` · `large-deck-orchestration.md` · `handoff-and-iteration.md`
+- `design-by-purpose.md` · `image-generation.md` · `generated-template.md` (image-tool template branch) · `animation.md` · `multilingual.md` · `font-guidance.md` · `style-analysis.md` · `redesign-existing-deck.md` · `collaborative-mode.md` · `large-deck-orchestration.md` · `handoff-and-iteration.md`
 - `examples/` — worked build script, the shared-style + section-module convention.
 
 **External (not part of the skill)**
