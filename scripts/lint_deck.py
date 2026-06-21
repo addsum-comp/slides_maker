@@ -90,6 +90,16 @@ def lint(path):
                 ix, iy = _inter(s, f)
                 if ix > TOL and iy > TOL and _frac_inside(f, s) < CONTAIN:
                     finds.append(f"FOOTER collision  {s['st']}'{s['txt']}' over footer '{f['txt']}'")
+        # 4) editability: a slide that is ~one whole-page image with no native text/objects
+        bigpic = next((s for s in bx if s["st"] == "PICTURE" and s["w"] * s["h"] >= 0.85 * sw * sh), None)
+        if bigpic is not None:
+            others = [s for s in bx if s is not bigpic and not s["bg"] and (s["text"] or s["w"] * s["h"] > 0.5)]
+            if not others:
+                finds.append("EDITABILITY: slide is ~one whole-page image with no native text/objects "
+                             "(build content as native shapes; images are plates/figures, not the whole slide)")
+        # 5) orphan / blank slide
+        if not [s for s in bx if not s["bg"] and (s["text"] or s["solid"])]:
+            finds.append("EMPTY/ORPHAN slide: no native content (blank or background only)")
         for m in finds:
             print(f"  slide {si+1}: {m}")
         total += len(finds)

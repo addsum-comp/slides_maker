@@ -196,9 +196,12 @@ Do not just skim for the first few obvious issues. Run these passes:
      centring bug. Check the bottom takeaway bars especially.
    - **Typography:** text too small to read from the back (callout/caption/figure
      labels — see the size floor in `design-principles.md`), inconsistent fonts/sizes.
-     For **non-Latin (CJK) decks**: any **tofu / missing glyphs** (□) is a blocker; the
+     For **non-Latin (CJK) decks**: any **tofu / missing glyphs** (□ / 缺字) is a blocker; the
      CJK font should be script-appropriate and consistent; emphasis must use weight/
      colour, **not faux-italic** (CJK has no true italic — slanted CJK reads as broken).
+     Also flag **叠字 — glyphs visibly overlapping or colliding** (bad tracking / a too-narrow box
+     squeezing CJK), and an **awkward line break (断句)** — a title or term split at a meaningless
+     point (mid-word / between a number and its unit) — give the box more room or rebreak the line.
      **A short display token wrapped mid-token** — a big section numeral like "01" broken to
      a stacked "0"/"1", or an oversized title splitting awkwardly — is a real flaw (fix: widen
      / auto-size so it stays one line; `deckkit.big_numeral` does this).

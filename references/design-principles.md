@@ -40,6 +40,19 @@ A relationship is clearer drawn than described. For structure you are creating f
 scratch (a pipeline, a state machine, a module map with no source figure), prefer native
 shapes (boxes + arrows via deckkit) over bullet lists. But see the next rule first.
 
+## Build native, editable objects — never a flattened slide
+Every slide is **real PowerPoint objects** — live text boxes, shapes, tables — that the user can
+select and edit one by one. This is a core advantage of building with python-pptx; protect it:
+- **Never deliver a content slide as one whole-page image** (a screenshot/render pasted as the
+  slide), and never ship "the deck" as code-only or HTML — the recipient must be able to fix a typo,
+  restyle a box, or move a shape in PowerPoint/Keynote without you.
+- **Generated/source images stay in their lane:** a figure, a chart, a *text-free* background plate,
+  or a cover/divider illustration **with a native title on top** — never the slide's text/data baked
+  into a raster. Text, numbers, labels, and titles are always native runs (so they're editable,
+  searchable, and crisp at any zoom), never pixels.
+- Keep the file clean: the planned slides and nothing else (no orphan/blank pages, no template
+  residue) — a tidy, fully-editable `.pptx` is part of the deliverable's quality.
+
 ## Use the source's own figures — whole
 *(True for any deck, not just academic ones.)* If the source — a paper, report,
 doc, an existing slide, or a chart/plot already produced from the code/data — has a

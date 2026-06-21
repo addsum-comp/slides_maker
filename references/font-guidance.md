@@ -19,7 +19,9 @@ etc. — metric-compatible, so the render is representative.
 right after import to match a brand or to maximise portability (`deckkit.FONT="Arial"`).
 
 ## Type pairing — give different roles different fonts (don't ship one font everywhere)
-A deck set in a **single** font reads flat and unconsidered; role-based pairing is the cheapest
+**This applies to EVERY deck, in any language** — a Latin/English deck benefits from role-based
+type pairing exactly as much as a CJK one; it is a general typography default, not a CJK special
+case. A deck set in a **single** font reads flat and unconsidered; role-based pairing is the cheapest
 lift in perceived quality. Map a small, deliberate set of faces to roles:
 - **Display** — titles, section headers, big numbers: a face with presence.
 - **Body** — bullets, captions, labels: a clean, legible workhorse.

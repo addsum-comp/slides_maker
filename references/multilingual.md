@@ -87,9 +87,12 @@ and tell the user which font the deck expects.
   "?" in a box, a standalone "!"), use the **ASCII** form: a full-width `？！` sits
   left-of-centre within its advance and won't optically centre. Full-width is for *running*
   CJK text, not a centred single glyph.
-- **Line-breaking.** CJK wraps at any character (no spaces needed) — fine, but give text
+- **Line-breaking (断句).** CJK wraps at any character (no spaces needed) — fine, but give text
   boxes a little more room and consider `line_spacing` ~1.1–1.2; dense CJK at tight
-  leading is hard to read.
+  leading is hard to read. Because it breaks anywhere, **check a wrapped title/term doesn't split
+  at a meaningless point** (mid-term, or between a number and its unit) — widen the box or rebreak.
+- **No 叠字 (overlapping glyphs).** If glyphs visibly collide/overlap, the box is too narrow or the
+  tracking is off — widen the box or fix spacing; never squeeze CJK to fit.
 - **Density.** A CJK character carries more meaning per glyph, so terse points matter even
   more — resist the temptation to fill the line just because it fits.
 - **Numbers / Latin terms** inside CJK text render in `FONT` (the latin font) — choose a
