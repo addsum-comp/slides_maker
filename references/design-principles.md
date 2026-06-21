@@ -51,8 +51,15 @@ panel *or* your boss) is far worse than showing the original correct figure. And
 guide the eye; don't chop it. For a **dense** whole figure (e.g. a paper
 architecture), enlarge it and overlay **big native labels the audience reads
 instead of the paper's tiny ones** — numbered markers (✪ on the 3–4 parts you name
-aloud) + a large legend strip, or endpoint labels over the columns that matter. Trim only the page header, the figure's caption, and
-dead outer whitespace — never the figure's content. Crop to a sub-region *only*
+aloud) + a large legend strip, or endpoint labels over the columns that matter. **Extract it
+precisely**: prefer `extract_pdf.py figures`/`figure` (it caption-anchors, detects the page's
+caption convention, snaps to the figure's true extent, and excludes page chrome) over eyeballed
+fractional crops, then **re-view the PNG and confirm BOTH ways** — nothing of the figure is
+clipped (legend, colour bar, axis labels/ticks, title, units, outer rows/cols, a sub-plot's
+x-axis labels) AND no page text bled in (the figure's caption, a neighbour figure's caption
+fragment, a running head/author line, a page number). A clean crop is tight to the figure's own
+content and contains none of the page's prose. Trim only the page header, the figure's caption,
+and dead outer whitespace — never the figure's content. Crop to a sub-region *only*
 when a figure is genuinely too dense to read at all, and say so.
 
 ## Every figure gets a legend + a takeaway
@@ -97,9 +104,13 @@ as much as the words on it. Design is not optional polish; it is half the job.
   outer margins) so its content **fills** the region, **or** centring the narrow element in
   its panel so the leftover white is symmetric. A large lopsided white band on one side is
   the tell to catch in the render.
-- **Bottom margin.** Keep content clear of the footer — nothing should touch or
-  cross the footer band (stop content by ~5.05 in on a 5.625-in slide). A line or
-  box jammed against the bottom edge is the most common amateur tell.
+- **Bottom margin — measure or anchor, never hand-pick a y.** Keep content clear of the
+  footer. The recurring failure is a bottom callout placed at an eyeballed low `y` that grows
+  *down* into the footer when its text wraps. Don't guess a coordinate: use
+  `deckkit.bottom_callout()` (anchors to the footer band and grows **up**, so it can't collide),
+  ask `deckkit.content_band()` for the safe region, and pack content-height blocks with
+  `deckkit.vstack(..., bottom=…)` (equal gaps + no overlap by construction; it errors at build
+  time if the content can't fit). A hand-picked y for any auto-growing block is a bug.
 - **Text must fit its box.** Never let text spill outside its callout/box. Size the
   box to the text (deckkit `callout` auto-grows), shorten the text, or both — then
   *check the render*, because overflow is invisible until you look.
@@ -214,6 +225,18 @@ reads as monotone and unconsidered. Rotate through the theme's accents
 the template's own secondary accents, so they stay on-brand) so colour signals
 *structure*, and reserve one colour (magenta) for emphasis/warnings. Pull the base
 palette from the template; these are accents on top of it.
+
+**A sequence of blocks must read as a *thought-through* set of colours.** For a row/stack of
+chips, cards, or pipeline stages, give each block a **distinct, deliberately-chosen hue** —
+and use `deckkit.palette(n, ACCENTS)` to get them: it returns `n` distinct fills and *warns at
+build time* if any two **adjacent** blocks aren't visibly different. Two rules it enforces:
+(1) **no two adjacent blocks share a hue** (the "first two blocks are the same colour" tell);
+(2) **never drop a neutral gray into a colour sequence as if it were a category** — gray reads
+as disabled / secondary, so a vivid block beside a gray one looks half-finished, not designed
+(reserve gray for genuinely de-emphasised items). Pick hues that *contrast* (cyan↔amber,
+violet↔rose — not two cool near-neighbours), and let `chip`/`modbox` auto-pick the text colour
+for ≥4.5:1 on each fill. If a meaningful order exists, map it (e.g. the primary accent on the
+key step, a warm/warning hue on the failure state).
 
 **Never let colour be the *only* signal.** If a chart's series, a status, or a
 "before/after" is distinguished by hue alone, it collapses under a projector's washed-out

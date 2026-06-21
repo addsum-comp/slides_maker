@@ -53,6 +53,28 @@ a false-positive acted on can wreck a correct slide, so refute confidently or sa
 never rubber-stamp one away. Batch the whole candidate list into your pass — you are one
 (or a few) arbiters over all the findings, not one agent per finding.
 
+### Re-derive by aspect — the three high-recurrence classes (cross-validate these hardest)
+These three slip through most often; re-derive each from first principles, never from the
+critic's say-so:
+- **PDF figure / table crop.** Open BOTH the slide PNG and the **source page**, and zoom every
+  edge of the placed figure. Two failure modes, both real if present: (a) **clipped** — any of the
+  figure's OWN parts cut (legend, colour bar, axis labels/ticks, an outer row/column, a sub-plot's
+  x-axis labels); (b) **text-contaminated** — any PAGE prose inside the crop (its caption, a
+  *neighbour* figure's caption fragment, a running head/author line, a page number). A crop is
+  correct only when it is tight to the figure's content AND free of page text — confirm BOTH in the
+  pixels, against the source page.
+- **Layout.** Re-check in the pixels, not the claim: does a block actually cross the footer band or
+  overlap a neighbour; are split panels / their flanking margins genuinely unequal (or a narrow
+  element stranded in dead-white); does an arrow point against the flow; is a lone glyph off-centre;
+  is content centred in its box? When a footer/overlap is real, the right fix is the **primitive**
+  (`bottom_callout` / `vstack` / `content_band`) — if the critic prescribed a one-off coordinate
+  nudge, return the primitive as the `better_fix`.
+- **Material understanding / fidelity.** Re-derive every flagged number/name/date/superlative against
+  its **source location AND its claim-ledger row**; confirm each figure/table's on-slide emphasis
+  matches the brief's recorded **carrying element** (the row/column/curve that makes the point), not
+  a plausible-but-wrong axis. A wrong number or a mis-emphasis is a blocker even if only one critic
+  caught it — never refute it away as noise.
+
 ### Job 1 output — return ONLY this JSON
 ```json
 {

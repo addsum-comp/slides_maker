@@ -100,7 +100,17 @@ Do not just skim for the first few obvious issues. Run these passes:
    asked to "judge quality" in the abstract than when handed an explicit list of
    *named* flaws to check for — so go through these by name on each slide and say
    which are present (this list is concrete on purpose; treat absence as something you
-   verified, not something you skipped):
+   verified, not something you skipped).
+   > **Three high-recurrence classes — check EVERY time, whatever your lens** (these are the
+   > ones that keep slipping to a later round, so they get double coverage: both panel critics
+   > check all three, and the arbiter re-derives them):
+   > **(1) PDF figure/table crop** — zoom all four edges: nothing of the figure clipped (legend,
+   > colour bar, axis labels/ticks, outer row/column, a sub-plot's x-labels) AND no page text bled
+   > in (caption, neighbour-caption fragment, running head, page number);
+   > **(2) layout** — no footer collision / block overlap, panels + margins symmetric, no narrow
+   > element stranded in dead-white, arrows follow the flow, content centred in its box;
+   > **(3) understanding/fidelity** — every number/claim traces to the source (+ claim ledger) and
+   > each figure/table's emphasis matches its true carrying element, not a plausible-wrong axis.
    - **Layout:** overflow / clipped text, content occluded or jammed on the footer,
      **two elements overlapping** (a figure/card encroaching on a table or text — check a
      figure placed beside a table isn't covering its last column), misaligned elements, no
@@ -114,7 +124,10 @@ Do not just skim for the first few obvious issues. Run these passes:
      shape (box/icon/chip) escaping its container** — a box/icon/node
      sitting outside the card or panel it belongs to, or an asymmetric/misaligned cluster of
      shapes — is a real flaw; check that every element of a native diagram stays inside its
-     frame and reads as deliberately placed.
+     frame and reads as deliberately placed. **When a footer collision or stacked-block overlap
+     looks like an auto-grown callout pushed into the footer / into the bullets above it,
+     prescribe the ROOT-CAUSE fix — switch to `deckkit.bottom_callout()` / `vstack()` /
+     `content_band()` — not a one-off `y` nudge**, which only recurs when the wording changes.
    - **Diagram connectors:** an arrow pointing the **wrong way for the flow** — most often a
      *sideways* arrow squeezed between two **vertically-stacked** boxes (where it should point
      down/up); and **unequal spacing** of repeated blocks/connectors in a row or column (one
@@ -153,7 +166,12 @@ Do not just skim for the first few obvious issues. Run these passes:
      colour, **not faux-italic** (CJK has no true italic — slanted CJK reads as broken).
    - **Colour:** insufficient contrast (text vs. background — aim ≥4.5:1), meaning
      carried by **colour alone** (e.g. a plot legend distinguished only by hue),
-     monotone (one accent everywhere) or clashing/off-brand colour.
+     monotone (one accent everywhere) or clashing/off-brand colour. **In a sequence of
+     blocks** (chips / cards / pipeline stages), flag **two adjacent blocks sharing a hue**
+     or near-identical fills (the "first two blocks are the same colour" tell), and a
+     **neutral gray dropped in as a category colour** (gray reads as disabled/secondary, so a
+     vivid block beside a gray one looks half-finished) — each block should be a distinct,
+     deliberately-contrasted hue (fix: `deckkit.palette(n, ACCENTS)`).
    - **Text:** excessive density / wall of bullets, full sentences the audience must
      read while the speaker talks, text that merely duplicates narration.
    - **Thoughtless motion or imagery** *(taste & purpose, judged by intent not count):*
@@ -171,15 +189,25 @@ Do not just skim for the first few obvious issues. Run these passes:
      Established technical terms, proper nouns, acronyms, units, and code in their
      original form are fine and are *not* violations.
    - **Figures:** illegible or hand-redrawn where a whole source figure exists, missing
-     one-line takeaway, **caption that disagrees with the figure**. Two specific clipping/
-     cropping flaws to check by eye on every figure: (1) **a part of the figure cut off** —
+     one-line takeaway, **caption that disagrees with the figure**. Three specific clipping/
+     cropping flaws to check by eye on **every figure pulled from a PDF — zoom in on all four
+     edges (top, bottom, left, right)**: (1) **a part of the figure cut off** —
      a legend, colour bar, axis label/ticks, title, units, or an outer row/column sliced by
-     the crop or by the slide placement (a half-cut legend at a figure's top edge is the
-     classic miss); flag it even if the rest looks fine. (2) **a multi-panel figure chopped
+     the crop or by the slide placement (a half-cut legend at the top edge, or a sub-plot's
+     x-axis labels shaved off the bottom, is the classic miss); flag it even if the rest looks
+     fine. (2) **a multi-panel figure chopped
      into pieces that lose context** — when only some columns/panels of the source figure are
      shown such that the authors' comparison is narrowed or changed; the integral whole figure
      is usually the safer choice, so flag an over-aggressive crop (note: a *deliberate*,
      faithful sub-figure that stands alone is fine — judge whether context was lost).
+     (3) **page text caught in the crop** — the figure PNG includes text that is NOT part of
+     the figure: its own **caption** ("Fig. 2. …" / "Table 1. …" or a caption fragment from a
+     neighbouring figure), a **running head / author line**, a **page number**, or a stray
+     line of body text at an edge. A clean crop is tight to the figure's own content (panels,
+     axes, legend, colour bar) and contains **none** of the page's prose. Both (1) and (3) mean
+     the crop box was wrong: it must **precisely** bound the figure's true extent — nothing of
+     the figure cut, no page chrome included — so a partly-clipped **or** text-contaminated
+     figure is a blocker/major, not a nitpick.
    - **Fidelity (judge hardest — see below):** any number, label, or claim not
      traceable to the source; an over-claimed trend; a table that foregrounds the
      wrong comparison.

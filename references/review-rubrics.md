@@ -42,13 +42,18 @@ Score each dimension; cite specific slides.
    whose claim can't be verified from the image is a blocker.
 3. **Cognitive load / text.** Few words per point; no paragraph the audience must
    read while the speaker talks. No text that merely duplicates what's said.
-4. **Figures labeled & intact.** Every figure has a legend (what rows/cols/axes are) and
-   a one-line takeaway (what to notice). Unlabeled figure = major issue. Also check the
-   figure is **intact**: none of its own parts — legend, colour bar, axis labels/ticks,
-   title, units, outer rows/columns — is clipped by a crop or by the slide placement (a
-   half-cut legend is the classic miss), and the figure isn't **chopped into pieces that lose
-   the authors' context** (prefer the whole, integral figure; a narrowed crop that changes
-   what was shown is a real finding).
+4. **Figures labeled, intact & cleanly cropped.** Every figure has a legend (what rows/cols/axes
+   are) and a one-line takeaway (what to notice). Unlabeled figure = major issue. A PDF-sourced
+   figure must be **precisely cropped** — zoom in on all four edges and check both failure modes:
+   (a) **intact** — none of its own parts (legend, colour bar, axis labels/ticks, title, units,
+   outer rows/columns, a sub-plot's x-axis labels) is clipped by the crop or the slide placement
+   (a half-cut legend, or x-labels shaved off the bottom, is the classic miss); and (b) **no page
+   text bled in** — the crop contains none of the page's prose: not the figure's own caption
+   ("Fig. N." / "Table N."), a neighbouring figure's caption fragment, a running head/author line,
+   a page number, or a stray body-text line at an edge. A clean crop is tight to the figure's own
+   content and nothing else; either failure is a real finding (the crop box was imprecise), not a
+   nitpick. Also flag a figure **chopped into pieces that lose the authors' context** (prefer the
+   whole, integral figure; a narrowed crop that changes what was shown is a real finding).
 5. **Signaling.** Is the eye guided to what matters (arrow, box, color, bold), or
    is everything the same weight?
 6. **Narrative flow.** Do the slides form an arc (problem → idea → method →
@@ -167,6 +172,14 @@ correct slide, but shipping a real blocker is worse — so this is **not** a fla
 - **All-unsure on a major → keep, flagged "unverified"** (skepticism is the default).
 - **Discard** only `false_positive` / `hurts` findings — each with the arbiters' reason
   kept in the round log, never silently.
+- **Three high-recurrence classes are re-derived from first principles, not voted on** — PDF
+  **crop** (zoom every figure edge against the source page: nothing clipped *and* no page text
+  bled in), **layout** (re-measure footer-collision / overlap / symmetry / centring in the
+  pixels), and **material-understanding / fidelity** (recompute each number against its source
+  location *and* claim-ledger row; check each figure/table's emphasis against the brief's
+  carrying element). These slip to a later round most often, so they get the hardest
+  cross-validation; a clip, a text-bleed, a footer collision, or a mis-emphasis confirmed in the
+  pixels is promoted at raise-count 1.
 
 After fixing, each promoted finding is **verified in the re-rendered pixels** (resolved +
 no regression). Final consent requires a **second independent pass** to agree there's no

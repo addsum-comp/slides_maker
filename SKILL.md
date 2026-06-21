@@ -296,19 +296,26 @@ deck that *looks* right but misrepresents the work, which an expert audience spo
 instantly. Read **all of it**, not the abstract: run the code's README, read the
 paper end-to-end (intro → method → **every results table/figure** → conclusion).
 
-Then **write down, before building, a comprehension brief** and sanity-check it:
-- The **one-sentence message** (what the authors most want remembered).
-- The **contributions**, in their words.
-- The **method essence** at talk-altitude (+ the one key equation).
-- For **each figure and table: what is it FOR?** What comparison does it make, and
-  what does it *emphasize*? A table exists to make one comparison obvious — represent
-  *that* comparison, not a different axis. (E.g. if a paper's point is "feature X
-  helps", the table must foreground *baseline vs +X*, not invite an unrelated A-vs-B
-  comparison — getting this wrong reveals you didn't understand the paper.)
-- Any **nuance/limitation** the authors stress.
+Then **write a comprehension brief — a REQUIRED, fixed-field, source-traced artifact** (the
+planner's `agents/content-planner.md` §1 is the spec); every field must trace to a locatable
+source span, not memory:
+- The **one-sentence message** + the verbatim source sentence it derives from (+ where).
+- The **contributions**, in their words, each with its source location.
+- The **method essence** at talk-altitude (+ the one key equation), and where it appears.
+- **One row per figure AND table:** `id | what it is FOR (the ONE comparison) | which exact
+  element carries it (row/column/curve/panel) | what it emphasises | the WRONG reading to avoid`.
+  A table exists to make one comparison obvious — foreground *that* (e.g. baseline vs +X), and
+  name the carrying element (it drives which row the build highlights + the assertion title).
+  A figure whose carrying element you cannot name is one you haven't understood.
+- Any **nuance/limitation** the authors stress, quoted.
+- A **claim ledger** (per `content-planner.md` §2): every number/date/name/citation/superlative/
+  dated-event as a row with source + verbatim value + verified?(Y/N) + as-of date; an unverifiable
+  claim is cut or marked open, never shipped.
 
-If you can't fill this in confidently, you haven't understood it yet — re-read or ask
-the user. Build only once the brief is right; every slide must be faithful to the
+**This is a hard gate, not a sanity check.** Self-verify the brief against the source; if any
+field is empty, hedged, or untraced — or the emphasis test fails (your one-sentence message
+would surprise the authors) — you have NOT understood it: re-read or log an open question.
+**An incomplete or untraced brief blocks the build.** Every slide must be faithful to the
 authors' actual emphasis, not a plausible-sounding paraphrase. Reuse their figures
 (relabel for the slide).
 
@@ -435,11 +442,16 @@ this.
 
 **Show the plan and get approval before building — always.** The deck plan (from the
 content-planner in Step 1) is the cheapest place to course-correct, so present it to the
-user every time: the narrative arc + the per-slide spec (takeaway, content, visual source,
-layout, motion) + the **image opt-in list** (which slides you'd propose a generated plate
-for, in what style — the user chooses whether any are generated) + any flagged
+user every time: the **comprehension brief + claim ledger** (shown FIRST, so the user can spot
+a misread before any build), then the narrative arc + the per-slide spec (takeaway, content,
+visual source, layout, motion) + the **image opt-in list** (which slides you'd propose a
+generated plate for, in what style — the user chooses whether any are generated) + any flagged
 forward-looking content + open questions. Fold in their edits, then build.
-> **🔴 CHECKPOINT** — show the deck plan and get the user's OK (including the image opt-in) before building.
+**Precondition — the comprehension gate:** before showing the plan, confirm it carries a
+*complete* comprehension brief (every field filled + traced) and claim ledger (no shipped
+`verified?=N` rows); a plan whose brief is empty/hedged/untraced is **not ready** — send it
+back to the planner rather than building on a shallow read.
+> **🔴 CHECKPOINT** — show the deck plan (brief + ledger first) and get the user's OK (including the image opt-in) before building.
 
 ## Step 4 — Build with deckkit
 Write a small per-deck build script that imports `scripts/deckkit.py` rather than
@@ -449,6 +461,16 @@ or N-up layout so the two sides and their flanking white space come out the same
 `picture` (place a figure/plate without distorting it — `fit="contain"` keeps edges,
 `fit="cover"` crops to fill), `bullet`, `callout` (auto-grows to fit), `arrow`,
 `chip` (pipelines), `modbox`,
+`content_band(slide)` (the SAFE rect below the title and above the footer — ask for it
+instead of hardcoding "above the footer" y-values), `bottom_callout(slide, x, w, label, body)`
+(a footer-SAFE bottom takeaway — measures itself, anchors to the bottom band, grows UP, so it
+can never collide with the footer; **use this for every bottom callout** instead of a
+hand-picked low `y`), `vstack(slide, x, y, w, blocks, bottom=…)` (measured vertical packer —
+**equal gaps + no overlap guaranteed by construction**, raises at build time if content
+overflows the band; pass `(measure_callout(...)/measure_bullets(...)/measure_text(...), draw)`
+blocks), and the `measure_*` helpers to know a block's true height BEFORE placing it,
+`palette(n, ACCENTS)` (n **distinct, contrast-checked** category fills for a chip/card/stage
+sequence — warns if adjacent blocks aren't visibly different; never a gray filler),
 `table` (booktabs data tables — highlight the key row to foreground the authors'
 comparison), `code_block` (monospace code panels with line-highlight),
 `hrule` (table rules), `equation_png` (formal LaTeX-style math via matplotlib) /
@@ -553,9 +575,21 @@ A few rules that matter (see `references/design-principles.md`):
   `arrow(direction=…)` the way the flow moves (down/up between stacked boxes), keep repeated
   connectors evenly spaced and adjacent blocks **gapped (never touching)**, and centre a lone
   glyph in its box; place figures/plates with **`picture(..., fit="contain")`** so the subject
-  is never cropped (`cover` only for edge-tolerant texture). Then run the Step-5 render self-check.
+  is never cropped (`cover` only for edge-tolerant texture).
+- **Never hand-pick a y for an auto-growing block — measure or anchor.** A bottom callout
+  placed at an eyeballed low `y` grows *down* into the footer when its text wraps (the #1
+  recurring layout bug). Use **`bottom_callout()`** (anchors to the footer band, grows up),
+  get the safe region from **`content_band()`**, and pack content-height blocks with
+  **`vstack(..., bottom=…)`** (equal gaps + no overlap by construction, errors at build time on
+  overflow). Use `measure_callout/measure_bullets/measure_text` when you must position manually.
+  Then run the Step-5 render self-check.
 - **Colour.** Rotate `deckkit.ACCENTS` so diagrams aren't monotone; reserve magenta
-  for emphasis. Name the closing slide for its purpose ("Conclusion" for a talk).
+  for emphasis. For a **sequence of blocks** (chips / cards / pipeline stages) give each a
+  **distinct, deliberately-contrasted hue** via `deckkit.palette(n, ACCENTS)` — it returns `n`
+  distinct fills and **warns if any two adjacent blocks aren't visibly different**; never reuse a
+  hue for adjacent blocks and **never use a neutral gray as a category colour** (gray reads as
+  disabled, not a category — it makes a coloured row look half-finished). Name the closing slide
+  for its purpose ("Conclusion" for a talk).
 - **Accessibility.** Keep text ≥4.5:1 on its fill (`contrast_ratio`; `chip`/`modbox`
   auto-pick a readable text colour) and never encode meaning by colour alone. Set
   **alt-text** on every informative figure — `deckkit.alt_text(shape, "one-line
@@ -631,14 +665,27 @@ critic round — full rationale in `references/design-principles.md`):
 - **Balance** — split panels and their flanking margins equal; no large dead-white band beside
   a narrow element (narrow that column or centre it); repeated blocks/connectors evenly spaced;
   elements aligned to a grid, nothing lopsided.
+- **Footer collision / overlap** — no block crosses into the footer band and no two stacked
+  blocks overlap. If one does, the cause is almost always a hand-picked `y` for an auto-growing
+  callout/stack — fix it by switching to `bottom_callout()` / `vstack()` / `content_band()`, not
+  a one-off coordinate nudge (that just recurs when the text changes).
 - **Diagrams** — arrows point the way the flow moves (down/up between stacked boxes); adjacent
   blocks have a visible gap (never touching); a lone glyph/icon optically centred (ASCII, not
   full-width, for a centred mark on a CJK deck).
+- **Block colours** — in a sequence of chips/cards/stages, every block is a **distinct,
+  deliberately-contrasted hue**: no two adjacent blocks share a colour, and **no neutral gray
+  sits in the sequence as if it were a category** (use `palette()` — it warns on both). A vivid
+  block beside a gray one reads as half-finished.
 - **Titles** — a subtitle/definition line has a clear gap below the title's accent rule; the
   kicker/eyebrow adds a section label, it doesn't echo a word the title already leads with.
 - **Images** — the key **subject is whole, not cropped** (`contain` vs `cover`); a generated
   image of real things is **factually right** (relative size/proportion, count, colour); any
   **labels sit under the feature** they name.
+- **PDF figures cropped precisely** — for every figure pulled from a paper, zoom each edge and
+  confirm BOTH: nothing of the figure is clipped (legend, colour bar, axis labels/ticks, outer
+  rows/cols, a sub-plot's x-axis labels) AND no page text bled in (its caption, a neighbour's
+  caption fragment, a running head, a page number). Prefer `extract_pdf.py figure` over eyeballed
+  fractional crops; a clipped *or* text-contaminated crop is a real flaw, not a nitpick.
 - **Motion & images by taste** — what's there earns its place (emphasises/engages/guides),
   nothing thoughtless; what's plain is fine.
 **On native Windows (PowerShell / cmd) there is no bash — call the Python entry points

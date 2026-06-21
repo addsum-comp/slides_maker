@@ -248,6 +248,49 @@ def _ovfrac(a, b):
     return inter / m if m > 0 else 0
 
 
+def _table_text_bbox(cap, side_by_kind, blocks, body, cap_rects, R, hdr, ftr):
+    """Fallback bbox for a BORDERLESS / rule-only table the graphics path can't see (booktabs
+    toprule/midrule/bottomrule are hairlines that `_graphics` filters out, and the cells are
+    plain text). Grow the table box from the caption over the CONTIGUOUS run of non-body,
+    non-caption text rows on the table's convention side — bounded by body prose, neighbouring
+    captions, and the header/footer band — capturing ALL columns/rows and excluding the
+    'Table N.' caption line. Returns a fitz.Rect or None when there's nothing table-like."""
+    cr = cap["r"]; side = side_by_kind.get("table", "below"); cx = (cr.x0 + cr.x1) / 2
+    cand = []
+    for b in blocks:
+        rb = fitz.Rect(b["bbox"])
+        if any(rb.intersects(c2) for c2 in cap_rects):                       # skip captions
+            continue
+        if any(rb.intersects(bb) and (bb & rb).get_area() > 0.5 * rb.get_area() for bb in body):
+            continue                                                          # skip body prose
+        if not (rb.x0 - 30 <= cx <= rb.x1 + 30 or _xshare(rb, cr) > 0.2):     # ~same column
+            continue
+        if side == "below" and rb.y0 < cr.y1 - 2:
+            continue
+        if side == "above" and rb.y1 > cr.y0 + 2:
+            continue
+        cand.append(rb)
+    if not cand:
+        return None
+    cand.sort(key=lambda r: r.y0, reverse=(side == "above"))
+    band = [cand[0]]                                  # contiguous run adjacent to the caption
+    for r in cand[1:]:
+        prev = band[-1]
+        gap = (r.y0 - prev.y1) if side == "below" else (prev.y0 - r.y1)
+        if gap > 1.8 * max(prev.height, r.height):
+            break
+        band.append(r)
+    box = fitz.Rect(band[0])
+    for r in band[1:]:
+        box |= r
+    if side == "below":
+        box.y0 = max(box.y0, cr.y1 + 3)
+    else:
+        box.y1 = min(box.y1, cr.y0 - 3)
+    box.y0 = max(box.y0, hdr); box.y1 = min(box.y1, ftr); box &= R
+    return box if not box.is_empty else None
+
+
 def find_figures(pdf, page_no=None):
     """Detect figure/table regions in a born-digital PDF by anchoring on captions
     ("Figure N" / "Fig. N" / "Table N") and growing into the adjacent graphics, bounded by
@@ -274,8 +317,18 @@ def find_figures(pdf, page_no=None):
         cap_rects = [c["r"] for c in caps]
         body = [fitz.Rect(b["bbox"]) for b in blocks
                 if _is_body(b, modal, R.width) and not any(fitz.Rect(b["bbox"]).intersects(cr) for cr in cap_rects)]
+        margin = 0.12 * R.height
+
+        def _is_chrome(b):
+            """Page chrome — a running head / page number / footer: a single text line in
+            the page's top or bottom margin. Never part of a figure, so it must be excluded
+            from the nonbody set or the grow step will swallow it into an adjacent figure."""
+            r = fitz.Rect(b["bbox"])
+            return len(b.get("lines", [])) <= 2 and (r.y0 < R.y0 + margin or r.y1 > R.y1 - margin)
+
         nonbody = [fitz.Rect(b["bbox"]) for b in blocks
-                   if not _is_body(b, modal, R.width) and not any(fitz.Rect(b["bbox"]).intersects(cr) for cr in cap_rects)]
+                   if not _is_body(b, modal, R.width) and not _is_chrome(b)
+                   and not any(fitz.Rect(b["bbox"]).intersects(cr) for cr in cap_rects)]
         gfx = _graphics(page, R)
         hdr, ftr = R.y0 + 0.045 * R.height, R.y1 - 0.045 * R.height
         accepted = []                      # boxes already taken on this page (no overlap)
@@ -292,6 +345,34 @@ def find_figures(pdf, page_no=None):
             for g in sorted(gfx, key=lambda r: (r.y0, r.x0)):
                 _take(_emit(pi, None, "figure", None, g, "", gfx, body, R, cap_rects))
             continue
+
+        # Caption convention: does the captioned element sit ABOVE its caption (caption-below,
+        # the usual figure case) or BELOW it (caption-above, the usual TABLE case)? Decide from
+        # the gap between a caption and its nearest graphics cluster on each side. Crucially this
+        # is computed PER KIND, not per page: figures and tables follow OPPOSITE conventions, so
+        # a page holding both must not be forced to one global side (which would mis-side one of
+        # them). Per-kind + a per-caption geometry override (in the loop) handles mixed/stacked
+        # layouts; the literature default (figures→above, tables→below) only breaks ties.
+        def _near_gap(cr, sign):
+            cx = (cr.x0 + cr.x1) / 2; gaps = []
+            for g in gfx:
+                if _xshare(g, cr) <= 0.2 and not (g.x0 - 24 <= cx <= g.x1 + 24):
+                    continue
+                if sign < 0 and g.y1 <= cr.y0 + 2:
+                    gaps.append(cr.y0 - g.y1)
+                elif sign > 0 and g.y0 >= cr.y1 - 2:
+                    gaps.append(g.y0 - cr.y1)
+            return min(gaps) if gaps else 1e9
+        _DEFAULT_SIDE = {"table": "below"}        # tables → body below caption; else above
+        side_by_kind = {}
+        for kd in {c["kind"] for c in caps}:
+            kc = [c for c in caps if c["kind"] == kd]
+            a = sum(min(_near_gap(c["r"], -1), 1e6) for c in kc)
+            b = sum(min(_near_gap(c["r"], +1), 1e6) for c in kc)
+            if a == b:                            # no graphics either side for this kind → prior
+                side_by_kind[kd] = _DEFAULT_SIDE.get(kd, "above")
+            else:
+                side_by_kind[kd] = "above" if a < b else "below"
 
         for c in caps:
             cr = c["r"]; cx = (cr.x0 + cr.x1) / 2
@@ -335,15 +416,43 @@ def find_figures(pdf, page_no=None):
 
             aRs, bRs = collect("above"), collect("below")
             aA = sum(r.get_area() for r in aRs); bA = sum(r.get_area() for r in bRs)
-            if aA == 0 and bA == 0:                # caption with no graphics (text table)
-                continue
-            side, rs = ("above", aRs) if aA >= bA else ("below", bRs)
+            if aA == 0 and bA == 0:                # caption with no graphics on either side
+                tbox = _table_text_bbox(c, side_by_kind, blocks, body, cap_rects, R, hdr, ftr) \
+                    if c["kind"] == "table" else None
+                if tbox is not None and tbox.width > 12 and tbox.height > 12:
+                    _take(_emit(pi, c["label"], c["kind"], side_by_kind.get("table", "below"),
+                                tbox, c["text"], gfx, body, R, cap_rects, c["r"]))
+                continue                            # else: a caption with no extractable content
+            # Choose the side the captioned element is on. PER-CAPTION GEOMETRY WINS: if one
+            # side's graphics clearly hug the caption (gap < 0.6x the other), trust that. Only
+            # when both sides are comparably close do we fall back to this caption KIND's
+            # convention (figures→above, tables→below) — never a single page-wide vote, so a
+            # page mixing a figure and a table sides each correctly.
+            kind_side = side_by_kind.get(c["kind"], "above")
+            ga, gb = _near_gap(cr, -1), _near_gap(cr, +1)
+            if aA == 0:
+                side, rs = "below", bRs
+            elif bA == 0:
+                side, rs = "above", aRs
+            elif min(ga, gb) < 0.6 * max(ga, gb):          # one side decisively closer
+                side, rs = ("above", aRs) if ga < gb else ("below", bRs)
+            elif kind_side == "above" and aA > 0:
+                side, rs = "above", aRs
+            elif kind_side == "below" and bA > 0:
+                side, rs = "below", bRs
+            else:
+                side, rs = ("above", aRs) if aA >= bA else ("below", bRs)
             box = fitz.Rect(rs[0])
             for r in rs[1:]:
                 box |= r
-            # grow to swallow nearby in-figure text (axis labels, legend, panel letters)
+            # Grow to swallow nearby in-figure text (axis labels, legend, panel letters),
+            # but measure proximity from the FIXED graphics extent — not the growing box.
+            # Measuring from the growing box lets the union chain outward (figure → panel
+            # letters → page running-head/footer) and swallow page chrome that is NOT part of
+            # the figure. Inflating a fixed graphics box keeps only text that truly hugs it.
+            gbox = fitz.Rect(box)
+            infl = fitz.Rect(gbox.x0 - 18, gbox.y0 - 18, gbox.x1 + 18, gbox.y1 + 18)
             for t in nonbody:
-                infl = fitz.Rect(box.x0 - 16, box.y0 - 16, box.x1 + 16, box.y1 + 16)
                 if infl.intersects(t):
                     cand = box | t
                     if not any(cand.intersects(bb) and (bb & cand).get_area() > 0.3 * bb.get_area()
@@ -354,12 +463,14 @@ def find_figures(pdf, page_no=None):
             # caption (same column) on the figure side — stops a caption grabbing a
             # neighbour's figure/table on dense multi-element pages.
             others = [o["r"] for o in caps if o is not c and _xshare(o["r"], cr) > 0.3]
+            # Clamp to the figure's own band with a 5pt gap from EVERY caption (its own and
+            # the neighbour's) so the render pad can't bleed back into adjacent caption text.
             if side == "above":
                 lim = max([o.y1 for o in others if o.y1 <= cr.y0 - 2] + [hdr])
-                box.y0 = max(box.y0, lim); box.y1 = min(box.y1, cr.y0 - 1)
+                box.y0 = max(box.y0, lim + 5); box.y1 = min(box.y1, cr.y0 - 5)
             else:
                 lim = min([o.y0 for o in others if o.y0 >= cr.y1 + 2] + [ftr])
-                box.y1 = min(box.y1, lim); box.y0 = max(box.y0, cr.y1 + 1)
+                box.y1 = min(box.y1, lim - 5); box.y0 = max(box.y0, cr.y1 + 5)
             box &= R
             if box.is_empty or box.width < 12 or box.height < 12:
                 continue
@@ -393,18 +504,89 @@ def _emit(pi, label, kind, side, box, caption, gfx, body, R, cap_rects=(), self_
             "caption": caption, "checks": checks}
 
 
-def render_figure(pdf, bbox, out, dpi=300, pad=5, do_trim=True):
-    """Render a detected figure bbox (page points) to PNG, with a small outward pad so
-    edge axis-labels/colour-bars aren't clipped, then snap-to-content trim the residual
-    background. pad is in points; bbox = (page_no, x0, y0, x1, y1)."""
+def _content_edges(png_path, edge_px=3, tol=26, frac=0.18):
+    """PIXEL self-check: which edges of the rendered PNG have content running flush to the
+    border (so the crop likely CLIPS a legend/axis/colour bar there). Background is estimated
+    from the four corners; an edge is 'content' if > `frac` of its `edge_px`-deep strip differs
+    from background by > `tol`. Returns a set ⊆ {'top','bottom','left','right'} (empty = clean)."""
+    try:
+        from PIL import Image
+    except Exception:
+        return set()
+    im = Image.open(png_path).convert("RGB"); W, H = im.size
+    if W < 2 * edge_px or H < 2 * edge_px:
+        return set()
+    px = im.load()
+    cs = [px[0, 0], px[W - 1, 0], px[0, H - 1], px[W - 1, H - 1]]
+    bg = tuple(sorted(c[i] for c in cs)[len(cs) // 2] for i in range(3))   # median corner
+    def on(p):
+        return (abs(p[0] - bg[0]) + abs(p[1] - bg[1]) + abs(p[2] - bg[2])) > tol
+    out = set()
+    if sum(on(px[x, y]) for y in range(edge_px) for x in range(W)) > frac * edge_px * W:
+        out.add("top")
+    if sum(on(px[x, y]) for y in range(H - edge_px, H) for x in range(W)) > frac * edge_px * W:
+        out.add("bottom")
+    if sum(on(px[x, y]) for x in range(edge_px) for y in range(H)) > frac * edge_px * H:
+        out.add("left")
+    if sum(on(px[x, y]) for x in range(W - edge_px, W) for y in range(H)) > frac * edge_px * H:
+        out.add("right")
+    return out
+
+
+def render_figure(pdf, bbox, out, dpi=300, pad=3, do_trim=True):
+    """Render a detected figure bbox (page points) to PNG, then SELF-CHECK the actual pixels and
+    auto-correct the two universal partial-crop failures before returning:
+      • BLEED — shrink the box away from any caption / lone page-number text block that would
+        fall inside the padded clip, so page prose can't render into the figure;
+      • CLIP — render, then read the PNG edges (`_content_edges`); if content runs flush to an
+        edge that ISN'T the page boundary, the bbox under-covers there (a colour bar/axis just
+        outside it), so grow the pad on that side and re-render (bounded retries).
+    Then snap-to-content trim. Prints an [ok] / [clip-fixed] / [CLIP?] / [bleed-fixed] status.
+    pad is in points; bbox = (page_no, x0, y0, x1, y1)."""
     doc = _open(pdf)
     pno, x0, y0, x1, y1 = bbox
     page = doc[pno - 1]; R = page.rect
-    clip = fitz.Rect(x0 - pad, y0 - pad, x1 + pad, y1 + pad) & R
     zoom = dpi / 72.0
-    pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), clip=clip, alpha=False)
-    pix.save(out)
+    box = fitz.Rect(x0, y0, x1, y1)
+    # --- BLEED guard: keep captions / page numbers out of the padded clip ---
+    bled = False
+    for b in _text_blocks(page):
+        rb = fitz.Rect(b["bbox"]); txt = _first_line(b).strip()
+        if not (_CAP.match(txt) or (txt.isdigit() and len(txt) <= 4)):
+            continue
+        infl = fitz.Rect(box.x0 - pad, box.y0 - pad, box.x1 + pad, box.y1 + pad)
+        if not infl.intersects(rb):
+            continue
+        midy = (box.y0 + box.y1) / 2
+        if rb.y1 <= midy and rb.y1 + 1 > box.y0 - pad:        # above-ish → push top down
+            box.y0 = max(box.y0, rb.y1 + 2); bled = True
+        elif rb.y0 >= midy and rb.y0 - 1 < box.y1 + pad:      # below-ish → pull bottom up
+            box.y1 = min(box.y1, rb.y0 - 2); bled = True
+    # --- CLIP guard: render, read edges, grow pad on under-covered sides, retry ---
+    pads = {"top": pad, "bottom": pad, "left": pad, "right": pad}
+    status = "ok"
+    for _ in range(4):
+        clip = fitz.Rect(box.x0 - pads["left"], box.y0 - pads["top"],
+                         box.x1 + pads["right"], box.y1 + pads["bottom"]) & R
+        page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), clip=clip, alpha=False).save(out)
+        edges = _content_edges(out)
+        if not edges:
+            break
+        at = {"top": clip.y0 <= R.y0 + 0.5, "bottom": clip.y1 >= R.y1 - 0.5,
+              "left": clip.x0 <= R.x0 + 0.5, "right": clip.x1 >= R.x1 - 0.5}
+        grew = False
+        for e in edges:
+            if not at[e] and pads[e] < pad + 30:               # cap total growth
+                pads[e] += 10; grew = True
+        if not grew:
+            status = "CLIP?"                                   # flush at a page bound — genuine
+            break
+        status = "clip-fixed"
+    else:
+        status = "CLIP?"
     doc.close()
+    if bled and status == "ok":
+        status = "bleed-fixed"
     if do_trim:
         try:
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -412,7 +594,7 @@ def render_figure(pdf, bbox, out, dpi=300, pad=5, do_trim=True):
             trim(out, out, margin=0.012)
         except Exception as e:
             print(f"(trim skipped: {e})")
-    print(f"wrote {out}")
+    print(f"wrote {out}  [{status}]")
     return out
 
 

@@ -50,6 +50,10 @@ ACCENTS = [BLUE, TEAL, GOLD, STEEL, VIOLET, GREEN]   # cycle for multi-item diag
 # layout: keep a consistent gutter of whitespace between a figure and any adjacent
 # text/callout/edge. Crowding elements together reads as amateur — give them room.
 GUTTER  = 0.4   # inches
+# the bottom band reserved for footer() chrome (tag + page number sit at h_in - 0.35).
+# content_band()/bottom_callout() keep content out of this zone, so a bottom callout can
+# never grow into the footer — the recurring "callout collided with the footer" failure.
+FOOTER_BAND = 0.5   # inches, measured up from the slide's bottom edge
 
 
 def contrast_ratio(c1, c2):
@@ -69,6 +73,53 @@ def contrast_ratio(c1, c2):
         return 0.2126 * chans[0] + 0.7152 * chans[1] + 0.0722 * chans[2]
     l1, l2 = sorted((lum(c1), lum(c2)), reverse=True)
     return (l1 + 0.05) / (l2 + 0.05)
+
+
+def _rgb_dist(a, b):
+    """Euclidean RGB distance — a quick proxy for 'are these two fills visually distinct?'.
+    (Use this, NOT contrast_ratio, for category colours: two different hues can share a
+    luminance — cyan vs amber — so contrast_ratio reads ~1 while they're clearly distinct.)"""
+    if isinstance(a, str): a = RGBColor.from_string(a)
+    if isinstance(b, str): b = RGBColor.from_string(b)
+    return sum((a[i] - b[i]) ** 2 for i in range(3)) ** 0.5
+
+
+def palette(n, accents=None):
+    """Return ``n`` DISTINCT categorical fills for a sequence of blocks/chips/cards.
+
+    A sequence of blocks must read as a *thought-through* set of colours, not an accident:
+    each block a deliberate, well-separated hue, **adjacent blocks visibly different**, and
+    **no neutral gray dropped in as a category** (gray reads as disabled/secondary, not a
+    category — reserve it for genuinely de-emphasised items). Pass the deck's own palette
+    (e.g. your style's ``ACCENTS``); defaults to deckkit's ``ACCENTS``. Cycles with a warning
+    if ``n`` exceeds the available hues (extend ``ACCENTS`` rather than repeat a category
+    colour), and warns if any two ADJACENT fills are perceptually too close — so a same-colour
+    or near-duplicate pair surfaces at build time instead of in the render.
+
+        fills = dk.palette(4, ACCENTS)          # 4 distinct, well-separated hues
+        for (x,y,w,h), label, fill in zip(cells, labels, fills):
+            dk.chip(s, x, y, w, h, *label, fill)
+    """
+    pool = list(ACCENTS if accents is None else accents)
+    if not pool:
+        raise ValueError("palette needs a non-empty accents list")
+    if n > len(pool):
+        import warnings
+        warnings.warn(f"palette({n}) exceeds {len(pool)} distinct hues — colours will repeat; "
+                      f"add more entries to ACCENTS rather than reuse a category colour")
+    fills = [pool[i % len(pool)] for i in range(n)]
+    import warnings
+    for a, b in zip(fills, fills[1:]):
+        if _rgb_dist(a, b) < 60:                 # ~perceptually similar / identical
+            warnings.warn("palette: two adjacent category fills are nearly identical — "
+                          "reorder or extend ACCENTS so neighbouring blocks contrast")
+    for c in fills:
+        cc = c if not isinstance(c, str) else RGBColor.from_string(c)
+        if max(cc[0], cc[1], cc[2]) - min(cc[0], cc[1], cc[2]) < 30:   # near-neutral / gray
+            warnings.warn("palette: a near-gray fill is used as a category colour — gray reads "
+                          "as disabled/secondary, not a category; use a saturated hue (reserve "
+                          "gray for genuinely de-emphasised items)")
+    return fills
 
 FONT    = "Calibri"       # display font — cross-platform default (ships with MS Office,
                           # renders the same on Windows PowerPoint and macOS/Keynote).
@@ -347,6 +398,63 @@ def rows(n=2, *, slide=None, w_in=None, h_in=None, x=None, y=None, w=None, top=1
     return [(x, y + i * (rh + gap), w, rh) for i in range(n)]
 
 
+def content_band(slide, *, top=1.15, footer_gap=0.15):
+    """The one authoritative SAFE content rect ``(x, y, w, h)`` — below the title bar and
+    **above the footer band** — read from the deck's REAL size.
+
+    Use it instead of hand-picking 'somewhere above the footer' y-coordinates (the magic
+    numbers like 4.3 / 5.05 that drift and let auto-growing blocks collide with the footer).
+    The bottom edge is ``h_in - FOOTER_BAND - footer_gap``, so anything placed within the
+    returned rect clears ``footer()``. Pair with :func:`vstack` / :func:`bottom_callout`.
+    """
+    w_in, h_in = _slide_size(slide)
+    y = top
+    bottom_y = h_in - FOOTER_BAND - footer_gap
+    return (GUTTER, y, w_in - 2 * GUTTER, bottom_y - y)
+
+
+def vstack(slide, x, y, w, blocks, *, gap=GUTTER, bottom=None, anchor="top"):
+    """Measured vertical packer — **equal gaps and no overlap, guaranteed by construction**.
+
+    Unlike :func:`rows` (which returns equal *fixed*-height cells), ``vstack`` respects each
+    block's CONTENT-driven height, so a callout/bullet-list/chip that auto-grows can't overflow
+    its cell and collide with the block below (the recurring "raised callout overlapped the
+    bullets above it" failure).
+
+    ``blocks`` = list of ``(height_in, draw)`` where ``draw(x, y, w)`` renders the block at that
+    top-left and width. Measure each height first with :func:`measure_callout` /
+    :func:`measure_bullets` / :func:`measure_text` (or a figure's known aspect).
+
+    With ``bottom`` given (e.g. from ``content_band``): raises a located error if the blocks
+    can't fit (so a collision surfaces at BUILD time, not at render); ``anchor='center'`` centres
+    the stack in the band and ``anchor='justify'`` spreads equal gaps to fill it — both kill the
+    "too much dead-white on the bottom" tell. Returns the placed ``(x, y, w, h)`` rects.
+    """
+    n = len(blocks)
+    if n == 0:
+        return []
+    heights = [h for h, _ in blocks]
+    content = sum(heights)
+    total = content + gap * (n - 1)
+    if bottom is not None:
+        avail = bottom - y
+        if total > avail + 1e-6:
+            raise ValueError(
+                f"vstack overflow: blocks need {total:.2f}in but the band is only {avail:.2f}in "
+                f"— shorten text, drop a block, or raise the top. (Surfaced at build time on purpose.)")
+        if anchor == "center":
+            y += (avail - total) / 2
+        elif anchor == "justify" and n > 1:
+            gap = (avail - content) / (n - 1)
+    cy = y
+    rects = []
+    for h, draw in blocks:
+        draw(x, cy, w)
+        rects.append((x, cy, w, h))
+        cy += h + gap
+    return rects
+
+
 # ================================================================= components
 def _is_wide(o):
     """True for CJK / full-width code points — their glyph advance is ≈ one em."""
@@ -466,6 +574,43 @@ def _measure_lines(runs, size_pt, avail_in, font=None):
     return max(1, lines)
 
 
+# ---- public "measure before you place" helpers (so a build knows a block's true height
+#      at a given width BEFORE choosing its y — measure-then-place, not place-and-pray) ----
+def measure_lines(runs, size_pt, avail_in, font=None):
+    """Public wrapper: how many lines ``runs`` = [(text, bold), ...] wrap to at ``size_pt``
+    within ``avail_in`` inches. Same metric the renderer/`bullet`/`callout` use."""
+    return _measure_lines(runs, size_pt, avail_in, font=font)
+
+
+def measure_callout(label, body, w):
+    """Height (inches) :func:`callout` will draw for this ``label``+``body`` at width ``w``.
+    Measure it BEFORE placing so the box can be positioned to clear the footer / the block
+    below — the single source of truth for the callout height formula."""
+    nlines = _measure_lines([(label + "  ", True), (body, False)], 12.5, w - 0.44)
+    return 0.36 + 0.245 * nlines
+
+
+def measure_bullets(items, w, size=17, gap=0.26):
+    """Height (inches) :func:`bullet` will occupy for ``items`` at width ``w`` (no trailing
+    gap), using the same per-item line measurement — so a build can place the next block
+    below the list (or hand the list to :func:`vstack`) without overlap."""
+    line_h = size / 72.0 * 1.12
+    total = 0.0
+    for i, (lead, rest) in enumerate(items):
+        nlines = _measure_lines([(lead, True), (rest, False)], size, w - 0.22)
+        total += line_h * nlines
+        if i < len(items) - 1:
+            total += gap
+    return total
+
+
+def measure_text(runs, w, size, *, line_h_factor=1.12, pad=0.0):
+    """Height (inches) a plain :func:`text` block of ``runs`` = [(text, bold), ...] needs at
+    ``size`` within width ``w``. ``pad`` adds top+bottom slack."""
+    nlines = _measure_lines(runs, size, w)
+    return nlines * (size / 72.0 * line_h_factor) + pad
+
+
 def bullet(slide, x, y, w, items, size=17, gap=0.26, marker=BLUE, lead_c=DEEP, body_c=SLATE):
     """Square-marker bullets. items = list of (lead, rest); keep both terse.
     Returns the bottom y, so a caller can place the next element (e.g. a callout)
@@ -497,11 +642,11 @@ def bullet(slide, x, y, w, items, size=17, gap=0.26, marker=BLUE, lead_c=DEEP, b
 
 
 def callout(slide, x, y, w, h, label, body, label_c=MAGENTA, fill=TINT, body_c=DEEP):
-    # auto-grow height so the body never spills outside the box. The label + body share one
-    # wrap width; nlines is MEASURED from real glyph metrics (label measured bold) so the
-    # box fits the rendered text rather than a chars-per-inch guess.
-    nlines = _measure_lines([(label + "  ", True), (body, False)], 12.5, w - 0.44)
-    h = max(h, 0.36 + 0.245 * nlines)
+    # auto-grow height so the body never spills outside the box. Height comes from
+    # measure_callout (MEASURED glyph metrics, label measured bold) — the ONE place the
+    # formula lives, so a build can call measure_callout()/bottom_callout() and get the
+    # identical height it will render.
+    h = max(h, measure_callout(label, body, w))
     box(slide, x, y, w, h, fill=fill, round=True)
     rad = 0.08 * min(w, h)                                   # inset the accent bar so its square
     box(slide, x, y + rad, 0.07, h - 2 * rad, fill=label_c)  # ends fall on the card's straight edge
@@ -511,6 +656,25 @@ def callout(slide, x, y, w, h, label, body, label_c=MAGENTA, fill=TINT, body_c=D
          [[(label + "  ", 11, label_c, True, False), (body, 12.5, body_c, False, False)]],
          anchor=MSO_ANCHOR.MIDDLE, space_after=0, line_spacing=1.08)
     return y + h   # bottom edge, so callers can keep a margin below
+
+
+def bottom_callout(slide, x, w, label, body, *, footer_gap=0.15, **kw):
+    """A footer-SAFE bottom callout — **never collides with the footer**, whatever the body
+    length. It MEASURES its own height (:func:`measure_callout`), anchors its BOTTOM just above
+    the footer band, and grows UPWARD. Returns its TOP y, so the caller keeps content above it.
+
+    This replaces the failure-prone pattern of hand-picking a low ``y`` and passing it to
+    :func:`callout` (which grows DOWN into the footer when the text wraps). Use this for every
+    bottom takeaway / WHY / NOTE bar::
+
+        top = dk.bottom_callout(s, 0.6, W-1.2, "TAKEAWAY", "...")
+        # ...place the slide's content within [title, top].
+    """
+    _, h_in = _slide_size(slide)
+    ch = measure_callout(label, body, w)
+    y = h_in - FOOTER_BAND - footer_gap - ch
+    callout(slide, x, y, w, ch, label, body, **kw)
+    return y
 
 
 def chip(slide, x, y, w, h, title, sub, fill, tcolor=None):

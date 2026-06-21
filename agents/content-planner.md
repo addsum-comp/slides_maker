@@ -58,18 +58,28 @@ split one paper's intro/method/results across blind agents.
 ### 1 — Understand the material as a human expert would
 Read **all of it**, not the abstract. Run the code's README; read the paper end-to-end
 (intro → method → **every results table/figure** → conclusion); read the doc or existing
-deck in full. Then write a **comprehension brief** and sanity-check it before you plan:
-- the **one-sentence message** (what the authors most want remembered);
-- the **contributions**, in their words;
-- the **method essence** at talk-altitude (+ the one key equation, if any);
-- for **each figure and table: what is it FOR?** What comparison does it make, and what
-  does it *emphasise*? (A results table exists to make one comparison obvious — represent
-  *that* comparison, e.g. baseline vs. the proposed thing, not a distracting one. Getting
-  this wrong proves you didn't understand the work.)
-- any **nuance or limitation** the authors stress.
+deck in full. Then write a **comprehension brief** — a REQUIRED, fixed-field artifact, every
+field traced to a locatable source span so it can't be paraphrased from memory:
+1. **ONE-SENTENCE MESSAGE** — what the authors most want remembered — plus the verbatim
+   source sentence it derives from and where it sits (abstract's last line / conclusion / README tagline).
+2. **CONTRIBUTIONS** — in the authors' words, each with its source location.
+3. **METHOD ESSENCE** at talk-altitude (+ the one key equation, if any) and where it appears.
+4. **PER FIGURE AND TABLE — one row each**: `id | what it is FOR (the ONE comparison) | which
+   exact element carries it (which row / column / curve / panel) | what it emphasises | the
+   WRONG reading the slide must NOT invite`. A results table exists to make one comparison
+   obvious (e.g. baseline vs the proposed thing, not a distracting axis). **Naming the carrying
+   element is how you prove you understood it** — and it drives the build (which row to
+   highlight, what the assertion-title asserts). A figure whose carrying element you cannot name
+   is one you have not understood — log it as an open question.
+5. **NUANCE / LIMITATION** the authors stress, quoted.
 
-If you cannot fill this in confidently, you have not understood it yet — re-read, or list
-the gap as an open question. Plan only once the brief is right.
+**SELF-VERIFY before planning a single slide (hard gate):** re-read the brief against the
+source and confirm every field is filled and traces to a specific location. If any field is
+empty, hedged, or unsupported by a quotable span, you have NOT understood it — re-read or log
+it as an open question; **an incomplete or untraced brief blocks the build** (do not proceed to
+the arc/plan). **Emphasis test:** predict, from your brief alone, what the source's own
+abstract/conclusion stresses most; if your one-sentence message would surprise the authors,
+it's wrong — fix it before continuing.
 
 ### 2 — Research and fact-check the web (for any deck, not just no-source)
 Use the web for **two jobs**, and run it whether or not you have a source:
@@ -78,15 +88,21 @@ Use the web for **two jobs**, and run it whether or not you have a source:
   there's no material at all, this also supplies the whole framing: draft an outline from
   your expertise, then verify it.
 - **(b) Re-verify falsifiable / time-bound claims — including ones taken from the source.**
-  List them — numbers, dates, names, citations, and every "first / largest / state-of-the-art
-  / latest / current" assertion — and confirm each against a credible source *at today's
-  date* before it lands in the plan; fix or cut anything you can't verify (a source's
-  superlative from years ago may now be false). Check whether a dated event has already
-  happened and write the correct tense.
+  Record them in a **CLAIM LEDGER** (a required part of the plan): one row per falsifiable
+  claim, columns `claim (as it appears on a slide) | type (number / date / name / citation /
+  superlative / dated-event) | source (paper §/fig/table+page, or web URL) | verbatim value or
+  quote | verified? (Y/N) | as-of date | tense/status`. **Extraction rule:** every number, date,
+  proper name, citation, every "first / largest / latest / state-of-the-art / best" superlative,
+  and every scheduled/dated event — from the SOURCE as well as the web — must be a ledger row
+  before it can appear on a slide; a row with **verified? = N is cut or marked open, never
+  shipped**. **Recency by type:** superlatives / SOTA / rankings / prices / counts / versions /
+  role-holders → re-verify at *today's* date with a recency-bounded search; dated events → check
+  whether they have already happened as of today and write the correct tense; stable facts
+  (definitions, historical events) → a source citation suffices. Re-run verification for
+  time-bound rows on **every** build — never reuse cached values for them.
 
-Keep a short **source log** in the plan so claims are traceable. For a **conference talk**,
-research the named venue (length, slide ratio, official template, audience composition, what
-a strong talk there looks like) and fold it in.
+For a **conference talk**, research the named venue (length, slide ratio, official template,
+audience composition, what a strong talk there looks like) and fold it in.
 
 ### 3 — Design the narrative arc (engage, and obey the logic)
 Choose an order that fits the *purpose* (a conference talk, a status update, and a defense
@@ -185,9 +201,12 @@ not by counting:
 ## Output — the deck plan
 Produce a single, human-readable **deck plan** (markdown) the user can approve and the
 builder can execute. Include:
-1. **Comprehension brief** — message, contributions, method essence (+ key equation),
-   per-figure/table purpose, nuances/limitations, and the **source log** whenever you used
-   the web (any deck — gap-fills and re-verified claims, not just no-source decks).
+1. **Comprehension brief** (the fixed-field artifact from §1, all fields filled + traced) —
+   emit it FIRST, as a labelled `## Comprehension brief` section, then a `## Claim ledger`
+   table (§2), then a one-line `## Authors'-emphasis check` stating your one-sentence message
+   matches what the source stresses. These are not optional preamble — they are the evidence
+   the rest of the plan stands on, and the Step-3 checkpoint reviews them first; a brief with
+   empty/hedged/untraced fields or a ledger with shipped `verified?=N` rows is not ready.
 2. **Deck-level decisions** — the narrative arc in one line; slide count vs. time budget
    (with the pace check); the look/palette/style for the purpose; the deck's **image
    art-direction** (even if no images are proposed yet); the deck-wide transition choice.
