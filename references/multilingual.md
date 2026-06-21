@@ -59,6 +59,20 @@ travels correctly. (Without `EAFONT`, CJK falls back to an uncontrolled default.
 Pick the CJK font to match the *purpose* the same way as Latin (`design-by-purpose.md`):
 sans (Heiti/PingFang) for modern/corporate/talks, serif (Songti) for formal/defense.
 
+**Pair CJK fonts by role too — don't set the whole deck in one face** (see the "Type pairing"
+section of `font-guidance.md`). Use a CJK **display** face for titles and a CJK **body** face for
+text, plus a clean **Latin** face for the numbers/English inside CJK runs:
+- `deckkit.EADISPLAY` = CJK title face (e.g. **PingFang SC**), `deckkit.EAFONT` = CJK body face
+  (e.g. **Hiragino Sans GB** / **Noto Sans CJK SC**) — `title_bar`/`editorial_header` then set
+  titles in EADISPLAY and body in EAFONT automatically.
+- `deckkit.DISPLAY`/`deckkit.FONT` = the Latin faces for those same roles, so digits/units/English
+  (e.g. "≈40%", "1/5–1/7") render in a crisp Latin face, not the CJK fallback.
+
+A tasteful, portable Chinese pairing: **PingFang SC** (titles) + **Hiragino Sans GB** or **Noto
+Sans CJK SC** (body) + **Helvetica Neue/Arial** (Latin). Keep it to 2–3 families and apply it on
+every slide. *(Avoid setting everything to "Arial" — it has no CJK glyphs, so the whole deck rides
+an uncontrolled single fallback, the flat one-font look to fix.)*
+
 ### Portability caveat (say this in step 6)
 PowerPoint can embed fonts, but python-pptx can't, so the recipient's machine needs the
 CJK font installed — or PowerPoint substitutes. Prefer a widely-installed font (PingFang

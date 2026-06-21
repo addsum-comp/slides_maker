@@ -18,6 +18,28 @@ etc. — metric-compatible, so the render is representative.
 `deckkit` defaults: `FONT="Calibri"`, `MONO="Consolas"`, `EQFONT="Arial"`. Override them
 right after import to match a brand or to maximise portability (`deckkit.FONT="Arial"`).
 
+## Type pairing — give different roles different fonts (don't ship one font everywhere)
+A deck set in a **single** font reads flat and unconsidered; role-based pairing is the cheapest
+lift in perceived quality. Map a small, deliberate set of faces to roles:
+- **Display** — titles, section headers, big numbers: a face with presence.
+- **Body** — bullets, captions, labels: a clean, legible workhorse.
+- **Mono** — code, filenames, page-markers / chrome: `MONO`.
+
+Keep it to **2–3 families** (more looks chaotic), pair for contrast (a characterful display over a
+neutral body), and apply the mapping **consistently on every slide**. `deckkit` supports it directly:
+set `DISPLAY` (title face) alongside `FONT` (body) — `title_bar`/`editorial_header` use `DISPLAY`
+for the title automatically; body stays on `FONT`; code/chrome on `MONO`. Per-run control: the 6th
+element of a `text()` run tuple is that run's Latin font. Match the pairing to **purpose**
+(`design-by-purpose.md`) — a serif display reads editorial, a heavy sans reads bold/modern.
+
+Safe, portable Latin pairings: **Georgia** (display) + **Arial/Calibri** (body); **Arial Black**
+(display) + **Arial** (body); **Helvetica Neue / Verdana** for a crisp numeric face.
+
+**Latin *inside* another language is its own role.** Numbers, units, and English terms embedded in
+CJK (or other) text should ride a clean Latin face while the script keeps its own font — so
+"私域营收 ≈40%" reads intentional, not like a fallback. deckkit does this via `FONT` (Latin) +
+`EAFONT` (CJK), and `DISPLAY`+`EADISPLAY` for headings. Full CJK pairing in `multilingual.md`.
+
 ## Equations are font-independent
 `equation_png` rasterises math with matplotlib's bundled math fonts, so **equations carry
 no font dependency** — they render identically anywhere. Prefer it over `eq_par` when you

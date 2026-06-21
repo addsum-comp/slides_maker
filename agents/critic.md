@@ -111,6 +111,12 @@ Do not just skim for the first few obvious issues. Run these passes:
    > element stranded in dead-white, arrows follow the flow, content centred in its box;
    > **(3) understanding/fidelity** — every number/claim traces to the source (+ claim ledger) and
    > each figure/table's emphasis matches its true carrying element, not a plausible-wrong axis.
+   >
+   > A deterministic `scripts/lint_deck.py` should have already flagged off-slide overflow, solid
+   > block/image overlaps, and footer collisions before this point — but **still verify overlap
+   > visually** (the lint deliberately ignores intentional layering, and can't judge a text run
+   > spilling past a panel edge). If you see a block/image/text overlap the lint would catch, treat
+   > it as a sign the lint wasn't run and call it out.
    - **Design fits the content (right form, not bullets-by-default):** with the kit's range, flag a
      slide whose *form* fights its message — a **bullet list / number table where a designed form
      would land better**: quantitative data with no chart; 3-6 metrics not shown as `scorecard`

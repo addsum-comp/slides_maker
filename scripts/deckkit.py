@@ -170,6 +170,12 @@ EAFONT  = None            # East-Asian font for CJK text (e.g. "PingFang SC" / "
                           # Chinese/Japanese/Korean glyphs with THIS font (not an
                           # uncontrolled default) while Latin/numbers stay on FONT. Leave
                           # None for Latin decks. See references/multilingual.md.
+DISPLAY = None            # optional DISPLAY/title font (Latin) — when set, title_bar uses it for
+                          # the title so headings get their own face vs the FONT body. Falls back
+                          # to FONT. Pairing roles (display / body / mono) beats one font for the
+                          # whole deck — see references/font-guidance.md ("Type pairing").
+EADISPLAY = None          # optional CJK DISPLAY/title font (e.g. "PingFang SC" titles over a
+                          # "Hiragino Sans GB"/"Noto Sans CJK SC" EAFONT body). Falls back to EAFONT.
 # To re-theme a whole deck (e.g. to match a style example), reassign these AND the
 # palette constants above right after importing deckkit, before building — set_font
 # resolves FONT at call time, so `deckkit.FONT = "Helvetica Neue"` takes effect.
@@ -1531,7 +1537,12 @@ def title_bar(slide, title, kicker="", accent=MAGENTA, title_c=DEEP, w_in=None):
         ty = 0.54
     else:
         ty = 0.40
-    text(slide, 0.55, ty, w_in - 1.1, 0.7, [[(title, 26, title_c, True, False)]], space_after=0)
+    tb = text(slide, 0.55, ty, w_in - 1.1, 0.7,
+              [[(title, 26, title_c, True, False, DISPLAY or FONT)]], space_after=0)  # title gets the DISPLAY face
+    if EADISPLAY:                                    # ...and a distinct CJK display face if set
+        for p in tb.text_frame.paragraphs:
+            for r in p.runs:
+                _apply_ea(r, EADISPLAY)
     box(slide, 0.57, ty + 0.62, 1.1, 0.045, fill=accent)
 
 

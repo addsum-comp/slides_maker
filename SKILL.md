@@ -714,6 +714,13 @@ or a missing glyph only show up in the image. Fix mechanical issues and re-rende
 (First time on a machine, or a render errors? `bash scripts/check_env.sh` verifies
 LibreOffice + the python deps and prints the fix for anything missing.)
 
+**Then run the layout lint** — `python scripts/lint_deck.py <deck.pptx>` — a cheap, deterministic
+check that flags **off-slide overflow, two solid blocks/images overlapping (neither contained), and
+footer collisions**: exactly the failures the eye misses (a callout tucked a few px under a panel or
+image — the recurring "block overlaps another block/image" bug). Fix every finding, re-render, and
+re-lint to clean before handing to the critic. It's a safety net for the no-overlap rule, **not** a
+replacement for looking (it can't judge crop, balance, legibility, or fidelity).
+
 **Render self-check — scan EVERY slide for these before handing to the critic** (they're
 invisible in the build code and only appear in the pixels; catching them yourself saves a
 critic round — full rationale in `references/design-principles.md`):
@@ -911,6 +918,9 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
   real, cross-platform implementation (macOS / Linux / WSL / native Windows): finds
   LibreOffice on PATH or in OS-specific install locations (incl. `C:\Program Files\…`),
   or set `SOFFICE`. `render_deck.sh` is a thin bash shim that forwards to it.
+- `scripts/lint_deck.py` — deterministic layout lint on a built `.pptx`: flags off-slide
+  overflow, solid block/image overlaps (neither contained — ignores intentional layering), and
+  footer collisions. Run after rendering, before the critic; exits non-zero on findings.
 - `scripts/check_env.py` — one-time preflight; verifies LibreOffice + python deps and
   prints the exact fix for anything missing. Run it if a render ever fails. `check_env.sh`
   is a thin bash shim that forwards to it. On native Windows run the `.py` directly.
