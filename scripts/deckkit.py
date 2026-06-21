@@ -587,7 +587,7 @@ def measure_callout(label, body, w):
     Measure it BEFORE placing so the box can be positioned to clear the footer / the block
     below — the single source of truth for the callout height formula."""
     nlines = _measure_lines([(label + "  ", True), (body, False)], 12.5, w - 0.44)
-    return 0.36 + 0.245 * nlines
+    return 0.30 + 0.245 * nlines   # 0.30 = top+bottom padding: snug to the text but not cramped
 
 
 def measure_bullets(items, w, size=17, gap=0.26):

@@ -662,9 +662,15 @@ invisible in the build code and only appear in the pixels; catching them yoursel
 critic round — full rationale in `references/design-principles.md`):
 - **Overflow / contrast / footer / glyphs** — no clipped or spilling text, ≥4.5:1 contrast,
   nothing jammed on the footer, no tofu/missing glyphs.
-- **Balance** — split panels and their flanking margins equal; no large dead-white band beside
-  a narrow element (narrow that column or centre it); repeated blocks/connectors evenly spaced;
-  elements aligned to a grid, nothing lopsided.
+- **Balance & suitable space** — every element has a comfortable margin on **all four sides**:
+  nothing crowds an edge, nothing strands a big dead gap (the right *degree* — not too tight,
+  not too loose). Split panels + flanking margins equal; no large dead-white band beside a
+  narrow element; a **figure beside text is anchored to its margin (not centred-and-far-
+  stranded)** with the text one gutter away; repeated blocks/connectors evenly spaced; grid-
+  aligned, nothing lopsided.
+- **Block padding** — text inside a chip/card/callout hugs the box with a **modest, balanced**
+  top/bottom margin (middle-anchored; not floating in a tall box, not cramped). A short card
+  must not leave a white strip at the bottom.
 - **Footer collision / overlap** — no block crosses into the footer band and no two stacked
   blocks overlap. If one does, the cause is almost always a hand-picked `y` for an auto-growing
   callout/stack — fix it by switching to `bottom_callout()` / `vstack()` / `content_band()`, not

@@ -84,6 +84,12 @@ TAKEAWAY of what to notice. Without the takeaway, the audience guesses.
 ## Layout: give every element room
 The overall layout of a slide — margins, alignment, balance, whitespace — matters
 as much as the words on it. Design is not optional polish; it is half the job.
+
+**The governing rule is *suitable space* — the right degree.** Every element should leave a
+comfortable margin on **all four sides**: never crowd an edge (top / bottom / left / right) and
+never strand a large dead gap either. Too tight reads as cramped; too loose reads as
+unfinished. The degree matters and is best judged in the render — so after building, look and
+ask of each element "is there suitable, balanced space around it, or is it crowding/floating?"
 - **Gutters.** Leave a consistent ~0.4 in (`deckkit.GUTTER`) between a figure and
   any adjacent text, callout, or slide edge. Text butted against a figure looks
   amateur.
@@ -104,6 +110,19 @@ as much as the words on it. Design is not optional polish; it is half the job.
   outer margins) so its content **fills** the region, **or** centring the narrow element in
   its panel so the leftover white is symmetric. A large lopsided white band on one side is
   the tell to catch in the render.
+- **Figure beside text — anchor the figure, gutter the text (don't centre + far-strand).** A
+  very common imbalance: a figure left in a wide half-panel gets **centred** by `contain`,
+  stranding white on its outer edge, *while* the side text is pushed to the far edge — leaving a
+  big dead gap between figure and text. Fix both: **align the figure to its margin** (set the
+  `picture` box to the figure's own aspect so `contain` doesn't centre-pad it) and place the
+  text **one normal gutter away**, not against the opposite edge. Result: figure at the left
+  margin, a ~`GUTTER` gap, then the text — balanced, with no stranded band.
+- **Blocks hug their text — modest, *balanced* internal padding.** Inside a chip / card /
+  callout the text should sit with a **modest** top-and-bottom margin: snug to the text, not
+  floating in a tall box, and not cramped against the edges. Size the box to its content (the
+  auto-growing `callout`; chips/cards sized ≈ text + a small pad) and **middle-anchor** the text
+  so the padding is symmetric — a short card must not leave a big white strip at the bottom, and
+  a one-line callout must not swim in a deep bar.
 - **Bottom margin — measure or anchor, never hand-pick a y.** Keep content clear of the
   footer. The recurring failure is a bottom callout placed at an eyeballed low `y` that grows
   *down* into the footer when its text wraps. Don't guess a coordinate: use

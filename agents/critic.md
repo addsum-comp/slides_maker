@@ -120,7 +120,15 @@ Do not just skim for the first few obvious issues. Run these passes:
      one side than the other (when no asymmetry is clearly intended) — reads as careless;
      flag it. **A large dead-white band in a panel** — a narrow element (a timeline, a thin
      chart, a short list) stranded in a too-wide column, leaving a big empty strip beside it —
-     is also a finding (fix: narrow that column or centre the element). **A drawn diagram
+     is also a finding (fix: narrow that column or centre the element). **A figure centred in
+     its half *and* the side text pushed to the far edge** — leaving white on the figure's outer
+     edge AND a big dead gap between figure and text — is the same imbalance (fix: anchor the
+     figure to its margin, pull the text in to one gutter). **Suitable space on all four sides:**
+     also flag the opposite — content **crowding an edge** (top/bottom/left/right) with no
+     breathing room. **Block padding** — text inside a chip/card/callout that **floats with
+     excess top/bottom space** (or, conversely, is cramped against the edges), e.g. a short card
+     with a big white strip at the bottom — flag it (fix: middle-anchor + size the box ≈ text +
+     a modest pad). **A drawn diagram
      shape (box/icon/chip) escaping its container** — a box/icon/node
      sitting outside the card or panel it belongs to, or an asymmetric/misaligned cluster of
      shapes — is a real flaw; check that every element of a native diagram stays inside its
