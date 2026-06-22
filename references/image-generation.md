@@ -74,15 +74,19 @@ Prefer real or deterministic assets instead when the visual carries evidence:
    manifest numbers files `slide-01.png`, `slide-02.png`… over your *sub-outline*, not by
    real deck position** — so map each generated file back to the actual deck slide it was
    planned for when you place it (e.g. the second plated slide is `slide-02.png` even if it's
-   deck slide 7).
+   deck slide 7). In the build script, resolve the asset directory from the script location
+   (`ROOT = Path(__file__).resolve().parent`) rather than from the process working directory.
 6. Place the image with `deckkit.picture(...)`:
 
    ```python
    import deckkit as dk
+   from pathlib import Path
+
+   ROOT = Path(__file__).resolve().parent
 
    dk.picture(
        slide,
-       "assets/generated/slide-03.png",
+       ROOT / "assets/generated/slide-03.png",
        0.0, 0.0, 10.0, 5.625,
        fit="cover",
        alt="",  # decorative plate

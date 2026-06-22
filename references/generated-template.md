@@ -75,8 +75,10 @@ Generate a **full-bleed, text-free** hero/divider illustration in the chosen sty
 Study the generated image the way you'd study a provided style example
 (`references/style-analysis.md`) and encode it so native content matches:
 - **Palette — extract it from the image** so colours are coherent:
-  `BASE = deckkit.palette_from_image("assets/generated/hero.png", 6)`; set the style's base/ink
-  and `ACCENTS` from it. (This is the bridge that makes native blocks fit the generated look.)
+  resolve the image path relative to the deck/build script, then call
+  `BASE = deckkit.palette_from_image(ROOT / "assets/generated/hero.png", 6)`; set the style's
+  base/ink and `ACCENTS` from it. (This is the bridge that makes native blocks fit the
+  generated look.) Avoid bare `"assets/..."` paths that depend on the shell's current directory.
 - **Motif vocabulary** — write 3–5 tiny native helpers for the signature shapes (e.g.
   `zigzag()`, `dot()`, `triangle()`, `squiggle()`), drawn with `deckkit` autoshapes in the
   palette, with the same outline weight. **Sprinkle them sparingly** as accents near content —

@@ -401,7 +401,9 @@ deck, so it should travel with the artifact: this makes every later iteration
 reproducible (re-run it, get the same deck) and is what lets you fold the user's
 later change requests back into the build rather than hand-patching the binary. See
 `references/handoff-and-iteration.md` for why this matters at hand-off and how to
-iterate without clobbering the user's manual edits.
+iterate without clobbering the user's manual edits. In that script, resolve deck assets
+relative to the script file (for example `ROOT = Path(__file__).resolve().parent`) rather
+than the current working directory, so `python /path/to/build_<deck>.py` works from anywhere.
 
 - **Template branch:** run `scripts/inspect_template.py <file.pptx>` to learn the
   layout indices, placeholder ids, and where logos/brand live (they sit on the
