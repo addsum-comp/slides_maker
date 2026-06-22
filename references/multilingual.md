@@ -93,6 +93,10 @@ and tell the user which font the deck expects.
   at a meaningless point** (mid-term, or between a number and its unit) — widen the box or rebreak.
 - **No 叠字 (overlapping glyphs).** If glyphs visibly collide/overlap, the box is too narrow or the
   tracking is off — widen the box or fix spacing; never squeeze CJK to fit.
+- **Equal, consistent space width around an operator/symbol.** Around an inline `=` `≈` `→` `+` `：`,
+  use the **same space character on both sides** — the classic CJK bug is a **full-width space (`　`,
+  ~1 em) on one side and an ASCII space on the other**, so the symbol sits lopsided. Pick one (a
+  full-width space reads well between CJK terms) and use it symmetrically; verify in the render.
 - **No orphaned punctuation (避头尾 / kinsoku).** A line must not **start** with closing punctuation
   (`。， 、！？：；）》】" '`) and must not **end** with an opening one (`（《【" '`); and never leave a
   **lone punctuation mark on its own row** (a trailing `。`/`，` pushed to the next line is the ugly

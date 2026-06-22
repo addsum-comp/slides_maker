@@ -400,11 +400,15 @@ anyway:
 - **Mixed-size text on one line — vertically centre it, don't baseline-mix.** When a single line
   pairs a small part with a much larger emphasised one (a `before → after` change stat, a label +
   hero number, a unit beside a big figure), runs in one box **share a baseline** — so the small
-  part/arrow sinks to the bottom and looks dropped well below the big value's centre (a real
-  misalignment, e.g. "<10% → **≈40%**" with the arrow low). Fix it by placing the small and large
-  parts as **separate MIDDLE-anchored boxes on the same line** so their optical centres align (the
-  `deckkit.change_stat` helper does exactly this for before→after stats), or keep the sizes close.
-  Don't rely on one mixed-size run.
+  part/arrow sinks to the bottom, dropped below the big value's centre (e.g. "<10% → **≈40%**" with
+  the arrow low). Fix by **vertically centring** the parts: keep them in one box and **baseline-shift
+  the small run up** to the big value's centre — which preserves natural, equal spacing
+  (`deckkit.change_stat` does this) — or use separate middle-anchored boxes; or keep the sizes close.
+- **Equal spacing around an operator/symbol.** An inline `=`, `≈`, `→`, `+`, `×`, `:` (etc.) must
+  have the **same gap on both sides** — `A = B`, never `A  =B`. Two traps to catch in the render:
+  (1) a layout that puts a wide fixed gap on one side and a tight text space on the other — size both
+  gaps equal; (2) on a CJK deck, a **full-width space (`　`, ~1 em) on one side and an ASCII
+  space on the other** (a common mistake) — use the *same* space character, same width, on both sides.
 - Name the closing slide for its purpose — an academic talk ends on **"Conclusion"**,
   not "Take home"; a status update might end on "Next steps".
 - Generous whitespace. A slightly empty slide reads as confident; a packed one

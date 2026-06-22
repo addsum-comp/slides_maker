@@ -206,7 +206,12 @@ Do not just skim for the first few obvious issues. Run these passes:
      emphasised one (a `before → after` stat, a label + hero number, a unit beside a big figure) where
      the small part/arrow **sits low on the shared baseline**, dropped below the big value's vertical
      centre (e.g. "<10% → **≈40%**" with the arrow sunk). They should be **vertically centred** on the
-     same line (fix: separate middle-anchored boxes / `deckkit.change_stat`, or sizes kept close).
+     same line (fix: baseline-shift the small run / `deckkit.change_stat`, or sizes kept close).
+   - **Uneven spacing around an operator/symbol:** an inline `=`, `≈`, `→`, `+`, `×`, `:` with a
+     **bigger gap on one side than the other** (e.g. `A  =B`, or an arrow closer to its left than its
+     right) — it must be equidistant. Common cause on CJK decks: a **full-width space (`　`) on one
+     side and an ASCII space on the other**; the fix is the same space on both sides. Check stat lines
+     and any "X = Y" especially.
    - **Typography:** text too small to read from the back (callout/caption/figure
      labels — see the size floor in `design-principles.md`), inconsistent fonts/sizes.
      For **non-Latin (CJK) decks**: any **tofu / missing glyphs** (□ / 缺字) is a blocker; the

@@ -453,21 +453,30 @@ def stat_row(slide, x, y, w, items, *, ink=DEEP, accent=MAGENTA, serif=None, div
     return y + 1.1
 
 
-def change_stat(slide, x, y, w, h, before, after, *, accent=MAGENTA, ink=DEEP, before_size=15,
-                after_size=28, arrow="→", font=None, split=0.46):
-    """A 'before → after' change stat with the AFTER value emphasized large and **vertically
-    centered** with the small before+arrow. Mixing very different font sizes on ONE line baseline-
-    aligns them, so the small prefix/arrow sinks to the baseline and looks dropped below the big
-    number — the misalignment to avoid. Here the two halves are each MIDDLE-anchored on the same
-    line (before right-aligned, after left-aligned) so the arrow and the big value meet at the
-    centre, optically aligned. Returns nothing; place at the row's box."""
-    bw = w * split
-    text(slide, x, y, max(0.3, bw - 0.06), h,
-         [[(f"{before} {arrow}", before_size, ink, False, False, font)]],
-         align=PP_ALIGN.RIGHT, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
-    text(slide, x + bw + 0.06, y, w - bw - 0.06, h,
-         [[(str(after), after_size, accent, True, False, font)]],
-         align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+def _set_baseline(run, pct):
+    """Raise (or lower, if negative) a run by `pct` percent of its font size via the OOXML baseline
+    shift — used to vertically centre a small run beside a much larger one WITHOUT splitting them
+    into separate boxes (so natural, equal spacing around the operator is preserved)."""
+    run._r.get_or_add_rPr().set("baseline", str(int(round(pct * 1000))))
+
+
+def change_stat(slide, x, y, w, h, before, after, *, accent=MAGENTA, ink=DEEP, before_size=16,
+                after_size=26, arrow="→", font=None, align=None):
+    """A 'before → after' change stat with the AFTER value emphasized large. It is **one text box**
+    — so the spaces around the arrow are natural and EQUAL on both sides, and it packs into a narrow
+    column like a normal line — and the small `before + arrow` run is **baseline-shifted UP** to
+    vertically centre on the big AFTER value (mixing sizes in a line otherwise baseline-aligns them,
+    sinking the small prefix/arrow below the big number). Returns the textbox."""
+    al = align if align is not None else PP_ALIGN.LEFT
+    tb = text(slide, x, y, w, h,
+              [[(f"{before} {arrow} ", before_size, ink, False, False, font),
+                (str(after), after_size, accent, True, False, font)]],
+              align=al, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+    pct = max(0.0, 0.36 * (after_size - before_size) / max(1, before_size) * 100)  # centre small on big
+    runs = tb.text_frame.paragraphs[0].runs
+    if runs:
+        _set_baseline(runs[0], pct)
+    return tb
 
 
 def quadrant(slide, x, y, w, h, *, x_labels=("", ""), y_labels=("", ""), gap=0.35, axis_c=MUTE):
