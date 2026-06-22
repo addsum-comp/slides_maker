@@ -130,8 +130,21 @@ For every slide, decide and record:
   any trim of page margins), a **designed chart** generated from real data (name the *archetype*
   from §5's selection guide — donut+KPI / dumbbell / slope / dual-axis / Pareto / bubble — not a
   vague "a chart"), a **native diagram / layout pattern** to draw (quadrant · hub-spoke · timeline ·
-  scorecards · stat-row · before/after · pipeline), a **generated plate** (see §6), or **none**.
-  Default to the source's own figures, whole — don't redraw or chop them.
+  scorecards · stat-row · before/after · pipeline), a **typeset equation** — either *transcribed*
+  from a written source (a paper's formula → mark "transcribe to `equation_png`", **never** a cropped
+  image of the PDF formula) or *derived* from code/other materials (see below), a **generated plate**
+  (see §6), or **none**. Default to the source's own figures, whole — don't redraw or chop them; but
+  **formulas are the exception — re-typeset them, don't crop them.**
+- **Form a formula from code when it shows the content better.** When the source is **code** (or other
+  non-paper material — a repo, a config, a notebook), and a slide's point is a *mathematical
+  relationship the code implements* — a loss/objective, an update or optimisation rule, a metric, a
+  transform, a probability/normalisation — **reconstruct that formula and present it typeset**
+  (`equation_png`) when it conveys the idea more directly than prose or a code dump. This is
+  especially apt for a **lab meeting / technical talk**. **Faithfulness rule:** the formula must be a
+  *correct* expression of what the code actually computes — read the code carefully, derive the math
+  it implements, and verify the equation against the code (same variables/indices/operations); do
+  **not** invent a plausible-looking formula the code doesn't implement, or over-simplify it wrongly.
+  If you can't derive it confidently, show the key code lines instead and flag it as an open question.
 - **Layout** — a *concrete* design, not "some bullets and a figure" (see §5).
 - **Motion** and **image** — by taste and purpose (see §6), recorded per slide.
 
@@ -213,11 +226,27 @@ not by counting:
 - **The only thing to avoid is *thoughtless* use** — motion added for flourish that pulls
   the eye off the meaning, or an image that competes with the content or just fills space.
   Judge the *intent and effect* of each one, never its frequency.
-- **Builds** shine when you want to reveal a pipeline one stage at a time, walk through a
-  multi-part argument, show before→after, or land an evidence→takeaway beat. A subtle
-  deck-wide fade transition is a fine, low-distraction default for continuity. (A slide must
-  still read correctly fully-built — a build layers on a correct static slide, never fixes a
-  cluttered one.) See `animation.md`.
+- **Builds — actively check each slide's LAYOUT against this repertoire, and animate the ones that
+  fit (only those).** Don't leave builds off by neglect: for every slide, ask "does stepping the
+  reveal *guide* or *emphasise* here?" The recurring build-friendly shapes:
+  - **A flow/pipeline of blocks joined by arrows** → reveal each stage **with its arrow** on click,
+    narrating the flow one step at a time. *(A multi-block-with-arrows slide is the canonical signal
+    to animate — don't ship it as a static dump.)*
+  - **Multi-part argument / numbered list** → reveal each point as you reach it (no reading ahead).
+  - **Before → after / problem → solution** → let the first state land, then reveal the after/fix.
+  - **Evidence → takeaway** → show the support, reveal the takeaway/callout last.
+  - **Layered data / a chart with an annotation** → baseline first, then the comparison on top.
+  - **Quadrant / matrix · timeline · step-cards** → reveal the cells / nodes / steps in order.
+  - **A result that IS motion** (a training run, a 4D/time-resolved or rotating sequence) → embed the
+    **GIF**, not a frozen frame (it loops in PowerPoint/Keynote). See `animation.md`.
+  Record each build **concretely** in the Motion column (what reveals, in what order, on click). A
+  subtle deck-wide fade transition is a fine low-distraction default for continuity.
+  **No quota, both directions:** a whole deck with *no* builds is fine when nothing has steps to pace
+  — but don't *miss* a pipeline/multi-part/before-after that clearly wants one; equally never animate
+  a title, divider, single-idea slide, a scan-all-at-once comparison, or a **read-alone/poster** deck
+  (no one clicks it), and never add motion for flourish/"consistency"/to fill a plain slide (fix the
+  layout instead). A slide must read correctly **fully-built** — a build layers on a correct static
+  slide, never fixes a cluttered one. See `animation.md`.
 - **Generated images — add one only where it helps the audience UNDERSTAND or feel the content,
   never as decoration or filler.** First decide *which specific slides/parts* actually benefit: a
   concept that's clearer **shown than told**, the real thing the audience should picture, or

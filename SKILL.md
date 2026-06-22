@@ -473,7 +473,11 @@ slides**, consider the section fan-out (step 4). Each slide's **takeaway** comes
 Each slide's **visual source** is set in the plan — source figure, chart, native diagram,
 generated plate, or **none**. Both **generated images and motion are a matter of taste and
 purpose, never a quota** (full rules: `references/image-generation.md`, `references/animation.md`):
-generated plates are opt-in, styled to the deck's purpose + topic, and never carry evidence.
+generated plates are opt-in, styled to the deck's purpose + topic, and never carry evidence. For
+**motion**, actively check each (presented) slide's *layout* for a build-friendly shape — a flow of
+blocks joined by arrows, a multi-part/numbered build, before→after, evidence→takeaway, a
+quadrant/timeline/step-cards — and plan a step-reveal there; none across the deck is fine, but don't
+*miss* a pipeline that clearly wants one (build it with `scripts/anim.py`).
 
 **Sanity-check pace against the clock.** After planning, compute `slide_count ÷
 time_minutes`: well over ~1/min for a *spoken* talk means you'll overrun — cut slides or
@@ -678,6 +682,18 @@ A few rules that matter (see `references/design-principles.md`):
   glyph size stays consistent across slides. Use **`eq_par()`** (`N()/SUP()/SUB()`)
   only for trivial inline math or when matplotlib is unavailable. **Never** paste
   Unicode super/subscripts (ᴴ ᵀ ᵣ) — the display font may lack them and render tofu.
+- **Formulas → TYPESET math (`equation_png`), never a cropped image.** Unlike a figure or table
+  (cropped *whole* from the PDF with `extract_pdf.py`), a needed equation is **re-typeset**: write it
+  as LaTeX and render with `equation_png()` (or `eq_par()` for simple inline). A cropped formula
+  bitmap is low-res, carries the source's font/background, can't be restyled to the deck, and clips —
+  a typeset one is crisp at any zoom and on-brand.
+  - **From a paper → transcribe** the formula precisely (don't alter symbols/indices).
+  - **From code/other material → derive** the formula the code implements (a loss, update rule,
+    metric, transform) when the content-planner judges it shows the idea more directly than prose —
+    great for **lab meetings**. It must be a *correct* expression of what the code computes (verify
+    against the code), not an invented or wrongly-simplified one.
+  - Either way the **fidelity rule applies** — verify the rendered math against the source.
+  `extract_pdf.py` is for figures/tables; formulas go through `equation_png`.
 - **One language.** Keep the whole deck in the chosen target language — don't drift
   (no stray English on a Chinese deck, no English headings over translated bullets).
   Technical terms / proper nouns / acronyms / units / code may stay original; only

@@ -153,6 +153,14 @@ don't force any of them:
   `deckkit.equation_png` (matplotlib mathtext: true italics, ⊙, fractions, proper
   sub/superscripts) and place the image. Keep `eq_par` for quick, editable inline
   math. Either way the notation must match the source's.
+- **Formulas are TYPESET, never cropped — and may be derived from code.** Figures and tables you take
+  *whole* from the PDF — but a formula you **re-typeset** with `equation_png` (or `eq_par`): a cropped
+  equation bitmap is low-res, drags in the source's font/background, can't be recoloured/resized to
+  the deck, and clips; a typeset one is crisp at any zoom and on-brand. **From a paper:** transcribe
+  it precisely. **From code/other material:** *derive* the formula the code implements (loss, update
+  rule, metric, transform) and typeset it, when it shows the idea more directly than prose — a strong
+  move for a lab meeting. Either way it must be **faithful** to the source (same symbols/indices; for
+  code, a correct expression of what it actually computes) and verified against it — fidelity rules.
 
 ## Layout: give every element room
 The overall layout of a slide — margins, alignment, balance, whitespace — matters

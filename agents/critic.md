@@ -193,6 +193,13 @@ Do not just skim for the first few obvious issues. Run these passes:
      it shows. A `cover`-fit plate that loses its subject, or any image showing only part of
      what it's meant to show, is a real finding — the fix is `contain`/shrink/regenerate, not
      leaving it cropped. (This is easy to miss; look for it on every image slide, any domain.)
+   - **Formula pasted as a cropped image instead of typeset:** a math equation that's a **bitmap
+     cropped from the source PDF** — low-res, carrying the paper's font/background, mismatched to the
+     deck's colours, or clipped — rather than re-typeset math. Flag it: a formula must be **typeset**
+     with `equation_png`/`eq_par` (transcribed from a paper, or *derived* from code), faithful to the
+     source. (Figures and tables are cropped whole; formulas are not.) If a formula was **derived from
+     code**, sanity-check it expresses what the code actually computes — flag an invented or
+     wrongly-simplified equation.
    - **Generated image is factually wrong about a real subject:** a generated plate of real,
      known things that gets a *visible fact* wrong — wrong **relative sizes/proportions** (two
      things drawn the wrong size relative to each other, e.g. a person as tall as a building),
@@ -269,10 +276,13 @@ Do not just skim for the first few obvious issues. Run these passes:
      whitespace would serve better; a plate that **doesn't help the audience understand** the slide
      (decoration, not comprehension); or one whose **style is off — not aligned with the deck's
      topic/content or its template/brand look** (a plate that reads pasted-in from another deck, or
-     clashes with the palette/style). Also flag the opposite — a clear pipeline / multi-part / evidence→takeaway
-     beat left plain where a build would have helped. **Do not** flag a slide for being plain,
-     or a deck for having several or *consecutive* builds/plates — frequency is a legitimate
-     design choice, not a flaw.
+     clashes with the palette/style). Also flag the opposite (on a **presented** deck): a
+     **build-friendly layout left static** where stepping the reveal would clearly have guided the
+     audience — a **flow of blocks joined by arrows**, a multi-part/numbered build, a before→after, an
+     evidence→takeaway, or a quadrant/timeline/step-cards assembled all at once. **Do not** flag a
+     slide for being plain when it has nothing to pace (title, divider, single idea, scan-at-once
+     comparison, read-alone deck), or a deck for having several or *consecutive* builds/plates —
+     frequency is a legitimate design choice, not a flaw.
    - **Language consistency:** the whole deck should be in **one** language — flag any
      accidental mixing (a heading/label/bullet in another language, or the language
      drifting between slides) unless the user asked for a bilingual/mixed deck.

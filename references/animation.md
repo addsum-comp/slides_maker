@@ -14,10 +14,12 @@ slide's `<p:timing>` XML). The model: draw your static base, then wrap each
 reveal-on-click chunk in a build step.
 
 ## When a build genuinely helps
-- **Step-by-step diagrams / pipelines.** Reveal each stage (and its arrow) on a
-  click so you can narrate the flow one box at a time, instead of dumping the whole
-  diagram at once.
-- **Progressive reasoning / multi-part points.** A slide making a 3-part argument:
+**Actively scan each (presented) slide's layout against this list** — animate the ones whose shape
+fits, leave the rest plain. The recurring build-friendly layouts:
+- **Step-by-step diagrams / pipelines (blocks joined by arrows).** Reveal each stage **and its
+  arrow** on a click so you narrate the flow one box at a time, instead of dumping the whole diagram
+  at once. *(A multi-block-with-arrows slide is the canonical signal to animate.)*
+- **Progressive reasoning / multi-part points / a numbered list.** A slide making a 3-part argument:
   reveal each part as you reach it, so the audience isn't reading point 3 while you
   explain point 1.
 - **Before → after / problem → solution.** Show the problem, let it land, then
@@ -25,6 +27,8 @@ reveal-on-click chunk in a build step.
 - **Build to a punchline / takeaway.** Show the evidence first; reveal the takeaway
   callout last, after the setup is on screen.
 - **Layered data.** Show a baseline, then reveal the comparison/annotation on top.
+- **Quadrant / matrix · timeline · step-cards.** Reveal the cells, the nodes left-to-right, or the
+  steps in order, so the structure assembles as you talk through it.
 
 ## Decide by taste and purpose — not by a rule or a quota
 Whether a slide builds is a **design call**, the same for every purpose (research/lab
