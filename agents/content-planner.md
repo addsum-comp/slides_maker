@@ -279,12 +279,13 @@ not by counting:
   the visual, a prompted-and-verified generated plate is fine, or **draw it natively** (deckkit
   shapes / a chart) for guaranteed control — just never plan to ship an unverified one. See
   `image-generation.md`.
-- **A real brand/product/UI → plan the REAL asset, never a generic stand-in.** When a slide is about
-  a real logo, product, company, or interface (pitch, launch, stakeholder, competitor), plan to show
-  the **real thing** (real logo / product render / UI screenshot, or the brand's real colours+fonts on
-  native blocks) — *not* a generated look-alike or a default-blue box. If that asset is needed but you
-  don't have it, **flag it as an open question for the user to supply**, rather than planning a fake or
-  silent placeholder. (Recognizability hierarchy in `image-generation.md`.)
+- **A real brand/product/UI → plan the REAL asset, never a generic stand-in.** Whenever a slide shows
+  a real logo, product, company, or interface — in *any* deck (a research talk's tool/framework/model,
+  a teaching deck's app screenshot, a status deck's vendor, as well as a pitch/launch/stakeholder
+  slide) — plan to show the **real thing** (real logo / product render / UI screenshot, or the brand's
+  real colours+fonts on native blocks) — *not* a generated look-alike or a default-blue box. If that
+  asset is needed but you don't have it, **flag it as an open question for the user to supply**, rather
+  than planning a fake or silent placeholder. (Recognizability hierarchy in `image-generation.md`.)
 - **Image style is part of the design — align it with topic, content, AND the deck's template/
   style.** Decide **one coherent art-direction for the whole deck** (palette, medium, mood, level of
   realism, motif, where to leave calm space for text) that fits *this* purpose and subject **and
@@ -336,8 +337,9 @@ builder can execute. Include:
 5. **Forward-looking additions** — anything you drafted that isn't in the source, clearly
    flagged as proposed.
 6. **Open questions** — anything you couldn't verify or need the user to confirm (including any
-   **real brand/product/UI asset** a pitch/launch/stakeholder slide needs but you don't have — list it
-   for the user to supply, rather than planning a stand-in).
+   **real brand/product/UI asset** *any* slide needs but you don't have — a tool/app/logo a research,
+   teaching, or status deck shows, as well as a pitch/stakeholder slide — list it for the user to
+   supply, rather than planning a stand-in).
 
 ## What you must NOT do
 - Don't **invent** content, numbers, results, citations, or figures (the one exception is

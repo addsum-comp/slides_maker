@@ -722,7 +722,7 @@ fights the single-file artifact, and doesn't speed up the parts that actually co
 time. Full workflow (incl. the critic panel + finding-routing) in
 `references/large-deck-orchestration.md`.
 
-**Motion & builds — by taste and purpose, not a quota; full rules in `references/animation.md`.**
+**Motion & builds — by taste and purpose, not a quota.**
 Add a build where your design sense says stepping the reveal will *emphasize*, *engage*, or
 *guide* — and leave it off where it wouldn't (consecutive builds are fine, a long plain stretch
 is fine; the only thing to avoid is *thoughtless* motion added for flourish). Two layers,

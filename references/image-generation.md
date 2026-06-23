@@ -54,10 +54,12 @@ Prefer real or deterministic assets instead when the visual carries evidence:
 
 ## Real brand / product assets come first — never fill with a generic stand-in
 
-When a slide is *about* a real brand, product, company, or UI (a pitch, a launch, a stakeholder
-readout, a competitor slide), the single biggest credibility lever is showing the **real thing** —
-and a generated plate or a default-coloured box is the *wrong* answer, not a fallback. Source the
-asset down a **recognizability hierarchy**, stopping at the first you can actually get:
+Whenever a slide shows a real brand, product, company, logo, or UI — in **any** deck, not just a
+product one: a research/conference talk citing a tool, framework, model, or dataset's source; a
+teaching deck showing an app's interface; a status update naming a vendor; as well as the obvious
+pitch / launch / stakeholder / competitor slide — the single biggest credibility lever is showing the
+**real thing**, and a generated plate or a default-coloured box is the *wrong* answer, not a fallback.
+Source the asset down a **recognizability hierarchy**, stopping at the first you can actually get:
 
 1. the **real logo / product render / UI screenshot** (the user's, or a clearly-official asset they point you to);
 2. the brand's **real colours + typography** applied to native deckkit blocks;
