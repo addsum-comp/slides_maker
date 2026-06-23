@@ -42,13 +42,30 @@ The recipes render a themed PNG → place with `deckkit.picture(out, ..., fit="c
    the SAME colours as a paired `leaderboard`, markers as well as hue — so it survives a projector
    and colour-blind viewers (the deck-wide accessibility rule).
 
-## Native vs matplotlib
-- **Default to the `designed_charts` (matplotlib) recipes** — they're robust, themable, and fast to
-  author, and transparent PNGs blend into any deck.
-- **Build a chart natively** (freeform lines/shapes via `deckkit`) only when you need *total* theme
-  control (e.g. a glass/Memphis deck where even a themed matplotlib plot would clash) or for
-  diagram-like "charts" (hub-and-spoke, a flow/Sankey, an annotated timeline) that are really
-  layout. Keep them measure-then-place so they slot into a `content_band`.
+## Editable native charts vs matplotlib rasters — pick by need
+Three ways to put a chart on a slide; choose by what the deck needs:
+- **Editable native PowerPoint chart — `deckkit.native_chart` / `deckkit.native_dual_axis`.** A *real*
+  chart object: the user can **click to edit data/labels** in PowerPoint, and **any non-Latin labels —
+  CJK (中文/日本語/한국어), Cyrillic, Greek, … — render via PowerPoint's own fonts, no tofu** (matplotlib
+  often can't find the script's font for a rotated axis title and renders □). **Prefer this whenever
+  (a) the deck is in ANY non-Latin language, or (b) the user wants to edit the chart.** Pass `font=`
+  your deck's text font for the script (your `EAFONT` for CJK; a Cyrillic/Greek deck's `FONT` already
+  covers those). **Covers nearly the whole roster:** `native_chart` (`line`/`line_markers`/`column`/
+  `bar`, and **slope** = a 2-point line), `native_dual_axis` (two-scale 'A↑ vs B↓', e.g. 占比% vs
+  成本指数), `native_donut` (part-to-whole + a KPI in the hole), `native_pareto` (columns + cumulative-%
+  line on a secondary axis), `native_bubble` (x·y·size). Themed (`palette`, `dark`, `font`,
+  `highlight`). *(RTL scripts — Arabic/Hebrew — remain a known layout limitation, see `multilingual.md`.)*
+- **`designed_charts` (matplotlib raster).** Use only when (a) you specifically want the matplotlib
+  styling, or (b) for the **dumbbell** (before→after gap), which has no native chart type — otherwise
+  prefer the native editable equivalents above. A transparent PNG; **not editable**, and on a
+  non-Latin deck you must pass `font="<the script's font>"` — still raster.
+- **Freeform native (`deckkit` shapes)** for diagram-like "charts" (hub-and-spoke, a flow/Sankey, an
+  annotated timeline) that are really layout — and for an editable **dumbbell** (rows of dot——dot).
+  Keep them measure-then-place inside a `content_band`.
+
+Rule of thumb: **default to the native editable charts** (`native_chart` / `native_dual_axis` /
+`native_donut` / `native_pareto` / `native_bubble` — pass the script's `font=`); reach for
+`designed_charts` (raster) only for dumbbell or a deliberate matplotlib look; a diagram → freeform.
 - Either way: **whole chart, legible at the deck's read distance, one message, one highlight, a
   takeaway.** ("From the back of the room" is the floor for a *presented* deck; for a **read-alone /
   reference** chart, size to arm's-length reading and it's fine to keep more series labelled — there's

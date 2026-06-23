@@ -270,7 +270,11 @@ Do not just skim for the first few obvious issues. Run these passes:
      **Glassmorphism only on a dark / glowing / photo base** — a glass card on a light slide is
      near-invisible (flag it); a **photo scrim aimed at the text zone**, not a flat full-slide wash
      that greys the whole image. Flag a `big_numeral`/`scorecard` value that wrapped or overran, and
-     a `leaderboard` whose swatch colours don't match its paired chart.
+     a `leaderboard` whose swatch colours don't match its paired chart. **Chart with tofu / missing
+     glyphs in its labels** (a non-Latin axis title or legend — CJK · Cyrillic · Greek · … — showing □,
+     the classic raster-`designed_charts` failure on a non-Latin deck) is a blocker: rebuild it as an
+     **editable native chart** (`deckkit.native_chart`/`native_dual_axis`, which render any script via
+     PowerPoint's fonts) or pass `font=<the script's font>` to the recipe.
    - **AI-slop tells (named):** flag, by name, the choices that read as machine-generated filler — a
      full-screen rainbow / mesh / purple-to-blue **gradient wash**; **emoji in titles** or as bullet
      markers; ✅/🚀/🔥 decoration; the **rounded-card-with-left-border-accent** on every block; three

@@ -1349,6 +1349,235 @@ def hrule(slide, x, y, w, color=MUTE, weight=0.012):
     return box(slide, x, y, w, weight, fill=color)
 
 
+# ================================================================= native (editable) charts
+def native_chart(slide, x, y, w, h, categories, series, *, kind="line_markers",
+                 palette=None, dark=False, font=None, highlight=None, legend=True,
+                 value_fmt=None, smooth=True):
+    """An **EDITABLE native PowerPoint chart** (a real chart object: click to edit data/labels in
+    PowerPoint, and **any non-Latin labels — CJK · Cyrillic · Greek · …** — render via PowerPoint's own
+    fonts, **no tofu**, unlike the rasterised designed_charts recipes). Prefer this whenever editability
+    or non-Latin labels matter. Pass ``font=`` your deck's text font for the script (e.g. your EAFONT
+    for CJK; a Cyrillic/Greek deck's FONT already covers those).
+
+    `series` = [(name, [v, v, ...]), ...]; `categories` = the x labels. Themed to the deck (palette,
+    dark). `kind`: 'line' | 'line_markers' | 'column' | 'bar'. `highlight` = index of the one series
+    to keep in the accent (others dropped to grey). For a two-scale 'A↑ vs B↓' chart use
+    `native_dual_axis` instead."""
+    from pptx.chart.data import CategoryChartData
+    from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
+    KIND = {"line": XL_CHART_TYPE.LINE, "line_markers": XL_CHART_TYPE.LINE_MARKERS,
+            "column": XL_CHART_TYPE.COLUMN_CLUSTERED, "bar": XL_CHART_TYPE.BAR_CLUSTERED}
+    cd = CategoryChartData()
+    cd.categories = [str(c) for c in categories]
+    for name, vals in series:
+        cd.add_series(str(name), tuple(vals))
+    gf = slide.shapes.add_chart(KIND.get(kind, XL_CHART_TYPE.LINE_MARKERS),
+                                Inches(x), Inches(y), Inches(w), Inches(h), cd)
+    ch = gf.chart
+    _theme_chart(ch, series, palette=palette, dark=dark, font=font, highlight=highlight,
+                 legend=legend, value_fmt=value_fmt, smooth=smooth, kind=kind)
+    return ch
+
+
+def _theme_chart(ch, series, *, palette, dark, font, highlight, legend, value_fmt, smooth, kind):
+    from pptx.enum.chart import XL_LEGEND_POSITION
+    ink = RGBColor(0xEA, 0xF2, 0xFF) if dark else RGBColor(0x22, 0x2A, 0x37)
+    grid = RGBColor(0x2A, 0x35, 0x55) if dark else RGBColor(0xE7, 0xE9, 0xF0)
+    muted = RGBColor(0x8A, 0x93, 0xA6) if dark else RGBColor(0xB8, 0xBE, 0xCC)
+    pal = [_as_rgb(c) for c in (palette or ACCENTS)]
+    fname = font or EAFONT or FONT          # the deck's script font → non-Latin labels render (no tofu)
+    try:
+        ch.font.name = fname; ch.font.size = Pt(11); ch.font.color.rgb = ink
+    except Exception:
+        pass
+    ch.has_title = False
+    multi = len(series) > 1
+    ch.has_legend = bool(legend and multi)
+    if ch.has_legend:
+        ch.legend.position = XL_LEGEND_POSITION.TOP; ch.legend.include_in_layout = False
+        ch.legend.font.color.rgb = ink; ch.legend.font.name = fname
+    for ax in (ch.category_axis, ch.value_axis):
+        try:
+            ax.tick_labels.font.color.rgb = ink; ax.tick_labels.font.name = fname; ax.tick_labels.font.size = Pt(10)
+            ax.format.line.color.rgb = grid
+        except Exception:
+            pass
+    try:
+        ch.value_axis.major_gridlines.format.line.color.rgb = grid
+        ch.value_axis.major_gridlines.format.line.width = Pt(0.5)
+        ch.category_axis.has_major_gridlines = False
+    except Exception:
+        pass
+    if value_fmt:
+        try:
+            ch.value_axis.tick_labels.number_format = value_fmt
+            ch.value_axis.tick_labels.number_format_is_linked = False
+        except Exception:
+            pass
+    for i, ser in enumerate(ch.series):
+        col = pal[i % len(pal)]
+        if highlight is not None:
+            col = pal[0] if i == highlight else muted
+        try:
+            ser.format.line.color.rgb = col; ser.format.line.width = Pt(2.5); ser.smooth = smooth
+        except Exception:
+            pass
+        try:
+            ser.marker.format.fill.solid(); ser.marker.format.fill.fore_color.rgb = col
+            ser.marker.format.line.color.rgb = col
+        except Exception:
+            pass
+        if kind in ("column", "bar"):
+            try:
+                ser.format.fill.solid(); ser.format.fill.fore_color.rgb = col
+            except Exception:
+                pass
+    return ch
+
+
+def native_dual_axis(slide, x, y, w, h, categories, left, right, *, left_name="A", right_name="B",
+                     palette=None, dark=False, font=None):
+    """An **editable** two-scale line chart (real PowerPoint combo chart): `left` values on the left
+    axis, `right` values on a SECONDARY right axis — the 'A↑ vs B↓' story (e.g. 占比% vs 成本指数).
+    Click-to-edit and **any-language-safe**: non-Latin labels (CJK · Cyrillic · Greek · …) render via
+    PowerPoint's fonts, no tofu (pass ``font=`` your deck's text font). The editable, non-rasterised
+    replacement for ``designed_charts.dual_axis`` — especially for non-Latin labels."""
+    from pptx.chart.data import CategoryChartData
+    from pptx.enum.chart import XL_CHART_TYPE
+    cd = CategoryChartData(); cd.categories = [str(c) for c in categories]
+    cd.add_series(str(left_name), tuple(left)); cd.add_series(str(right_name), tuple(right))
+    gf = slide.shapes.add_chart(XL_CHART_TYPE.LINE_MARKERS, Inches(x), Inches(y), Inches(w), Inches(h), cd)
+    ch = gf.chart
+    _theme_chart(ch, [(left_name, 1), (right_name, 1)], palette=palette, dark=dark, font=font,
+                 highlight=None, legend=True, value_fmt=None, smooth=True, kind="line_markers")
+    _chart_to_secondary(ch, dark=dark, font=font)
+    return ch
+
+
+def _chart_to_secondary(ch, *, dark, font):
+    """Move the LAST series of a 2-series chart onto a SECONDARY right-hand value axis, drawn as a
+    line (builds the combo-chart OOXML python-pptx has no public API for). Works whether the primary
+    plot is a line or a bar chart — so it powers both dual-axis and Pareto (bars + cumulative line)."""
+    ink = "EAF2FF" if dark else "222A37"
+    fname = font or EAFONT or FONT
+    pa = ch._chartSpace.xpath('.//c:plotArea')[0]
+    prim = (pa.xpath('./c:lineChart') or pa.xpath('./c:barChart'))[0]
+    axids = [int(e.get('val')) for e in prim.xpath('./c:axId')]
+    cat2, val2 = max(axids) + 111, max(axids) + 222
+    ser1 = prim.xpath('./c:ser')[-1]; prim.remove(ser1)
+    txpr = (f'<c:txPr><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="1000">'
+            f'<a:solidFill><a:srgbClr val="{ink}"/></a:solidFill><a:latin typeface="{fname}"/>'
+            f'</a:defRPr></a:pPr><a:endParaRPr lang="en-US"/></a:p></c:txPr>')
+    lc2 = parse_xml(f'<c:lineChart {nsdecls("c")}><c:grouping val="standard"/><c:varyColors val="0"/>'
+                    f'<c:marker val="1"/><c:axId val="{cat2}"/><c:axId val="{val2}"/></c:lineChart>')
+    lc2.insert(2, ser1); prim.addnext(lc2)
+    pa.append(parse_xml(f'<c:valAx {nsdecls("c", "a")}><c:axId val="{val2}"/><c:scaling>'
+                        f'<c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="r"/>'
+                        f'{txpr}<c:crossAx val="{cat2}"/><c:crosses val="max"/></c:valAx>'))
+    pa.append(parse_xml(f'<c:catAx {nsdecls("c")}><c:axId val="{cat2}"/><c:scaling>'
+                        f'<c:orientation val="minMax"/></c:scaling><c:delete val="1"/><c:axPos val="b"/>'
+                        f'<c:crossAx val="{val2}"/></c:catAx>'))
+
+
+def native_donut(slide, x, y, w, h, segments, center_value="", center_label="", *,
+                 palette=None, dark=False, font=None):
+    """Editable part-to-whole **DOUGHNUT** + an optional headline KPI in the hole (native chart;
+    click-to-edit; any-language-safe). segments = [(label, value), ...]. Editable replacement for
+    designed_charts.donut_kpi. (The KPI is a separate native textbox — nudge it onto the hole if needed.)"""
+    from pptx.chart.data import CategoryChartData
+    from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
+    from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+    if not segments:
+        raise ValueError("native_donut needs at least one segment")
+    cd = CategoryChartData(); cd.categories = [str(s[0]) for s in segments]
+    cd.add_series("", tuple(s[1] for s in segments))
+    gf = slide.shapes.add_chart(XL_CHART_TYPE.DOUGHNUT, Inches(x), Inches(y), Inches(w), Inches(h), cd)
+    ch = gf.chart
+    ink = RGBColor(0xEA, 0xF2, 0xFF) if dark else RGBColor(0x22, 0x2A, 0x37)
+    mute = RGBColor(0x8A, 0x93, 0xA6) if dark else RGBColor(0x9A, 0xA0, 0xAE)
+    fname = font or EAFONT or FONT
+    pal = [_as_rgb(c) for c in (palette or ACCENTS)]
+    ch.has_title = False
+    try:
+        ch.font.name = fname; ch.font.color.rgb = ink; ch.font.size = Pt(11)
+        ch.has_legend = True; ch.legend.position = XL_LEGEND_POSITION.BOTTOM
+        ch.legend.include_in_layout = False; ch.legend.font.color.rgb = ink; ch.legend.font.name = fname
+    except Exception:
+        pass
+    for i, pt in enumerate(ch.series[0].points):
+        try:
+            pt.format.fill.solid(); pt.format.fill.fore_color.rgb = pal[i % len(pal)]
+        except Exception:
+            pass
+    if center_value or center_label:
+        runs = []
+        if center_value:
+            runs.append([(str(center_value), 28, ink, True, False, fname)])
+        if center_label:
+            runs.append([(str(center_label), 12, mute, False, False, fname)])
+        text(slide, x + w * 0.18, y + h * 0.32, w * 0.64, h * 0.30, runs,
+             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+    return ch
+
+
+def native_pareto(slide, x, y, w, h, items, *, palette=None, dark=False, font=None):
+    """Editable **Pareto**: ranked columns + a cumulative-% line on a secondary axis (native combo
+    chart; click-to-edit; any-language-safe). items = [(label, value), ...] (sorted desc by you).
+    Editable replacement for designed_charts.pareto."""
+    from pptx.chart.data import CategoryChartData
+    from pptx.enum.chart import XL_CHART_TYPE
+    if not items:
+        raise ValueError("native_pareto needs at least one item")
+    vals = [float(v) for _, v in items]
+    tot = sum(vals) or 1.0
+    cum, run = [], 0.0
+    for v in vals:
+        run += v; cum.append(round(100.0 * run / tot, 1))
+    cd = CategoryChartData(); cd.categories = [str(k) for k, _ in items]
+    cd.add_series("数量", tuple(vals)); cd.add_series("累计 %", tuple(cum))
+    gf = slide.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(x), Inches(y), Inches(w), Inches(h), cd)
+    ch = gf.chart
+    pal = [_as_rgb(c) for c in (palette or ACCENTS)]
+    _theme_chart(ch, [("数量", 1), ("累计 %", 1)], palette=pal, dark=dark, font=font,
+                 highlight=0, legend=True, value_fmt=None, smooth=False, kind="column")
+    _chart_to_secondary(ch, dark=dark, font=font)
+    return ch
+
+
+def native_bubble(slide, x, y, w, h, points, *, palette=None, dark=False, font=None,
+                  xlabel="", ylabel=""):
+    """Editable **bubble** chart — x vs y with a third (size) dimension (native; click-to-edit;
+    any-language-safe). points = [(x, y, size[, label]), ...]. Editable cousin of designed_charts.bubble_trend."""
+    from pptx.chart.data import BubbleChartData
+    from pptx.enum.chart import XL_CHART_TYPE
+    if not points:
+        raise ValueError("native_bubble needs at least one point")
+    bcd = BubbleChartData()
+    ser = bcd.add_series("")
+    for p in points:
+        ser.add_data_point(float(p[0]), float(p[1]), float(p[2]))
+    gf = slide.shapes.add_chart(XL_CHART_TYPE.BUBBLE, Inches(x), Inches(y), Inches(w), Inches(h), bcd)
+    ch = gf.chart
+    ink = RGBColor(0xEA, 0xF2, 0xFF) if dark else RGBColor(0x22, 0x2A, 0x37)
+    grid = RGBColor(0x2A, 0x35, 0x55) if dark else RGBColor(0xE7, 0xE9, 0xF0)
+    fname = font or EAFONT or FONT
+    pal = [_as_rgb(c) for c in (palette or ACCENTS)]
+    ch.has_title = False; ch.has_legend = False
+    try:
+        ch.font.name = fname; ch.font.color.rgb = ink; ch.font.size = Pt(11)
+        ch.series[0].format.fill.solid(); ch.series[0].format.fill.fore_color.rgb = pal[0]
+    except Exception:
+        pass
+    for ax in (ch.category_axis, ch.value_axis):
+        try:
+            ax.tick_labels.font.color.rgb = ink; ax.tick_labels.font.name = fname
+            ax.format.line.color.rgb = grid
+            ax.major_gridlines.format.line.color.rgb = grid; ax.major_gridlines.format.line.width = Pt(0.5)
+        except Exception:
+            pass
+    return ch
+
+
 # ================================================================= tables & code
 def _hex(c):
     return c if isinstance(c, str) else str(c)   # RGBColor.__str__ -> 'RRGGBB'

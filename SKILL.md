@@ -611,10 +611,14 @@ A few rules that matter (see `references/design-principles.md`):
   with matplotlib or another available figure-making workflow — then place the result
   *whole*, with a legend + takeaway, like any other figure. A bare number table is the
   weakest way to show a trend. **Pick the chart TYPE that fits the argument, not always a
-  bar** — `references/data-viz.md` has a roster + ready recipes (`scripts/designed_charts.py`:
-  donut+KPI, dumbbell, slope, dual-axis, bubble+trend, Pareto), each **themed to the deck**
-  (pass your palette / `dark=True`), with a **single highlight** on the one series that matters
-  and a `deckkit.takeaway_rail` carrying the "so-what". For 3-6 headline metrics use
+  bar** — `references/data-viz.md` has a roster + ready recipes. **For a deck in ANY non-Latin language
+  (CJK · Cyrillic · Greek · …), or when the user will edit the chart, use an EDITABLE native chart** —
+  `deckkit.native_chart` (line/column/bar) / `deckkit.native_dual_axis` (two-scale A↑ vs B↓): a real
+  PowerPoint chart that renders non-Latin labels via PowerPoint's fonts (**no tofu**) and is
+  click-editable (pass `font=` the script's font). For the richer raster types
+  (`scripts/designed_charts.py`: donut+KPI, dumbbell, slope, bubble+trend, Pareto) pass your palette /
+  `dark=True` (and `font=<the script's font>` on a non-Latin deck). Either way: a **single highlight** on the one series
+  that matters + a `deckkit.takeaway_rail` "so-what". For 3-6 headline metrics use
   `deckkit.scorecard` tiles; key a ranked list to a chart with `deckkit.leaderboard`.
 - **Concept needs a domain image → show the real thing, not an abstract icon.** When an
   idea has a concrete visual — a real data sample, a signal/waveform, a chart of the
@@ -983,7 +987,12 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
   fade) that python-pptx can't; pair with `references/animation.md`.
 - `scripts/designed_charts.py` — the "designed plots" roster (donut+KPI, dumbbell, slope,
   dual-axis, bubble+trend, Pareto) — themed, single-highlight matplotlib recipes beyond default
-  bars; pair with `references/data-viz.md`.
+  bars (raster PNGs; pass `font=` for CJK); pair with `references/data-viz.md`.
+- `deckkit.native_chart` / `native_dual_axis` / `native_donut` / `native_pareto` / `native_bubble` —
+  **editable** native PowerPoint charts (line/column/bar, two-scale dual-axis, doughnut+KPI, Pareto,
+  bubble; slope = a 2-point line): click-to-edit, **any-language-safe (no tofu)**. Prefer over the
+  raster `designed_charts` for non-Latin decks or when the user will edit the chart — `designed_charts`
+  is then only for dumbbell or a deliberate matplotlib look (`references/data-viz.md`).
 - `scripts/presets.py` — named **design-language presets** (`preset("glassmorphism"|"swiss"|
   "editorial_paper"|"editorial_report"|"risograph"|"memphis")`): one switch returns a coherent
   palette + fonts + surface treatment + image-prompt style. Starting languages, not straitjackets.
