@@ -634,7 +634,11 @@ A few rules that matter (see `references/design-principles.md`):
 - **Generated visual plates (atmosphere / conceptual) — by taste & purpose; full rules in
   `references/image-generation.md`.** Generate where your design sense says a plate helps (no
   quota), styled to the deck's purpose+topic, **opt-in only**; never bake words/numbers/labels/
-  charts/logos into a plate (those stay editable objects or real assets). Build prompts with
+  charts/logos into a plate (those stay editable objects or real assets). **Each plate must be
+  *highly topical* — depict THIS slide's actual subject, not a generic "fancy" image that could sit on
+  any slide** (name what it shows; if you can't, cut it). **And place plates consistently — never a
+  one-off generated *header* on a single body slide** (title chrome is `title_bar`'s; a content plate
+  goes full-bleed / side-panel / inline, with one role+art-direction across the plated slides). Build prompts with
   `scripts/image_prompts.py` (a sub-outline of *only* the plated slides), then generate by the
   **auto-detected** source — **no API key needed**: native imagegen (Codex) → else the **Codex CLI**
   `generate_images_codex.py` if `codex` is installed (no key) → OpenAI `generate_images_openai.py`

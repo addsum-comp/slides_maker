@@ -272,7 +272,15 @@ not by counting:
   concept that's clearer **shown than told**, the real thing the audience should picture, or
   atmosphere that frames a section — not every slide, and not "to fill space." For those, **propose
   it — do not assume it ships** (the user decides whether to generate). State in the plan *why* that
-  slide earns an image (what it makes clearer). Never put a generated image where evidence belongs
+  slide earns an image **and name in one phrase what it DEPICTS about that slide's point** — it must be
+  **highly topical** (the actual subject/concept/domain), not a generic "fancy" plate (random
+  gradients/orbs/swooshes) that could sit on any slide; if the same image could drop onto an unrelated
+  slide unnoticed, it's decoration — cut it.
+  - **Plan placement consistently — a content plate is NOT a header.** Don't propose a generated image
+    as a one-off **header/banner on a single content slide** while peers have none (arbitrary; breaks
+    the system) — title chrome is `title_bar`/`editorial_header`'s job. Place a content plate where it
+    serves the content (full-bleed bg, side panel, or inline figure), and when several slides carry
+    plates give them **one role + one art-direction** (repeated full-bleed is for dividers). Never put a generated image where evidence belongs
   (source figures, data charts, screenshots, logos, anything traceable stays real). **When a plate has a subject, plan it so the subject stays
   whole** — note the `fit` (usually `contain`) and prompt for the subject centred with margin
   so a crop can't cut it (the subject reduced to a sliver = the failure to avoid). **For real,

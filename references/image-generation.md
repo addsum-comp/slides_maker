@@ -39,6 +39,14 @@ deck** — topic, content, and the **template/brand/style** (palette, the genera
 a mimicked style) so it reads as part of *this* deck, not pasted in. Feed the deck's palette + art
 direction into the prompt. If either gate fails, use real/native assets or plain whitespace instead.
 
+**The image must be *about this slide* — highly topical, not generic "fancy" filler.** A plate that
+depicts the slide's actual subject (the concept, object, scene, or domain the slide is explaining)
+earns its place; a pretty-but-generic abstract (random gradients, glowing orbs, "techy" swooshes that
+could sit on *any* slide) is decoration that *makes no sense* against the content — cut it. **The test:
+name, in one phrase, what the image shows about THIS slide's point.** If you can't — or if the same
+image could drop onto an unrelated slide without anyone noticing — it's not topical; use a real asset,
+a native diagram/chart, or plain whitespace instead. Put the slide's actual subject into the prompt.
+
 Use the agent's native image generation skill when a slide would benefit from:
 
 - a text-free hero image, atmospheric background, or side-panel photo/illustration;
@@ -51,6 +59,21 @@ Prefer real or deterministic assets instead when the visual carries evidence:
 - source figures, tables, screenshots, charts, medical/scientific imagery, microscopy, maps, UI states, code, product shots, logos, or brand marks;
 - any result whose content must be traceable to the user's material;
 - any plot or diagram that needs readable labels, axes, numbers, or formulas.
+
+## Place plates consistently — and a content plate is NOT a header
+How a plate sits on the slide is part of the system, so keep it consistent and purposeful:
+- **No one-off header band.** Don't drop a generated image as a decorative **header/banner strip on a
+  single content slide** when the other content slides have none — it reads as arbitrary and breaks
+  the deck's visual system (the eye asks "why does only this slide have a top image?"). A generated
+  content plate **needn't be a header at all** — place it where it *serves the content*: a full-bleed
+  background under native text, a **side panel** beside the points, or an **inline figure** in the
+  content area. Title chrome is the `title_bar`/`editorial_header` job, not a generated image's.
+- **One treatment family across the plated slides.** When several content slides carry a plate, give
+  them the **same role and framing** (e.g. all right-side panels, or all full-bleed dividers) and one
+  art-direction — not a header here, a corner image there. Section **dividers** are the natural place
+  for a repeated full-bleed image; per-slide content plates are opt-in and should look deliberate, not
+  sprinkled. (The cover/divider hero from the generated-template route is the *consistent* use; a lone
+  header on one body slide is the inconsistency to avoid.)
 
 ## Real brand / product assets come first — never fill with a generic stand-in
 

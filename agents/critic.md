@@ -286,6 +286,17 @@ Do not just skim for the first few obvious issues. Run these passes:
      **generated look-alike, an invented logo, or a default-blue box** standing in for the real asset
      (instead of the real logo/product/screenshot, or an honest "swap this" placeholder) — a
      credibility + fidelity finding; the fix is to use the real asset or ask the user for it.
+   - **Generated image not topical to the slide:** a plate that doesn't **depict this slide's actual
+     subject** — a generic "fancy" image (random gradients/orbs/swooshes, an unrelated stock-y scene)
+     that could sit on any slide and adds no understanding. Test: can you name what it shows about the
+     slide's point? If not, flag it (fix: a real asset / native diagram / whitespace, or a prompt that
+     shows the real subject).
+   - **One-off generated header / inconsistent plate placement:** a generated image used as a
+     **header/banner on a single content slide** while the other body slides have none (arbitrary —
+     title chrome is `title_bar`'s job), or plated slides that don't share **one role + art-direction**
+     (a header here, a corner image there). Flag the inconsistency; a content plate belongs in the
+     content area (full-bleed / side panel / inline figure), and repeated full-bleed imagery belongs on
+     dividers, applied consistently.
    - **Deck rhythm (a deck-level check — scan all the thumbnails together):** across a **long** deck,
      do the **visual protagonist and density vary** (chart → diagram → photo → big-number → quote, with
      dense slides paced by airy ones), or does it read as **one template repeated**? Flag a long deck
