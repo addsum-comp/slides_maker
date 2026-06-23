@@ -56,7 +56,8 @@ preset + a reference) is fine — just name what you're combining so the choice 
 Generate a **full-bleed, text-free** hero/divider illustration in the chosen style:
 - **Tooling — auto-detect the source, no API key needed** (build the prompt with
   `scripts/image_prompts.py`; full guidance in `references/image-generation.md`). Use what's present,
-  in order: **(1)** native imagegen when the host has it (inside Codex — free, no key); **(2)** else
+  in order: **(1)** native imagegen when the host has it (inside Codex — use the agent tool call
+  directly, free, no key); **(2)** else
   the **Codex CLI** `scripts/generate_images_codex.py --orientation landscape` if `codex` is installed
   (Codex/ChatGPT subscription, **no key** — shells `codex exec`, decodes the hosted image from the
   session rollout); **(3)** else, only as a fallback, the OpenAI API `scripts/generate_images_openai.py`

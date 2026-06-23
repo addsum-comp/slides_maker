@@ -172,8 +172,9 @@ the direction gate** (the look is already decided). The four:
         reference images / a logo / mood material**. Then **tailor the chosen style** to the
         scenario + brand before generating (the preset is a starting language, not a straitjacket).
      2. **Generate the template** — a **text-free** full-bleed hero/divider illustration in that
-        style with a calm zone for the title (**no API key needed** — auto-detect: native imagegen in
-        Codex → else the **Codex CLI** `scripts/generate_images_codex.py` if `codex` is installed →
+        style with a calm zone for the title (**no API key needed** — in Codex, use the native
+        imagegen tool call directly and save/copy the selected bitmap into the deck folder; outside a
+        native-imagegen host, fall back to the **Codex CLI** `scripts/generate_images_codex.py` if `codex` is installed →
         OpenAI `scripts/generate_images_openai.py` only as a fallback; see
         `references/image-generation.md`), then **derive a matching `style.py`**: pull the
         palette straight from the image with `deckkit.palette_from_image(...)` and define the
@@ -640,7 +641,8 @@ A few rules that matter (see `references/design-principles.md`):
   one-off generated *header* on a single body slide** (title chrome is `title_bar`'s; a content plate
   goes full-bleed / side-panel / inline, with one role+art-direction across the plated slides). Build prompts with
   `scripts/image_prompts.py` (a sub-outline of *only* the plated slides), then generate by the
-  **auto-detected** source — **no API key needed**: native imagegen (Codex) → else the **Codex CLI**
+  **auto-detected** source — **no API key needed**: native imagegen (Codex tool call, then save/copy
+  the bitmap into the deck folder) → else the **Codex CLI**
   `generate_images_codex.py` if `codex` is installed (no key) → OpenAI `generate_images_openai.py`
   (+`OPENAI_API_KEY`) only as a fallback if neither exists. Use what's present and say so; ask only if
   none is available (see `image-generation.md`); keep
@@ -759,6 +761,10 @@ slide). python-pptx writes blind — overflow, low contrast, a callout on the fo
 or a missing glyph only show up in the image. Fix mechanical issues and re-render.
 (First time on a machine, or a render errors? `bash scripts/check_env.sh` verifies
 LibreOffice + the python deps and prints the fix for anything missing.)
+**Codex sandbox note:** LibreOffice may abort or produce no PDF when launched inside a managed
+sandbox even though `check_env.py` passes; in that case rerun only the render command with elevated /
+unsandboxed execution, then continue the normal render -> lint -> critic loop. This is an environment
+permission issue, not evidence that the deck is malformed.
 
 **Then run the layout lint** — `python scripts/lint_deck.py <deck.pptx>` — a cheap, deterministic
 check that flags **off-slide overflow, text overflowing the card behind it, uneven card heights in a
@@ -1007,7 +1013,7 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
 - `scripts/image_prompts.py` — create text-free image generation prompt manifests and
   expected filenames for optional slide visual plates.
 - `scripts/generate_images_codex.py` — **no-API-key** image generation (the default outside a
-  native-imagegen host): shells out to `codex exec` (the hosted `image_generation` tool), decodes the
+  native-imagegen host; inside Codex, prefer the native imagegen tool call): shells out to `codex exec` (the hosted `image_generation` tool), decodes the
   image from the Codex session rollout, and writes the manifest's `slide-XX.png` files. Auto-detected
   when `codex` is installed/logged-in; prompts are passed verbatim. **No key, no per-image cost.**
 - `scripts/generate_images_openai.py` — **fallback** OpenAI Images API path (only when neither native

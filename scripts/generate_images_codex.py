@@ -137,7 +137,15 @@ def main():
               "scripts/generate_images_openai.py with OPENAI_API_KEY instead.", file=sys.stderr)
         return 2
 
-    items = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
+    manifest = Path(args.manifest)
+    if not manifest.is_file():
+        print(f"error: manifest not found: {manifest}", file=sys.stderr)
+        return 2
+    try:
+        items = json.loads(manifest.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"error: invalid JSON in manifest {manifest}: {exc}", file=sys.stderr)
+        return 2
     if not isinstance(items, list):
         print("error: manifest must be a JSON list", file=sys.stderr)
         return 2

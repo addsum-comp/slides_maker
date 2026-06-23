@@ -170,7 +170,10 @@ common cases image generation needs **no API key**. **Detect what's available, u
 which — don't prompt the user to choose a path, and don't ask for a key by default.** Preference order:
 
 **1 · Native host imagegen** — if the host's agent has a built-in image tool (e.g. running *inside
-Codex*), generate directly with it. No key, no extra step.
+Codex*), generate directly with that tool call. No key, no extra step. In Codex specifically this is
+an agent tool, not a shell command a script can auto-detect; call it for each approved prompt, then
+save/copy the selected bitmap into `~/Downloads/<deck>/assets/generated/` before the build script
+references it.
 
 **2 · Codex CLI** — the default outside a native-imagegen host (e.g. in Claude Code): if the `codex`
 CLI is installed and logged in (check `which codex`; `codex login` once), shell out to it — it calls
@@ -196,8 +199,8 @@ python scripts/generate_images_openai.py \
 Both scripts share the manifest format and the `--out-dir` / `--limit` / `--overwrite` / `--dry-run`
 flags, save each output to the manifest path (e.g. `slide-01.png`), and skip existing files by default.
 
-> **Detection-first; ask only when stuck.** Pick native → Codex CLI → API key by what's installed,
-> proceed, and tell the user which you used (one line). **Only ask** when *none* is available — then
+> **Detection-first; ask only when stuck.** Pick native tool call → Codex CLI → API key by what's
+> available, proceed, and tell the user which you used (one line). **Only ask** when *none* is available — then
 > point them to `codex login` (no key) or, as a last resort, an `OPENAI_API_KEY`. Never block on a
 > choice when a working path is already present.
 
