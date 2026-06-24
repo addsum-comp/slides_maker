@@ -22,10 +22,15 @@ Checks (tuned for low false-positives):
                   NO containment escape — a low content band that swallows the footer text into its
                   bbox is still a collision (that "text-on-a-card" exclusion was the blind spot that
                   let a band overlap the footer).
+  Plus: off-slide overflow, TEXT-OVERFLOWS-CARD, UNEVEN CARD HEIGHTS, ORPHANED PUNCTUATION / WIDOW
+  (a wrapped box whose last line is a lone 。/，or a single CJK glyph — 避头尾), CJK-TEXT-WITHOUT-EA-FONT
+  (the root cause of orphaned punctuation: no <a:ea> → PowerPoint applies no kinsoku, plus tofu risk),
+  whole-page-image/editability, and orphan/empty slides.
 """
 import sys
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
+from pptx.oxml.ns import qn
 
 EMU = 914400.0
 TOL = 0.05        # inches — ignore hairline/touching overlaps
@@ -44,7 +49,7 @@ def _boxes(slide, sw, sh):
             continue
         full = s.text_frame.text.strip() if s.has_text_frame else ""
         txt = full.replace("\n", " ")[:26]
-        paras, size = [], 0.0
+        paras, size, cjk_no_ea = [], 0.0, False
         if s.has_text_frame:
             size = max((r.font.size.pt for p in s.text_frame.paragraphs for r in p.runs if r.font.size),
                        default=12.0)
@@ -52,10 +57,15 @@ def _boxes(slide, sw, sh):
                 pr = [(r.text, (r.font.size.pt if r.font.size else size)) for r in p.runs]
                 if pr:
                     paras.append(pr)
+                for r in p.runs:                         # CJK run with no <a:ea> → no kinsoku + tofu risk
+                    if any(ord(ch) > 0x2E80 for ch in r.text):
+                        rPr = r._r.find(qn("a:rPr"))
+                        if rPr is None or rPr.find(qn("a:ea")) is None:
+                            cjk_no_ea = True
         out.append({"l": l, "t": t, "w": w, "h": h, "r": l + w, "b": t + h,
                     "st": str(s.shape_type).split()[0], "txt": txt, "full": full, "size": size or 12.0,
                     "paras": paras, "solid": s.shape_type in SOLID,
-                    "text": bool(s.has_text_frame and txt),
+                    "text": bool(s.has_text_frame and txt), "cjk_no_ea": cjk_no_ea,
                     "bg": (w * h) >= 0.95 * (sw * sh)})
     return out
 
@@ -81,6 +91,31 @@ def _est_lines(paras, width_in):
                     w += cw
         total += lines
     return total or 1
+
+
+def _last_line(paras, width_in):
+    """Return the text on the LAST wrapped visual line (same CJK-aware wrap estimate as _est_lines) —
+    so we can catch a lone trailing punctuation mark or a single orphaned glyph (避头尾 / widow)."""
+    if width_in <= 0 or not paras:
+        return ""
+    line = ""
+    for pr in paras:
+        line, w = "", 0.0
+        for text, size_pt in pr:
+            em = max(0.01, size_pt / 72.0)
+            for ch in text:
+                if ch == "\n":
+                    line, w = "", 0.0; continue
+                cw = em * (1.0 if ord(ch) > 0x2E80 else 0.52)
+                if w + cw > width_in and w > 0:
+                    line, w = ch, cw          # this char starts a new line
+                else:
+                    line += ch; w += cw
+    return line                                # last paragraph's last line = the box's last line
+
+
+# punctuation that must never stand alone at the start of a line (closing marks)
+_CLOSERS = set("。．，、！？：；）》】」』〕〗｝….,!?:;)]}、。")
 
 
 def _inter(a, b):
@@ -174,6 +209,24 @@ def lint(path):
                     finds.append(f"TEXT OVERFLOWS its card: '{t['txt']}' (~{nlines} lines) runs past the "
                                  f"card bottom ({round(host['b'],2)}in) — size the card to the text "
                                  f"(measure-then-place) or shorten the text")
+        # 6b) orphaned punctuation / widow: a wrapped box whose LAST line is just a punctuation mark
+        #     (the 避头尾 bug — a lone 。/，pushed to its own row) or a single orphaned CJK glyph
+        for t in [s for s in bx if s["text"] and s["w"] > 0]:
+            if _est_lines(t["paras"], t["w"]) < 2:
+                continue
+            ll = _last_line(t["paras"], t["w"]).strip()
+            if ll and all(c in _CLOSERS for c in ll):
+                finds.append(f"ORPHANED PUNCTUATION: the last line of '{t['txt']}' is just '{ll}' — "
+                             f"widen the box / lower the size / reword so the mark stays attached (避头尾)")
+            elif len(ll) == 1 and ord(ll) > 0x2E80:
+                finds.append(f"WIDOW: a lone glyph '{ll}' stranded on the last line of '{t['txt']}' — "
+                             f"widen the box or reword so the last line has company")
+        # 6c) CJK text with NO East-Asian font set — the ROOT cause of orphaned punctuation: without an
+        #     <a:ea> font PowerPoint applies no kinsoku (避头尾), so a 。/，can start a line; also tofu/
+        #     uncontrolled-font risk. Set deckkit.EAFONT (+ EADISPLAY). Reliable, render-independent.
+        for t in [s for s in bx if s["text"] and s.get("cjk_no_ea")]:
+            finds.append(f"CJK TEXT without an EA font: '{t['txt']}' has CJK runs with no East-Asian "
+                         f"font — set deckkit.EAFONT (no kinsoku → orphaned punctuation; uncontrolled font → tofu)")
         # 7) uneven card heights in a row (sibling cards must share ONE height)
         cset = [s for s in bx if s["solid"] and not s["bg"] and not s["text"] and s["h"] > 0.5 and s["w"] < 0.6 * sw]
         bycol = {}                                  # dedupe layered shapes per (top,left): keep the tallest (the card, not its header band)

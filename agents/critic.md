@@ -274,10 +274,14 @@ Do not just skim for the first few obvious issues. Run these passes:
      Also flag **叠字 — glyphs visibly overlapping or colliding** (bad tracking / a too-narrow box
      squeezing CJK), and an **awkward line break (断句)** — a title or term split at a meaningless
      point (mid-word / between a number and its unit) — give the box more room or rebreak the line.
-     **Orphaned punctuation (avoid 头尾):** a line that **starts** with closing punctuation
-     (`。，、！？：；）" `) or **ends** with an opening one, or — the ugliest tell — a **lone
-     punctuation mark sitting alone on its own row**. Fix: widen the box / nudge the size / rebreak
-     so the mark stays with its character (also applies to a stray Latin ")" or "." wrapping alone).
+     **Orphaned punctuation (避头尾) — check on EVERY CJK slide:** a line that **starts** with closing
+     punctuation (`。，、！？：；）" `) or **ends** with an opening one, or — the ugliest tell — a **lone
+     punctuation mark (a single 。/，) sitting alone on its own row** (the recurring bug). The usual
+     root cause is a **CJK run with no East-Asian font** → PowerPoint applies no kinsoku, so the mark
+     can start a line: when you see this, prescribe **setting `deckkit.EAFONT`** (not just widening),
+     and widen the box / nudge the size / rebreak so the mark stays with its character (also a stray
+     Latin ")" or "." wrapping alone). `scripts/lint_deck.py` now flags **ORPHANED PUNCTUATION** and
+     **CJK-TEXT-WITHOUT-EA-FONT** deterministically — read its findings, but still eyeball the render.
      **A short display token wrapped mid-token** — a big section numeral like "01" broken to
      a stacked "0"/"1", or an oversized title splitting awkwardly — is a real flaw (fix: widen
      / auto-size so it stays one line; `deckkit.big_numeral` does this).
