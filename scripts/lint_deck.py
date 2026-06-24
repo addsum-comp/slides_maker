@@ -24,8 +24,9 @@ Checks (tuned for low false-positives):
                   let a band overlap the footer).
   Plus: off-slide overflow, TEXT-OVERFLOWS-CARD, UNEVEN CARD HEIGHTS, ORPHANED PUNCTUATION / WIDOW
   (a wrapped box whose last line is a lone 。/，or a single CJK glyph — 避头尾), CJK-TEXT-WITHOUT-EA-FONT
-  (the root cause of orphaned punctuation: no <a:ea> → PowerPoint applies no kinsoku, plus tofu risk),
-  whole-page-image/editability, and orphan/empty slides.
+  (the root cause of orphaned punctuation: no <a:ea> → PowerPoint applies no kinsoku, plus tofu risk —
+  checked across ANY text: text boxes, table cells, and grouped shapes), whole-page-image/editability,
+  and orphan/empty slides.
 """
 import sys
 from pptx import Presentation
@@ -49,7 +50,7 @@ def _boxes(slide, sw, sh):
             continue
         full = s.text_frame.text.strip() if s.has_text_frame else ""
         txt = full.replace("\n", " ")[:26]
-        paras, size, cjk_no_ea = [], 0.0, False
+        paras, size = [], 0.0
         if s.has_text_frame:
             size = max((r.font.size.pt for p in s.text_frame.paragraphs for r in p.runs if r.font.size),
                        default=12.0)
@@ -57,15 +58,10 @@ def _boxes(slide, sw, sh):
                 pr = [(r.text, (r.font.size.pt if r.font.size else size)) for r in p.runs]
                 if pr:
                     paras.append(pr)
-                for r in p.runs:                         # CJK run with no <a:ea> → no kinsoku + tofu risk
-                    if any(ord(ch) > 0x2E80 for ch in r.text):
-                        rPr = r._r.find(qn("a:rPr"))
-                        if rPr is None or rPr.find(qn("a:ea")) is None:
-                            cjk_no_ea = True
         out.append({"l": l, "t": t, "w": w, "h": h, "r": l + w, "b": t + h,
                     "st": str(s.shape_type).split()[0], "txt": txt, "full": full, "size": size or 12.0,
                     "paras": paras, "solid": s.shape_type in SOLID,
-                    "text": bool(s.has_text_frame and txt), "cjk_no_ea": cjk_no_ea,
+                    "text": bool(s.has_text_frame and txt),
                     "bg": (w * h) >= 0.95 * (sw * sh)})
     return out
 
@@ -116,6 +112,37 @@ def _last_line(paras, width_in):
 
 # punctuation that must never stand alone at the start of a line (closing marks)
 _CLOSERS = set("。．，、！？：；）》】」』〕〗｝….,!?:;)]}、。")
+
+
+def _walk_runs(shapes):
+    """Yield every text run on the slide — recursing into GROUPS and descending into TABLE cells —
+    so checks cover ANY text scenario, not just top-level text boxes."""
+    for s in shapes:
+        try:
+            if s.shape_type == MSO_SHAPE_TYPE.GROUP:
+                yield from _walk_runs(s.shapes); continue
+            if getattr(s, "has_table", False):
+                for row in s.table.rows:
+                    for cell in row.cells:
+                        for p in cell.text_frame.paragraphs:
+                            yield from p.runs
+                continue
+            if s.has_text_frame:
+                for p in s.text_frame.paragraphs:
+                    yield from p.runs
+        except Exception:
+            continue
+
+
+def _run_cjk_no_ea(run):
+    """True if the run has CJK glyphs but no <a:ea> font (→ no kinsoku + tofu/uncontrolled-font risk)."""
+    try:
+        if not any(ord(ch) > 0x2E80 for ch in run.text):
+            return False
+        rPr = run._r.find(qn("a:rPr"))
+        return rPr is None or rPr.find(qn("a:ea")) is None
+    except Exception:
+        return False
 
 
 def _inter(a, b):
@@ -221,12 +248,16 @@ def lint(path):
             elif len(ll) == 1 and ord(ll) > 0x2E80:
                 finds.append(f"WIDOW: a lone glyph '{ll}' stranded on the last line of '{t['txt']}' — "
                              f"widen the box or reword so the last line has company")
-        # 6c) CJK text with NO East-Asian font set — the ROOT cause of orphaned punctuation: without an
-        #     <a:ea> font PowerPoint applies no kinsoku (避头尾), so a 。/，can start a line; also tofu/
-        #     uncontrolled-font risk. Set deckkit.EAFONT (+ EADISPLAY). Reliable, render-independent.
-        for t in [s for s in bx if s["text"] and s.get("cjk_no_ea")]:
-            finds.append(f"CJK TEXT without an EA font: '{t['txt']}' has CJK runs with no East-Asian "
-                         f"font — set deckkit.EAFONT (no kinsoku → orphaned punctuation; uncontrolled font → tofu)")
+        # 6c) CJK text with NO East-Asian font — the ROOT cause of orphaned punctuation (no <a:ea> →
+        #     PowerPoint applies no kinsoku (避头尾), so a 。/，can start a line; also tofu/uncontrolled
+        #     font). Checked across ANY text scenario — text boxes, TABLE cells, and grouped shapes —
+        #     not just top-level boxes. Reliable, render-independent. Fix: set deckkit.EAFONT (+ EADISPLAY).
+        bad_ea = [r for r in _walk_runs(slide.shapes) if _run_cjk_no_ea(r)]
+        if bad_ea:
+            sample = next((r.text.strip() for r in bad_ea if r.text.strip()), "")[:18]
+            finds.append(f"CJK TEXT without an EA font: {len(bad_ea)} run(s) (e.g. '{sample}', incl. any "
+                         f"table/grouped text) have CJK with no East-Asian font — set deckkit.EAFONT "
+                         f"(no kinsoku → orphaned punctuation; uncontrolled font → tofu)")
         # 7) uneven card heights in a row (sibling cards must share ONE height)
         cset = [s for s in bx if s["solid"] and not s["bg"] and not s["text"] and s["h"] > 0.5 and s["w"] < 0.6 * sw]
         bycol = {}                                  # dedupe layered shapes per (top,left): keep the tallest (the card, not its header band)
