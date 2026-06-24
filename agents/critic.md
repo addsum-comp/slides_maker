@@ -134,6 +134,21 @@ Do not just skim for the first few obvious issues. Run these passes:
      `references/data-viz.md` + the planner's design-selection guide). Conversely, **don't reward a
      pattern used where it doesn't fit** — a `quadrant` with no real second axis, a `hub_spoke` for a
      sequence, a `specimen_card`/`wireframe_grid` outside a type/design/systems deck.
+   - **Overlap — check this carefully, pair by pair; overlap is UNACCEPTABLE.** Scan each slide and
+     test every pair of distinct blocks against the ONE distinction: a **collision** — two *separate*
+     blocks intersecting with **neither containing the other** (a card over a table/figure, a band or
+     callout over the **footer**, a diagram node poking outside its panel, two stacked blocks touching),
+     or **text crossing out of its own box/card** — is **always a flaw: major, or a blocker when it
+     covers the footer / makes text unreadable.** Never wave it through as "almost clear." **Intentional
+     LAYERING is not a collision and must NOT be flagged** — a label on its card, a scrim over a photo,
+     a glow under a glass card, a header band on its card (the child sits fully *inside* its parent);
+     the test is simply *does one fully contain the other?* (contain → fine; not → collision).
+     `scripts/lint_deck.py` flags solid block/image collisions, footer-zone intrusions, and text-past-
+     card deterministically — **read its findings AND re-verify visually**, because it can't see a text
+     run spilling a panel edge, two elements a hair apart that read as touching, or a figure's label
+     clipped by a neighbour. For each real collision, name the **two elements**, where they touch, and
+     the **root-cause fix** (re-anchor via `content_band` / `vstack(bottom=)` / `bottom_callout`,
+     resize, or add a gap — never a one-off `y` nudge that recurs when the wording changes).
    - **Layout:** overflow / clipped text, content occluded or jammed on the footer,
      **text spilling outside its own card/box** — a body that wraps to more lines than its card was
      sized for, so a line hangs *below the card edge* (a distinct, glaring tell; fix by sizing the

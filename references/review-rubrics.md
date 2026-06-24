@@ -86,7 +86,11 @@ Score each dimension; cite specific slides.
    a figure (architecture, results, a chart), is it shown **whole** rather than
    partial-cropped or hand-redrawn (redraws risk dropping/mis-stating detail)? Is
    there breathing room — a consistent gutter between figures and text, nothing
-   crammed, **and no two elements overlapping** (a figure encroaching on a table/text)?
+   crammed, **and no two elements overlapping**? A **collision** — two separate blocks intersecting
+   with neither containing the other (a figure encroaching on a table/text, a band over the footer,
+   text crossing out of its box) — is **unacceptable** (major; a covered footer / unreadable overlap is
+   a blocker). *Intentional layering* — a child fully inside its parent (label on a card, scrim on a
+   photo, glow under a glass card) — is **not** overlap and is fine.
    On **split layouts** (text + figure, two-up, image + caption), are the left and right
    regions — *and the white margins flanking them* — the **same width** (or a clearly
    intentional asymmetric split with equal outer margins)? Unequal panels, a lopsided

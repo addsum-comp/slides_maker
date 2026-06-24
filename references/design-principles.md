@@ -259,6 +259,19 @@ ask of each element "is there suitable, balanced space around it, or is it crowd
   breathing tool around content — not a large leftover void. *(On a **fixed surface** — poster,
   single-slide infographic, one-pager — you can't "add a slide": organise the density into clear
   regions/columns with strong hierarchy instead; the no-large-void rule still holds within the canvas.)*
+- **Overlap vs layering — the one distinction, so "no overlap" and "layer glass on a glow" never
+  conflict.** Two definitions, applied everywhere (rules, lint, critic):
+  - **Collision = two SEPARATE blocks intersecting, neither contained in the other** (a card over a
+    table, a callout over the footer, text crossing out of its box, a diagram node poking past its
+    panel). **This is UNACCEPTABLE — always a flaw, never "close enough."** Separate blocks need a
+    visible gap; they never touch or overlap.
+  - **Layering = a child fully INSIDE its parent** (a label on its card, a scrim over a photo, a glow
+    *under* a glass card, a header band on its card, an icon in its tile). This is **intentional and
+    correct — not overlap.** The "no-overlap" rule forbids *collisions*, not containment.
+  So the test for any two intersecting shapes: *does one fully contain the other?* Contained →
+  intentional layering, fine. Not contained → collision, fix it (re-anchor via `content_band`/`vstack`/
+  `bottom_callout`, resize, or add a gap). `lint_deck.py` encodes exactly this (containment excluded;
+  the footer zone has no containment escape).
 - **Mind the gaps between blocks — even and intentional.** Equal gaps between repeated/adjacent
   blocks (cards, chips, rows, list items) — derive them from `columns`/`rows`/`vstack`, never
   eyeball; one gap visibly larger than its neighbours reads as careless. Adjacent blocks always need
