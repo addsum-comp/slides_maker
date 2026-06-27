@@ -372,6 +372,18 @@ not by counting:
   glassmorphism/Memphis/riso deck's plates must carry that same look. Pull the deck's palette into
   the prompt. Apply that one direction to every plate you propose so they read as one family. Record the art-direction
   once in the plan; the user approves it with the images.
+- **Icons — propose ONE coherent family where they genuinely label, never as decoration (rules +
+  five quality marks in `references/icons.md`).** Where a slide has **category/feature/section/step
+  cards**, a recurring section mark, or a real **brand/tech product** to name, plan icons from a
+  *single* open-licensed family (Tabler/Lucide/Phosphor; `simple:` for logos) — the upper-left-of-card
+  (`icon_card`) or centred-top-of-step-card pattern is the default. For each card, name the **specific
+  icon whose metaphor fits** (eye→perception, plug→execute…), not "an icon". In a **multi-category**
+  layout, plan **colour-coding** — each category its own hue (from `palette(n)`), carried by the icon +
+  label + tint — not one global accent; ensure **contrast** (bright on a dark deck / saturated on
+  light). Pick the family **once for the whole deck** and note it + the per-category hues in the
+  art-direction. Plan icons only where they aid recognition; **do not** plan an icon per bullet, a
+  decorative/mismatched icon, or an icon without a text label. Like plates, icons are opt-in — note
+  which slides get them and let the user approve.
 - **Plan the look clear of the AI-slop tells.** Steer the design language and per-slide forms away from
   the machine-generated tells (full-screen rainbow/mesh/gradient washes, emoji in titles or as bullet
   markers, the rounded-card-with-left-accent on *every* slide, three near-identical "feature cards") —

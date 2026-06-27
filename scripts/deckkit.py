@@ -889,6 +889,49 @@ def picture(slide, path, x, y, w, h, fit="contain", alt=None, round=False, r=Non
     return pic
 
 
+def icon(slide, png, x, y, size, *, alt=None, disc=None, disc_pad=None):
+    """Place a square icon PNG (use `scripts/icons.py`'s `icon_png()` to fetch+recolor+rasterize
+    an open-licensed SVG first). `size` is the icon's edge in inches — keep it small and consistent
+    (≈0.32–0.5 in; an icon should read at ~heading size, never bigger than the title).
+
+    `disc=<hex>` draws a soft rounded **tinted tile** behind the icon (a common, tidy treatment —
+    an accent-tinted square with the icon centred); `disc_pad` is the inset of the icon inside the
+    tile. Pass `alt` for a screen-reader label (icons are decorative-ish, but if it carries meaning
+    give it alt text AND a visible text label — never rely on the icon alone). Returns the picture
+    shape. The icon must sit in ONE consistent family/size/colour across the deck (see icons.md)."""
+    if disc:
+        if isinstance(disc, str):
+            disc = disc.lstrip("#")
+        pad = disc_pad if disc_pad is not None else 0.22 * size   # icon ≈56% of the tile
+        box(slide, x, y, size, size, fill=disc, round=True, r=0.11 * size)
+        return picture(slide, png, x + pad, y + pad, size - 2 * pad,
+                       size - 2 * pad, fit="contain", alt=alt)
+    return picture(slide, png, x, y, size, size, fit="contain", alt=alt)
+
+
+def icon_card(slide, x, y, w, h, png, title, body="", *, fill=None, line=None,
+              icon_size=0.42, accent=BLUE, ink=DEEP, body_c=SLATE, disc=None, pad=0.26):
+    """A card with the **icon in the UPPER-LEFT corner**, then a title and optional body below —
+    the clean "feature card" pattern. Use a row of these (built from one `columns(n)` grid) to label
+    categories/features/sections; keep the SAME icon family, size, and colour across every card so
+    they read as a system (CRAP Repetition).
+
+    `png` is a placed icon PNG (recolour it to `accent` via icons.py first); `disc=<hex>` puts the
+    icon in a tinted tile. `fill`/`line` style the card (defaults to a hairline-bordered light card).
+    Title sits at ~heading size, body smaller — never let the icon exceed the title. Returns the
+    card's bottom y."""
+    box(slide, x, y, w, h, fill=fill if fill is not None else WHITE,
+        line=line if line is not None else RGBColor(0xE3, 0xE8, 0xEE), line_w=1.0, round=True)
+    icon(slide, png, x + pad, y + pad, icon_size, disc=disc)
+    ty = y + pad + icon_size + 0.16
+    text(slide, x + pad, ty, w - 2 * pad, 0.34,
+         [[(title, 15, ink, True, False, DISPLAY or FONT)]], space_after=0)
+    if body:
+        text(slide, x + pad, ty + 0.34, w - 2 * pad, h - (ty + 0.34 - y) - pad * 0.5,
+             [[(body, 12, body_c, False, False)]], space_after=0, line_spacing=1.02)
+    return y + h
+
+
 def gif_poster(path, out_png=None, frame="first"):
     """Extract ONE representative frame of an animated GIF to a PNG — for the render/critic
     (which see only a static image) and as a check on what the deck shows when NOT in slideshow.

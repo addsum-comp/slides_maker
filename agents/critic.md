@@ -376,6 +376,18 @@ Do not just skim for the first few obvious issues. Run these passes:
      specifics** (invented stats, fake quotes, an imagined/realistic-but-fake logo — the last is also a
      fidelity blocker). The tell beneath them: decoration *added* to a plain slide instead of the
      layout being fixed by subtraction.
+   - **Icon misuse (named):** when the deck uses SVG icons, judge them against the five quality marks
+     (`references/icons.md`) and flag — **wrong/generic metaphor** (the icon doesn't match what it
+     labels — a gear on every card; an icon that mislabels the concept); **broken colour-coding** (a
+     multi-category layout where the icons DON'T carry each category's hue, or the hues aren't distinct/
+     consistent — icon, label, and card tint should share one colour per category); **poor contrast**
+     (a dark/pale icon lost on a dark deck, or pure-black on a coloured one — it should be bright on
+     dark / saturated on light, disc if needed); **mismatched families** or **outline-mixed-with-filled**
+     across siblings; **inconsistent** size/position across sibling cards; an **oversized** icon (larger
+     than the title); a **decorative** icon that labels nothing or **one-per-bullet** clutter; an **icon
+     with no text label**. Well-used icons (one coherent family, semantic fit, colour-coded per
+     category, good contrast, small, consistent) are *good* — don't flag those. Emoji or ✅/🚀/🔥 used
+     **as** icons is the AI-slop tell above, not an icon.
    - **Build/meta annotation leaked onto a slide (BLOCKER):** any text describing *how the slide was
      made* rather than its content — e.g. "（可点击编辑的原生图表）"/"(editable native chart)",
      "(AI-generated)"/"AI 生成", "(placeholder)"/"占位", "(draft)"/"草稿", "(sample/示例)", "generated

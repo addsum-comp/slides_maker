@@ -519,7 +519,9 @@ full signatures + behaviour are in its docstrings). The helper set, by job:
   (measured stack: equal gaps + no overlap by construction, errors at build time on overflow) with the
   `measure_callout/measure_bullets/measure_text` helpers, `picture` (`fit="contain"` keeps edges /
   `"cover"` crops), `gif` (animated GIF, undistorted + size/still warnings) + `gif_poster` (extract the
-  first/representative frame to verify what the render & PDF export show). *(These exist so you never
+  first/representative frame to verify what the render & PDF export show), `icon`/`icon_card` (place an
+  open-licensed SVG icon — recolored + rasterized via `scripts/icons.py`; `icon_card` is the
+  upper-left-corner feature-card pattern). *(These exist so you never
   hardcode a low `y` — the recurring overlap/footer bug.)*
 - **Text & blocks:** `bullet`, `callout` (auto-grows), `chip`, `modbox`, `arrow`, `table` (highlight
   the key row), `code_block`, `hrule`.
@@ -652,6 +654,20 @@ A few rules that matter (see `references/design-principles.md`):
   → OpenAI fallback; build the manifest with `image_prompts.py`), keep assets in
   `~/Downloads/<deck>/assets/generated/`, place with `deckkit.picture(fit="contain"|"cover")`, and
   render-check (calm space behind text, no pseudo-text/fake charts, subject whole, real things right).
+- **SVG icons — ONE coherent open-licensed family, recolored, used with restraint (full rules in
+  `references/icons.md`).** Icons label categories/sections/cards and give a block a focal point — but
+  **don't hand-draw a set** (inconsistent = amateur) and don't sprinkle them as decoration. **Fetch from
+  one family** (Tabler/Lucide/Phosphor MIT-ISC; `simple:` CC0 for brand/tech logos) via
+  `scripts/icons.py` `icon_png(spec, out, color=ACCENT)` — it fetches, **recolors to the deck palette**,
+  and rasterizes to a transparent PNG (python-pptx can't embed SVG reliably; rasterizing renders the
+  same everywhere). Place with `deckkit.icon()` or the **`icon_card()`** upper-left-corner pattern. The
+  five quality marks (`icons.md`): **semantic fit** (the metaphor matches what it labels), **colour-coded
+  per category** (in a multi-category layout each category its own hue from `palette(n)`, carried by the
+  icon + label + tint — not one global accent), **contrast** (bright on dark / saturated on light, a
+  `disc=` tile if needed), **consistent** family/size/position across siblings (size **≤ the title**,
+  ≈0.32–0.5 in), and **style matching the deck** (outline vs filled). **Always pair an icon with a text
+  label.** Cache in `~/Downloads/<deck>/assets/icons/`. Skip them entirely rather than ship a mismatched
+  zoo or one-per-bullet clutter.
 - **Speaker notes — for a PRESENTED deck, put the spoken script in the notes, not on the slide.**
   For any deck the user will *present* (especially a conference talk, defense, or lecture), move the
   full sentences off the slide into speaker notes with `deckkit.speaker_notes(slide, "…")`.
@@ -1065,11 +1081,14 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
   **one HTML link**; `archetypes.py` is the older pptx-render variant + the post-pick one-slide
   fidelity confirm) · `assemble.py` (assemble a sectioned deck) · `export_notes.py` (notes →
   rehearsal script).
+- `icons.py` — fetch an open-licensed SVG icon (Tabler/Lucide/Phosphor/Simple…), recolor to the deck
+  palette, rasterize to a transparent PNG (`icon_png(spec, out, color, px)`); pair with
+  `deckkit.icon`/`icon_card`. See `references/icons.md`.
 - `extract_pdf.py` (crop a figure from a PDF — `figures`/`figure`/`autofig` auto-detect, `page`/`crop`
   manual) · `crop_helper.py` (crop/trim/panel **by looking, not guessing**) · `extract_deck.py` (pull
   content out of an existing deck — the redesign path).
 **Agents** (`agents/`): `content-planner.md` (Step-1 deep-understand + the build-ready per-slide plan; the Step-3 checkpoint) · `critic.md` (independent critic brief — the two review lenses + JSON schema) · `arbiter.md` (high-stakes finding cross-validation + fix-verification; no-op low-stakes) · `openai.yaml` (Codex display metadata).
 
-**References** (`references/`, loaded on demand): `design-principles.md` (the craft / the "why"; incl. the **C.R.A.P. framework** — Contrast · Repetition · Alignment · Proximity) · `review-rubrics.md` (universal + per-purpose review criteria) · `design-by-purpose.md` (per-purpose look for "design a clean one") · `data-viz.md` (pick the chart type; editable-native vs raster) · `image-generation.md` (when/how; topical, text-free, consistently placed) · `generated-template.md` (Q1's image-tool template branch) · `style-analysis.md` (mimic a style example, Q4) · `font-guidance.md` (portable fonts, tofu recovery) · `multilingual.md` (non-Latin / CJK / RTL) · `animation.md` (when/why + `anim.py`) · `large-deck-orchestration.md` (section fan-out; default is single-author) · `collaborative-mode.md` (direction→outline→draft gates) · `redesign-existing-deck.md` (diagnose-then-rebuild) · `handoff-and-iteration.md` (delivery + iterate without clobbering edits) · `examples/` (`build_example_generic.py`, `style_example.py`, `section_example.py`).
+**References** (`references/`, loaded on demand): `design-principles.md` (the craft / the "why"; incl. the **C.R.A.P. framework** — Contrast · Repetition · Alignment · Proximity) · `review-rubrics.md` (universal + per-purpose review criteria) · `design-by-purpose.md` (per-purpose look for "design a clean one") · `data-viz.md` (pick the chart type; editable-native vs raster) · `image-generation.md` (when/how; topical, text-free, consistently placed) · `icons.md` (one coherent open-licensed icon family, recolored, restrained) · `generated-template.md` (Q1's image-tool template branch) · `style-analysis.md` (mimic a style example, Q4) · `font-guidance.md` (portable fonts, tofu recovery) · `multilingual.md` (non-Latin / CJK / RTL) · `animation.md` (when/why + `anim.py`) · `large-deck-orchestration.md` (section fan-out; default is single-author) · `collaborative-mode.md` (direction→outline→draft gates) · `redesign-existing-deck.md` (diagnose-then-rebuild) · `handoff-and-iteration.md` (delivery + iterate without clobbering edits) · `examples/` (`build_example_generic.py`, `style_example.py`, `section_example.py`).
 
 **Registry** (NOT part of the skill): `~/.codex/slide-templates/` (Codex) · `~/.claude/slide-templates/` (Claude Code) — the user's saved templates; read for choices, write new `profile.md`s to the active host. Empty for a new user.
