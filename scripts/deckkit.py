@@ -2236,12 +2236,14 @@ def connector(slide, p0, p1, *, style="solid", color=None, width=1.5, label="", 
 
 
 def flow_chain(slide, x, y, w, h, labels, *, accent=None, gap=None, subs=None, hub_idx=None,
-               vertical=False):
+               vertical=False, hub_accent=None):
     """Convenience over node()+connector(): a CHAIN of nodes joined by arrows (a pipeline).
     `labels` = list of node titles; `subs` optional same-length sub-labels; `hub_idx` promotes
-    one node to the solid accent. Horizontal by default; `vertical=True` stacks + down-arrows.
-    Returns the list of node centers."""
+    one node to a solid fill. `hub_accent` colours that hub differently from the chain `accent`
+    (e.g. a coral 'Generate' hub among cyan retrieval nodes — keeps a semantic-colour contract).
+    Horizontal by default; `vertical=True` stacks + down-arrows. Returns the list of node centers."""
     acc = accent if accent is not None else BLUE
+    hubacc = hub_accent if hub_accent is not None else acc
     n = len(labels); g = gap if gap is not None else 0.34
     centers = []
     if vertical:
@@ -2249,7 +2251,7 @@ def flow_chain(slide, x, y, w, h, labels, *, accent=None, gap=None, subs=None, h
         for i, lab in enumerate(labels):
             ny = y + i * (nh + g)
             c = node(slide, x, ny, w, nh, lab, sub=(subs[i] if subs else ""),
-                     hub=(i == hub_idx), accent=acc)
+                     hub=(i == hub_idx), accent=(hubacc if i == hub_idx else acc))
             if i: connector(slide, (x + w / 2, ny - g + 0.02), (x + w / 2, ny - 0.02), color=_blend(acc, WHITE, 0.3))
             centers.append(c)
     else:
@@ -2257,7 +2259,7 @@ def flow_chain(slide, x, y, w, h, labels, *, accent=None, gap=None, subs=None, h
         for i, lab in enumerate(labels):
             nx = x + i * (nw + g)
             c = node(slide, nx, y, nw, h, lab, sub=(subs[i] if subs else ""),
-                     hub=(i == hub_idx), accent=acc)
+                     hub=(i == hub_idx), accent=(hubacc if i == hub_idx else acc))
             if i: connector(slide, (nx - g + 0.02, y + h / 2), (nx - 0.02, y + h / 2), color=_blend(acc, WHITE, 0.3))
             centers.append(c)
     return centers
@@ -2361,17 +2363,23 @@ def bilingual_lockup(slide, x, y, w, zh, en, *, zh_size=30, en_size=11, ink=None
 
 
 def concept_equation(slide, x, y, w, h, terms, *, op="=", accent=None, ink=None, highlight_idx=None,
-                     term_size=30, op_size=34, font=None):
+                     term_size=30, op_size=34, font=None, term_colors=None):
     """A word-EQUATION headline device (not LaTeX math): big display terms joined by oversized
-    accent operators — 'ZINE = MAGAZINE', 'A ≠ B ≠ C', '城府 = 压表现 × 稳胜负 × 延迟满足'. `op` is the
-    joiner ('='|'≠'|'×'|'+'|'→'); `highlight_idx` recolors one term to the accent. Centred row."""
+    accent operators — 'ZINE = MAGAZINE', 'A ≠ B ≠ C', 'Answer = Retrieve + Generate'. `op` is the
+    joiner: a single string ('='|'≠'|'×'|'+'|'→') for all gaps, OR a **list** of operators (one per
+    gap, len == len(terms)-1) for a MIXED equation like Answer = Retrieve + Generate (op=['=','+']).
+    `highlight_idx` recolors one term to the accent; `term_colors` (a list aligned to `terms`,
+    `None` per slot = default) overrides per-term colour for a semantic palette. Centred row."""
     acc = accent if accent is not None else MAGENTA
     ic = ink if ink is not None else DEEP
+    ops = list(op) if isinstance(op, (list, tuple)) else [op] * (len(terms) - 1)
     runs = []
     for i, t in enumerate(terms):
-        runs.append((t, term_size, acc if i == highlight_idx else ic, True, False, font or DISPLAY or FONT))
+        col = (term_colors[i] if term_colors and i < len(term_colors) and term_colors[i] is not None
+               else (acc if i == highlight_idx else ic))
+        runs.append((t, term_size, col, True, False, font or DISPLAY or FONT))
         if i < len(terms) - 1:
-            runs.append(("  " + op + "  ", op_size, acc, True, False, font or DISPLAY or FONT))
+            runs.append(("  " + ops[i] + "  ", op_size, acc, True, False, font or DISPLAY or FONT))
     tb = text(slide, x, y, w, h, [runs], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
     eaface = font or EADISPLAY        # honor the CJK display face for any CJK terms
     if eaface:
@@ -2506,6 +2514,50 @@ def segmented_bar(slide, x, y, w, h, parts, *, labels=None, accents=None, show_p
             text(slide, cx, y, seg, h, [[(lab, 10.5, tc, True, False)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
         cx += seg
     return y + h
+
+
+def meter_bar(slide, x, y, w, frac, *, label=None, value=None, value_unit=None,
+              accent=None, track=None, h=0.28, gap_above=0.34, value_pos="right",
+              value_pad=0.2, value_w=2.6, label_size=12.5, value_size=18, unit_size=11,
+              ink=None, label_c=None, font=None, value_font=None):
+    """A horizontal METER / progress bar with a value label that is **always vertically
+    centered on the bar** (never floating above or below it) — the correct, reusable form of
+    the hand-built "track + fill + number" row. Use for percentile / share / progress / "want
+    vs have" rows (e.g. ``第10百分位``, ``95%``).
+
+    Draws: an optional caption ``label`` ABOVE the bar, a rounded ``track``, an ``accent`` fill
+    to ``frac`` (0..1), and ``value`` (+ optional ``value_unit``) set on the bar's centerline.
+
+    ``value_pos``:
+      - ``"right"`` (default) — value sits just past the END OF THE TRACK, so a column of
+        meter_bars shares one value column and reads aligned. Never overlaps the fill.
+      - ``"end"`` — value sits just past the FILL (tied to the bar length); good for a single
+        bar, but for a short fill it floats over the empty track, so prefer ``"right"`` in a
+        stack.
+
+    Colours default to deckkit's light palette; on a DARK deck pass ``track=`` your panel
+    colour, ``ink=`` your body colour, ``label_c=`` your muted colour, and ``accent=``.
+    Returns the bar's BOTTOM y (so a caller can stack rows)."""
+    acc = accent if accent is not None else BLUE
+    tr = track if track is not None else RGBColor(0xE6, 0xE9, 0xEE)
+    vink = ink if ink is not None else DEEP
+    lc = label_c if label_c is not None else MUTE
+    f = max(0.0, min(1.0, frac))
+    yt = y + (gap_above if label else 0.0)
+    if label:
+        text(slide, x, y, w, gap_above, [[(str(label), label_size, lc, False, False, font)]],
+             anchor=MSO_ANCHOR.BOTTOM, space_after=0)
+    box(slide, x, yt, w, h, fill=tr, round=True, r=h / 2)
+    if f > 0:
+        box(slide, x, yt, max(w * f, h), h, fill=acc, round=True, r=h / 2)
+    if value is not None:
+        vx = (x + w + value_pad) if value_pos == "right" else (x + w * f + value_pad)
+        runs = [(str(value), value_size, vink, True, False, value_font or font)]
+        if value_unit:
+            runs.append((" " + str(value_unit), unit_size, lc, True, False, value_font or font))
+        # value box shares the bar's y/h with MIDDLE anchor → text on the bar's centerline
+        text(slide, vx, yt, value_w, h, [runs], anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+    return yt + h
 
 
 def year_badge(slide, x, y, text_str, *, fill=None, tcolor=None, w=0.95, h=0.4):

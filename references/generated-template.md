@@ -32,13 +32,22 @@ layers**, and the split is what keeps it editable *and* on-brand:
 Run a short extra interview *now* — only what the *look* needs (purpose/audience/source come
 later in the normal interview):
 - **Scenario / topic** — what the deck is for (e.g. "summer music festival annual handbook").
-- **Start from a known style (recommended) — don't generate from a cold prompt.** Seed the look
-  with a *proven visual language* from the **Style library** at the end of this file (e.g. the
-  **Memphis** style reverse-engineered from the Sugar Rush sample, or Swiss, Art Deco, Vaporwave,
-  Editorial, Risograph, …). From the catalog, **propose the 3–4 best-fit styles for this
-  scenario as selectable options**, plus **"describe your own look"** and **"I'll provide a
-  reference image / brand."** A named style gives the image tool a strong, coherent target and
-  gives you a ready palette + motif + type starting point for the native `style.py`.
+- **Offer the style as a choice — list common styles AND an auto option.** Present, as selectable
+  options:
+  - **The 3–4 best-fit named styles** for this scenario from the **Style library** at the end of this
+    file (e.g. **Memphis** from the Sugar Rush sample, or Swiss, Art Deco, Vaporwave, Editorial,
+    Risograph, Glassmorphism, Blueprint…). A named style gives the image tool a strong, coherent target
+    *and* a ready palette + motif + type starting point for the native `style.py` — so it's the
+    recommended path when the user has a leaning.
+  - **"Describe your own look"** (a vibe, era, reference in words) and **"I'll provide a reference
+    image / brand."**
+  - **"Let the image tool pick the style" (auto)** — the user has no preference and wants you to
+    choose. Don't generate from a *cold* prompt even here: from the **scenario + brand colours**, YOU
+    select the best-fit library style (name it back to the user so the choice is legible — "for a summer
+    festival I'll go Memphis/pop"), or, when the scenario is distinctive, let the image tool decide by
+    giving it a richer *mood-led* prompt (scenario + energy + palette + "design a cohesive visual
+    identity") rather than a named style. Either way the 🔴 sample-slide checkpoint below is where the
+    user approves or redirects — so "auto" still gets a real look to react to, never a blind commit.
 - **Vibe / mood (if describing your own)** — the aesthetic in words: energy (calm↔loud), era,
   references. Use this to pick/blend a library style or to author a fresh one.
 - **Brand colours / must-haves** — any fixed colours, a logo, words that must appear.
@@ -142,10 +151,10 @@ them, and show both. The content slide is essential: it proves the blocks actual
   size/proportion/count/colour must be factually correct (the image-generation fidelity rule).
 
 ## Checklist
-- [ ] Mini-interview done (scenario; **best-fit library styles offered as options** + describe-own
-      + reference drop-ins invited; brand colours).
-- [ ] A library style **picked and tailored** to the scenario (or a fresh look authored from a
-      reference) — palette/motifs customised, not used raw.
+- [ ] Mini-interview done (scenario; style offered as a choice — **best-fit library styles** +
+      describe-own + reference drop-ins + **"let the image tool pick" (auto)**; brand colours).
+- [ ] A style **chosen and tailored** to the scenario — a picked library style, an auto-picked one
+      (named back to the user), or a fresh look from a reference — palette/motifs customised, not raw.
 - [ ] Hero (and divider) generated **text-free**, in-style, with a **calm zone** for the title.
 - [ ] `style.py` derived: palette **extracted from the image**, motif helpers, component helpers,
       fonts/chrome.

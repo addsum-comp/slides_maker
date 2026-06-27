@@ -76,6 +76,15 @@ def _esc(t):
     return html.escape(str(t))
 
 
+def _is_dark(hexc):
+    s = str(hexc).lstrip("#")
+    try:
+        r, g, b = (int(s[i:i + 2], 16) for i in (0, 2, 4))
+    except Exception:
+        return False
+    return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.45
+
+
 # ── the 4 archetype slides, as HTML (mirrors scripts/archetypes.py) ──────────────────────
 
 def _title_bar(S, title, kicker):
@@ -94,13 +103,19 @@ def _footer(S, page, tag=""):
 
 def _slide_cover(S):
     name = S["name"]
-    return f'''<div class="slide cover" style="background:{S['ink']}">
+    # Faithful cover: a DARK deck gets a dark cover (its bg + light ink title); a LIGHT deck gets
+    # a bold inverted cover (ink panel + light title). Avoids the inverted/low-contrast preview bug.
+    if _is_dark(S["bg"]):
+        cbg, tt, tag = S["bg"], S["ink"], S["mute"]
+    else:
+        cbg, tt, tag = S["ink"], "#ffffff", "rgba(255,255,255,.55)"
+    return f'''<div class="slide cover" style="background:{cbg}">
       <div class="accentbar" style="background:{S['accent']}"></div>
       <div class="cover-body">
-        <div class="cover-ttl" style="color:#fff">Deck Title</div>
+        <div class="cover-ttl" style="color:{tt}">Deck Title</div>
         <div class="cover-sub" style="color:{S['accent']}">a one-line subtitle in this direction</div>
       </div>
-      <div class="cover-tag" style="color:rgba(255,255,255,.5)">Direction: {_esc(name)}</div>
+      <div class="cover-tag" style="color:{tag}">Direction: {_esc(name)}</div>
     </div>'''
 
 

@@ -125,8 +125,14 @@ the direction gate** (the look is already decided). The four:
 1. **Template / brand.** First **list this user's registered templates** — check the
    host-appropriate registry (`~/.codex/slide-templates/` in Codex, `~/.claude/slide-templates/`
    in Claude Code; if only one exists, use it). Each subfolder is one template they've used before,
-   with a `profile.md`). Offer those as choices, **plus** "a new template (I'll
-   provide one)", "design a clean one", and **"generate a template with an image tool"**. Then:
+   with a `profile.md`).
+   **⚠️ The template question MUST present ALL FOUR standard choices every time — do not silently drop
+   one (especially the image-tool option, which is easy to forget):**
+   **(a)** each *registered template* · **(b)** *"a new template (I'll provide one)"* · **(c)** *"design
+   a clean one"* · **(d)** *"generate a template with an image tool"* (a bespoke generated visual
+   identity). If you're using a structured-choice UI and run out of option slots, keep (c) and (d) and
+   fold the registered/provide-your-own into one "use/provide a template" option — never omit the
+   generate-with-image-tool path. Then:
    - *A registered template* → build on it using its saved `profile.md` (step 2).
    - *A new template* → they give a `.pptx`/brand; build on it, AND after profiling it
      (step 2) **save a new subfolder to the active template registry** (its
@@ -166,7 +172,9 @@ the direction gate** (the look is already decided). The four:
      hero/divider illustration, then reproduced natively so every content block fits it — for a vivid,
      designed deck (launch, event, brand, playful pitch) where a clean default isn't enough. **Follow
      `references/generated-template.md`**: a mini-interview *now* (scenario + brand colours; **seed from
-     its Style library**, offering the 3–4 best-fit as options + "describe your own"/"a reference") →
+     its Style library**, offering the 3–4 best-fit as options + "describe your own" + "a reference" +
+     **"let the image tool pick the style"** — the auto path where you don't choose a named style and
+     instead let the model/image tool decide the best-fit look from the scenario) →
      generate the text-free hero with a calm title zone (**no key** — native imagegen in Codex, else
      `generate_images_codex.py`; see `image-generation.md`) → **derive a matching `style.py`** (palette
      via `deckkit.palette_from_image`, motif + component helpers, so native blocks match) → render the
@@ -551,7 +559,10 @@ full signatures + behaviour are in its docstrings). The helper set, by job:
   ordinal), `concept_equation` (ZINE=MAGAZINE word-equation), `pull_quote`/`standfirst`, `cta_button`/
   `cta_pair`, `status_stamp`/`corner_tab`, `spec_card`, `year_badge`, `gradient_rule` (2-stop brand rule),
   `catalogue_frame` (double-line specimen frame — museum/eastern presets).
-- **Micro-viz:** `dot_meter` (●●○), `tradeoff_list` (+/−), `segmented_bar` (cumulative 100%).
+- **Micro-viz:** `dot_meter` (●●○), `tradeoff_list` (+/−), `segmented_bar` (cumulative 100%), `meter_bar`
+  (a single percentile/share/progress row — track + accent fill + a value label **vertically centered on
+  the bar**; use this instead of hand-building "track box + fill box + number", which is how value labels
+  end up floating off the bar's centerline).
 - **Photo on-brand (`scripts/image_fx.py`):** `duotone` / `grayscale` so a colour photo doesn't fight
   the accent (riso/brutalist/ink/luxury/museum), then `picture(fit="cover")`.
 
@@ -707,6 +718,14 @@ A few rules that matter (see `references/design-principles.md`):
   **`vstack(..., bottom=…)`** (equal gaps + no overlap by construction, errors at build time on
   overflow). Use `measure_callout/measure_bullets/measure_text` when you must position manually.
   Then run the Step-5 render self-check.
+  - **Reserve the bottom callout's space BEFORE sizing content above it — don't add it last.**
+    `bottom_callout()` returns its TOP y; the recurring mistake is to hardcode tall panels/cards
+    (e.g. `y=1.7, h=2.5`) and *then* drop a callout on top, so the bar overlaps the cards' bottom
+    edge. Call the callout FIRST, then size content to end **a full `GUTTER` above** its returned
+    top: `top = dk.bottom_callout(s, 0.6, W-1.2, "要点", "…"); card_h = top - GUTTER - card_y`. A
+    *near-zero* overlap is not harmless — the bar draws on top and **clips the cards' rounded
+    corners** — so require a visible gap, not just non-collision. (The Step-5 self-check + lint now
+    flag a wide bar grazing the content above it, but reserving the space avoids it by construction.)
 - **Colour.** Rotate `deckkit.ACCENTS` so diagrams aren't monotone; reserve magenta
   for emphasis. For a **sequence of blocks** (chips / cards / pipeline stages) give each a
   **distinct, deliberately-contrasted hue** via `deckkit.palette(n, ACCENTS)` — it returns `n`
@@ -870,7 +889,14 @@ critic round — full rationale in `references/design-principles.md`):
 - **Footer collision / overlap** — no block crosses into the footer band and no two stacked
   blocks overlap. If one does, the cause is almost always a hand-picked `y` for an auto-growing
   callout/stack — fix it by switching to `bottom_callout()` / `vstack()` / `content_band()`, not
-  a one-off coordinate nudge (that just recurs when the text changes).
+  a one-off coordinate nudge (that just recurs when the text changes). **Look specifically at the
+  seam where content meets a bottom callout/bar:** a *wide* bar grazing the cards above it by even
+  a sliver clips their rounded corners — there must be a visible gap, so size content to the
+  callout's returned top minus a `GUTTER` (reserve its space before sizing content, don't add it last).
+- **Bar labels sit ON the bar** — for any track+fill row (percentile / share / progress / "want vs
+  have"), the value/percent label is **vertically centered on the bar's centerline**, not floating
+  above or below it, and doesn't overlap the track. Use `meter_bar()` (which centers the value by
+  construction) rather than hand-placing a number at a guessed `y`.
 - **Diagrams** — arrows point the way the flow moves (down/up between stacked boxes); adjacent
   blocks have a visible gap (never touching); a lone glyph/icon optically centred (ASCII, not
   full-width, for a centred mark on a CJK deck).
