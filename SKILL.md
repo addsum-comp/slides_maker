@@ -188,6 +188,23 @@ the direction gate** (the look is already decided). The four:
    *company/stakeholder readout* · *product description / pitch* · *thesis defense* ·
    *teaching* · *webinar / online presentation*. Get the **time budget**. This selects
    the critic's rubric (`references/review-rubrics.md`).
+   - **Also capture two axes that the purpose alone doesn't pin down — ASK, don't infer them**
+     (both change foundational design decisions *before* you build):
+     - **Delivery context — presented live to a room · shared/screen-shared in a meeting · sent
+       digitally / self-read.** This is the **single most design-determining answer**: it sets the
+       deck's **delivery mode** (`design-principles.md` "Delivery mode"). A *presented* deck wants few
+       words per slide + larger type + speaker notes; a *self-read* deck must be self-sufficient and can
+       carry more text per surface. The same purpose can go either way (a status update presented vs
+       emailed), so **don't infer it from the purpose or the density choice — ask it.** For self-read,
+       there's no talking-time, so also get the **deck length** directly (short ~5–8 / medium ~9–15 /
+       long 16+) instead of deriving it from minutes.
+     - **Primary goal / intent — inform & educate · support a decision · inspire / motivate action.**
+       This sets the **rhetorical arc**: *inform* builds to the evidence; *decide* leads with the
+       recommendation and the ask; *inspire* opens on stakes and closes on a call to action. Purpose
+       hints at it but doesn't fix it (a conference talk can inform *or* persuade) — so confirm it.
+   - *(Structure emphasis — data/trends vs narrative-insights vs sector/section breakdown — and the
+     fine-grained slide count are best steered at the **Step-3 plan checkpoint**, where the user
+     approves the arc, rather than front-loaded here — keep this interview cheap.)*
    - **Webinar / online presentation** = a talk delivered over video, watched in a shrunk
      window on mixed-size screens. Build it like a conference talk but for a shared screen:
      larger type, light background, content in the central safe area, more/lighter slides
@@ -301,7 +318,7 @@ it through an available multi-agent/subagent tool when the host exposes one (in 
 discover multi-agent tools with `tool_search` if needed), otherwise run the same planner
 brief inline yourself. It is the
 constructive counterpart to the critic/arbiter judges. Give it the interview answers
-(purpose/audience/time, style/language, template
+(purpose/audience/time, **delivery context** & **primary goal**, style/language, template
 decision, venue if any), the source material (or "none"), and the craft references
 (`design-principles.md`, `design-by-purpose.md`, `animation.md`, `image-generation.md`,
 `review-rubrics.md`, `multilingual.md`). It returns a **deck plan**: a comprehension brief

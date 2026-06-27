@@ -108,7 +108,19 @@ audience composition, what a strong talk there looks like) and fold it in.
 
 ### 3 — Design the narrative arc (engage, and obey the logic)
 Choose an order that fits the *purpose* (a conference talk, a status update, and a defense
-are sequenced differently — let the rubric guide you). Then:
+are sequenced differently — let the rubric guide you). **Let two interview answers steer the arc and
+the density directly:**
+- **Primary goal / intent → the arc shape.** *Inform & educate* builds to the evidence and explains;
+  *support a decision* leads with the recommendation + the ask, then justifies (don't bury the
+  decision); *inspire / motivate action* opens on the stakes and closes on a clear call to action.
+  State which arc you chose and why in the deck-level decisions.
+- **Delivery context → the delivery mode (density / self-sufficiency).** *Presented live* (or
+  screen-shared in a meeting) → few words per slide, the speaker carries the prose (put it in speaker
+  notes), pace by builds. *Sent digitally / self-read* → each slide must stand alone with the
+  explanation a presenter would otherwise say *on the slide*, and fuller text per surface is correct,
+  not a flaw. Don't infer this from the purpose — use the stated answer; if it's missing, flag it as an
+  open question rather than guessing. (See `design-principles.md` "Delivery mode".)
+Then:
 - **One idea per slide.** Use ~1 spoken minute per slide only as a rough sizing check (a
   4-click build is *one* slide) — pace by the story, not the clock: some slides earn a long
   dwell, others flash by. A longer deck means *more* slides, never a denser one.
