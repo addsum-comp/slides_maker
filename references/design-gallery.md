@@ -66,6 +66,13 @@ Pick the preset to the purpose+mood, then **vary it** — these are starting lan
 - **East-Asian:** `seal` (vermilion chop), `cjk_numeral` (壹贰叁), `bilingual_lockup` — see
   `east-asian-aesthetic.md`.
 - **Math:** `equation_png` (real LaTeX) for *math*; `concept_equation` for a *word*-equation headline.
+- **Algorithms / pseudocode (CS·AI):** `algorithm_block` — a LaTeX-`algorithm`-environment-style block
+  (booktabs rules or `boxed=True`, numbered indented lines, auto-bolded keywords Input/Output/for/if/
+  while/return/end…) for a *training loop, optimizer, or method procedure*. Use a `MONO` font; pair the
+  exact steps with one prose line of intuition. The right form for "describe the method as exact steps."
+- **Explaining a principle/mechanism:** don't state it as text alone — put a **labelled schematic
+  diagram beside it** (`node`+`connector`, an annotated whole/generated figure, or an `equation_png`
+  when the law *is* the relation), so the reader *sees* the forces/signal-path/geometry/cause→effect.
 
 ## Reproduction notes
 - python-pptx can't embed SVG → rasterise (icons via `icons.py`, figures from PDFs via `extract_pdf.py`).

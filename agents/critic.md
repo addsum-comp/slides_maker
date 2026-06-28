@@ -180,9 +180,12 @@ Do not just skim for the first few obvious issues. Run these passes:
      slide whose *form* fights its message — a **bullet list / number table where a designed form
      would land better**: quantitative data with no chart; 3-6 metrics not shown as `scorecard`
      tiles; a sequence not drawn as a `timeline`/pipeline; a core-and-peers idea not a `hub_spoke`;
-     a two-axis classification not a `quadrant`; a before→after not a `dumbbell`/`before_after`. Also
-     flag the **wrong chart for the argument** (a bar where part-to-whole wants a donut, a grouped
-     bar where a trend wants a slope/dual-axis). The fix names the better form (judge against the
+     a two-axis classification not a `quadrant`; a before→after not a `dumbbell`/`before_after`;
+     **a method's procedure / training loop written as prose where an `algorithm_block`** (numbered
+     pseudocode) would be exact and skimmable; **a principle / mechanism stated text-only where a
+     labelled schematic diagram beside it** would let the reader *see* the forces/signal-path/cause→
+     effect. Also flag the **wrong chart for the argument** (a bar where part-to-whole wants a donut, a
+     grouped bar where a trend wants a slope/dual-axis). The fix names the better form (judge against the
      **content-shape → candidate-forms map in `references/form-selection.md`** + `data-viz.md`).
      Conversely, **don't reward a
      pattern used where it doesn't fit** — a `quadrant` with no real second axis, a `hub_spoke` for a

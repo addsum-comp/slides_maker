@@ -163,7 +163,10 @@ Score each dimension; cite specific slides.
    quota — a short or deliberately-uniform deck is fine). **Also flag over-reliance on ONE component
    format** (most often the rounded-card / panel grid) on **>~40–50% of content slides** — even
    *mid-deck*, not only when literally every slide matches; the fix is to rework the weakest into the
-   format their content wants (a timeline, big-numeral, quote, chart, 2×2, step-list, table).
+   format their content wants (a timeline, big-numeral, quote, chart, 2×2, step-list, table). For
+   **CS/AI methods**, is the procedure shown as an `algorithm_block` (numbered pseudocode) rather than
+   buried in prose; and for a **principle/mechanism**, is there a labelled schematic diagram *beside* the
+   statement rather than text alone? (See `references/form-selection.md`.)
 10. **Factual fidelity** *(when source material exists — the check every system fails).*
    Does every number, label, and headline claim trace back to the source? Does the deck
    represent the source's *actual emphasis* (e.g. a comparison table foregrounds the

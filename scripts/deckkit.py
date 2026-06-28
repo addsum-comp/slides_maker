@@ -2310,6 +2310,89 @@ def loop_path(x_from, x_to, y_row, y_drop):
     return [(x_from, y_row), (x_from, y_drop), (x_to, y_drop), (x_to, y_row)]
 
 
+_ALGO_KW = {"input", "output", "require", "ensure", "initialize", "for", "while", "repeat",
+            "until", "if", "else", "elif", "endfor", "endif", "endwhile", "end", "then", "do",
+            "return", "break", "continue", "function", "procedure", "foreach"}
+
+def _algo_runs(text_s, size, ink, kwc, font):
+    """Split a pseudocode line into runs, bolding + colouring control-flow keywords."""
+    import re
+    out = []
+    for tok in re.split(r"(\s+)", text_s):
+        key = tok.strip().lower().rstrip(":")
+        if tok.strip() and key in _ALGO_KW:
+            out.append((tok, size, kwc, True, False, font))
+        else:
+            out.append((tok, size, ink, False, False, font))
+    return out or [(text_s, size, ink, False, False, font)]
+
+def algorithm_block(slide, x, y, w, lines, *, title="Algorithm 1", caption=None, size=10.5,
+                    ink=None, kw_color=None, rule_c=None, font=None, indent=0.20, gutter=0.30,
+                    pad=0.16, number=True, boxed=False, fill=None):
+    """Render a pseudocode ALGORITHM block — LaTeX `algorithm`/`algorithmic`-environment style, for
+    describing a CS/AI method, training loop, or optimization procedure as exact, skimmable steps.
+
+    `lines` = list of entries, each either:
+        "text"                      → indent level 0, auto-numbered
+        (text, indent_level)        → indent_level * indent of left padding
+        (text, indent_level, False) → not numbered (e.g. a Input:/Output: header or a sub-note)
+    Control-flow KEYWORDS (Input, Output, for, while, if, else, then, do, return, end…) are auto-bolded
+    and tinted `kw_color`. Lines auto-number 1..N (skip with the per-entry flag). Default look is academic
+    **booktabs rules** (a thick top rule, a hairline under the title, a thick bottom rule, no side
+    borders); pass `boxed=True` (or a `fill`) for a full rounded card instead. Use a MONO `font` for the
+    classic pseudocode feel. Pair the block with one prose line of intuition — the block gives the exact
+    procedure, the prose gives the why. Returns the block height H (so you can place a caption below).
+    See references/form-selection.md ('an algorithm / procedure') and design-gallery.md."""
+    ink = DEEP if ink is None else ink
+    kwc = ink if kw_color is None else kw_color
+    rc = ink if rule_c is None else rule_c
+    f = font or MONO or FONT
+    lh = size * 1.66 / 72.0
+    th = size * 2.0 / 72.0
+    norm = []
+    for e in lines:
+        if isinstance(e, (tuple, list)):
+            t = e[0]; ind = e[1] if len(e) > 1 else 0; nm = e[2] if len(e) > 2 else True
+        else:
+            t = e; ind = 0; nm = True
+        norm.append((t, ind, nm))
+    # estimate wrapped visual-line count per entry (mono char-width ≈ 0.62·size) so long lines
+    # don't collide with the next step; keep lines short (one display line) for the cleanest look.
+    cw = 0.66 * size / 72.0
+    counts = []
+    for (t, ind, nm) in norm:
+        lx0 = pad + gutter + 0.09 + ind * indent
+        cpl = max(6, int((w - pad - lx0) / cw))
+        counts.append(max(1, -(-len(t) // cpl)))
+    H = pad + th + 0.06 + sum(counts) * lh + pad * 0.7
+    framed = boxed or fill is not None
+    if framed:
+        box(slide, x, y, w, H, fill=(fill if fill is not None else WHITE), line=rc, line_w=1.1, round=True)
+    else:
+        box(slide, x, y, w, 0.020, fill=rc)            # thick top rule
+        box(slide, x, y + H, w, 0.020, fill=rc)        # thick bottom rule
+    # title row ("Algorithm N: caption")
+    cap = (":  " + caption) if caption else ""
+    text(slide, x + pad, y + pad * 0.7, w - 2 * pad, th,
+         [[(title, size + 0.5, ink, True, False, f), (cap, size + 0.5, ink, False, False, f)]],
+         space_after=0)
+    ry_mid = y + pad * 0.7 + th + 0.02
+    box(slide, x, ry_mid, w, 0.010, fill=rc)           # hairline under title
+    # numbered, indented lines (advance by each entry's wrapped height)
+    yy = ry_mid + 0.05
+    i = 0
+    for (t, ind, nm), c in zip(norm, counts):
+        i += 1
+        if number and nm:
+            text(slide, x + pad, yy, gutter, lh, [[(str(i) + ":", size, ink, False, False, f)]],
+                 align=PP_ALIGN.RIGHT, space_after=0)
+        lx = x + pad + gutter + 0.09 + ind * indent
+        text(slide, lx, yy, x + w - pad - lx, c * lh, [_algo_runs(t, size, ink, kwc, f)],
+             space_after=0, line_spacing=1.32)
+        yy += c * lh
+    return H
+
+
 def flow_chain(slide, x, y, w, h, labels, *, accent=None, gap=None, subs=None, hub_idx=None,
                vertical=False, hub_accent=None):
     """Convenience over node()+connector(): a CHAIN of nodes joined by arrows (a pipeline).
