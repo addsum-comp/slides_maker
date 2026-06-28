@@ -296,20 +296,23 @@ the direction gate** (the look is already decided). The four:
      deck → *diagram-heavy (recommended) ↔ balanced* (a text-heavy presented deck is a wall of text —
      steer away); a **self-read / poster** deck → *balanced ↔ text-heavy*. Don't silently decide it from
      the purpose. (This sets the deck's **delivery mode** — see `references/design-principles.md`.)
-   - **"Mimic an example I'll provide"** — the user hands over a deck (or slides /
-     PDF / screenshots) whose **visual style they want imitated**. Different from a
-     *template* (Q1): you do NOT build on it or inherit its logos — you reproduce its
-     *look and feel* in your own build. **Understand the style fully before building**
-     — a glance won't do; the style lives in the *system* (what repeats across slides)
-     and the *details* (its decorations). View **every** slide and write a structured
-     **style brief** covering the overall structure/rhythm, grid & layout, exact
-     colour system, typography, **decorations & motifs** (bands, rules, shapes,
-     corners, icons, signature touches), and how each recurring element (titles,
-     callouts, figures, tables, equations, diagrams) is styled. Follow the full
-     checklist in **`references/style-analysis.md`**, then build to the brief —
-     overriding deckkit's defaults to match — while keeping the user's content,
-     purpose, and the craft rules. A style example composes with everything (e.g.
-     build on the user's template for branding yet mimic an example's density/motifs).
+   - **"Mimic an example I'll provide"** — the user hands over a **whole deck, a few slides, or even ONE
+     slide / screenshot** whose design they want echoed. Different from a *template* (Q1): you do NOT
+     build on it or inherit its logos/content — you reproduce what they value in your own build.
+     **First ask which INTENT** (they mean one of two — the build differs):
+     - **(1) Reproduce the look** — same family: match the example's **palette, fonts, motifs, density**
+       (a faithful style clone, with the user's content).
+     - **(2) Borrow its components & layout, but redesign the style for MY topic** — keep the example's
+       *structure + component vocabulary* (its card style, callout, diagram/layout pattern, signature
+       motif) but **re-choose the palette / mood / type to fit the topic** and refill with the user's
+       content ("inspired by, not copied"). *This is the common ask* ("mimic but not copy, restyle for
+       the topic, apply some of its components").
+     Then **understand it before building** — a glance won't do (for a single slide, treat its treatment
+     as the deck-wide system, confirming with the user). Write the structured **style brief** (structure/
+     rhythm, grid, colour, type, decorations & motifs, the **2–4 components worth reusing**, tone) and
+     build per the chosen mode — **follow `references/style-analysis.md`** (Mode A reproduces; Mode B
+     borrows components + restyles to the topic), keeping the user's content + the craft rules. Composes
+     with everything (e.g. build on the user's template for branding, yet borrow an example's components).
    - Plus any tone (academic, corporate, playful).
    Honor their choice over your own habits; nudge toward concise + visual when
    unsure; carry the choice into the plan (step 3) and the build (step 4).
