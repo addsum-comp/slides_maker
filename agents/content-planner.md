@@ -553,7 +553,23 @@ builder can execute. Include:
    ready unless: (a) **every slide has ONE named hero** that passes the squint test; (b) the Form-ledger
    diversity gate passes; (c) every non-obvious slide names the **alternative its form beat**; (d) the
    **Design language is concrete** — a *named* signature motif + a deliberately-chosen palette/type,
-   never a defaulted light/minimal/blue with no motif. If any fails, fix it before the Step-3 checkpoint.
+   never a defaulted light/minimal/blue with no motif.
+   **Plus the THREE DESIGN MUSTS — each must be DELIBERATELY ADDRESSED in the plan: applied where it
+   helps and *justified in one clause where it isn't*. This is a must to CONSIDER + APPLY, NOT a blanket
+   per-slide quota — keep thinking smartly about WHERE and WHEN (they are easy to forget, which is why
+   they are now gated, not optional):**
+   - (e) **Appear-builds** (presented decks) — the structural beats (a pipeline / multi-stage diagram, a
+     multi-part argument, an evidence→takeaway, a reveal-one-at-a-time list) carry an **appear build**,
+     and the **motion manifest records build / static *with a reason* for every slide**. A presented deck
+     with obvious build-candidate slides and no builds (unreasoned) is **not ready**. *(A self-read deck
+     is static by design — that IS the reasoned answer; don't force builds there.)*
+   - (f) **SVG icons** — on an **icon-fit preset** with category / section / step / entity content, a
+     **style-matched icon family is planned** (labelling the categories/steps); a category-rich deck that
+     ships **zero icons is not ready**. *(Bounded by the rule-of-thumb + ≤5/group; match the style to any
+     preset — never excluded by topic; never one-per-bullet or on an evidence slide. See `icons.md`.)*
+   - (g) **Diverse components** — the Form-ledger gate (b) must show you **actively varied the form**
+     (timeline / stat / quote / chart / diagram / table / big-number…), not one card grid repeated.
+   If any of (a)–(g) fails, fix it before the Step-3 checkpoint.
 4. **Image opt-in list** — the **roll-up of every slide whose *Image* column is marked**: one
    explicit list, *"slides X, Y could carry a generated plate in <art-direction> — approve
    which, if any."* It must match the table exactly; it exists so the user makes one clear

@@ -541,11 +541,16 @@ the user has opted into image generation.** The user then approves which (if any
 **Precondition — the comprehension AND design gates:** before showing the plan, confirm it carries a
 *complete* comprehension brief (every field filled + traced) and claim ledger (no shipped
 `verified?=N` rows) — AND that the **design side passes too**: a concrete **Design language** (a *named*
-signature motif + a deliberately-chosen palette/type, not a defaulted light/minimal/blue), and a **Form
+signature motif + a deliberately-chosen palette/type, not a defaulted light/minimal/blue), a **Form
 ledger** whose diversity gate passes (no one format-family on >~40–50% of content slides — the
-card-overuse guard). A plan that is empty/hedged/untraced **or** that defaults its look / over-relies on
-one format is **not ready** — send it back to the planner rather than building on a shallow or monotone plan.
-> **🔴 CHECKPOINT** — show the deck plan (brief + claim ledger + **Design language + Form ledger**) and get the user's OK (including the image opt-in) before building.
+card-overuse guard), and the planner's **THREE DESIGN MUSTS** addressed (`content-planner.md` §3c) —
+**(1) appear-builds** on the structural beats (motion manifest: build/static *with a reason* per slide),
+**(2) a style-matched SVG icon family** on an icon-fit, category-rich deck, **(3) diverse formats**
+(not a card grid repeated) — each *applied where it helps or justified where not* (a must to consider +
+apply, never a blank per-slide quota — still smart about where/when). A plan that is empty/hedged/untraced
+**or** that defaults its look / over-relies on one format / silently forgets builds or icons is **not
+ready** — send it back to the planner.
+> **🔴 CHECKPOINT** — show the deck plan (brief + claim ledger + **Design language + Form ledger + the 3 design musts**) and get the user's OK (including the image opt-in) before building.
 
 ## Step 4 — Build with deckkit
 Write a small per-deck build script that imports `scripts/deckkit.py` (don't re-derive primitives;
