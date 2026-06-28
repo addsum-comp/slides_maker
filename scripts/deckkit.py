@@ -533,30 +533,41 @@ def hub_spoke(slide, cx, cy, radius, center, spokes, *, hub=(1.7, 1.0), node=(1.
     return pts
 
 
+def spaced_centers(x, w, n, *, label_w=2.0, total_w=10.0, margin=0.05):
+    """Center x's for n evenly-spaced markers across [x, x+w], **inset at the ends** so a
+    `label_w`-wide caption CENTERED on each end marker still fits the canvas [margin, total_w-margin].
+    Returns (centers, axis_x0, axis_w). Use for ANY row of markers carrying centered captions —
+    a timeline, tick row, numbered steps, a stat row under dots. The end inset is what keeps each
+    caption **co-centered with its marker**: the failure to avoid is clamping a caption to the margin
+    *independently* of its marker, which desyncs them near a slide edge (the classic "first/last label
+    sits off to the side of its dot" bug). With this, place each caption at `center - label_w/2` and it
+    is guaranteed to land on-canvas AND centered under the marker — no per-caption clamp needed."""
+    if n <= 1:
+        return ([x + w / 2.0], x, w)
+    pad = max(0.0, label_w / 2.0 - (x - margin), label_w / 2.0 - ((total_w - margin) - (x + w)))
+    pad = min(pad, w / 2.0 - 0.3)
+    x0 = x + pad
+    aw = w - 2 * pad
+    step = aw / (n - 1)
+    return ([x0 + i * step for i in range(n)], x0, aw)
+
+
 def timeline(slide, x, y, w, events, *, orientation="h", highlight=None, accent=MAGENTA,
              ink=DEEP, axis_c=RGBColor(0x9A, 0xA0, 0xAE), h=1.4):
     """Native timeline. events = [(when, title[, caption]), ...]. orientation='h' (axis L→R, 3-6
     evenly-weighted events) or 'v' (top→bottom spine, when each event needs 2+ lines). One node is
-    recolored `accent` via `highlight` index. For chronology/roadmaps/evolution — not comparisons."""
+    recolored `accent` via `highlight` index. For chronology/roadmaps/evolution — not comparisons.
+    End nodes are inset (via `spaced_centers`) so the first/last captions stay centered on their dots."""
     n = len(events)
     if orientation == "h":
         ay = y + 0.2
         sw, _sh = _slide_size(slide)
-        lwlab = 2.0
         def _lx(cx, lw):                                  # keep a centered label box on-canvas
             return max(0.05, min(cx - lw / 2, sw - lw - 0.05))
-        # INSET the end nodes so the first/last centered labels fit WITHOUT clamping — otherwise the
-        # end dots sit at the canvas edge and their labels shift inward, looking mis-aligned from the
-        # dots while the middle node (un-clamped) looks centered. Inset keeps every label under its dot.
-        pad = 0.0
-        if n > 1:
-            pad = max(0.0, lwlab / 2 - (x - 0.05), lwlab / 2 - ((sw - 0.05) - (x + w)))
-            pad = min(pad, w / 2 - 0.3)
-        ax0, axw = x + pad, w - 2 * pad
+        centers, ax0, axw = spaced_centers(x, w, n, label_w=2.0, total_w=sw)
         box(slide, ax0, ay - 0.012, axw, 0.024, fill=axis_c)
-        step = axw / max(1, n - 1) if n > 1 else 0
         for i, ev in enumerate(events):
-            ex = ax0 + (i * step if n > 1 else axw / 2)
+            ex = centers[i] if n > 1 else (x + w / 2)
             when, title = ev[0], ev[1]; cap = ev[2] if len(ev) > 2 else ""
             em = (highlight is None or i == highlight)
             dc = accent if em else axis_c

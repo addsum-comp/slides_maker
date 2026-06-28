@@ -539,7 +539,11 @@ full signatures + behaviour are in its docstrings). The helper set, by job:
   symmetric margins), `content_band` (the SAFE rect below title / above footer), **`bottom_callout`**
   (footer-safe bottom takeaway — anchors to the band, grows UP, can't collide), **`vstack(…, bottom=)`**
   (measured stack: equal gaps + no overlap by construction, errors at build time on overflow) with the
-  `measure_callout/measure_bullets/measure_text` helpers, `picture` (`fit="contain"` keeps edges /
+  `measure_callout/measure_bullets/measure_text` helpers, **`spaced_centers`** (evenly-spaced marker
+  centers for a timeline / tick row / numbered steps, **inset at the ends so a centered caption stays
+  co-centered with its end marker** — use it instead of hand-rolling a row of dots+captions, which
+  desyncs the first/last caption from its dot near a slide edge; `timeline` already uses it),
+  `picture` (`fit="contain"` keeps edges /
   `"cover"` crops), `gif` (animated GIF, undistorted + size/still warnings) + `gif_poster` (extract the
   first/representative frame to verify what the render & PDF export show), `icon`/`icon_card` (place an
   open-licensed SVG icon — recolored + rasterized via `scripts/icons.py`; `icon_card` is the
@@ -917,6 +921,12 @@ critic round — full rationale in `references/design-principles.md`):
   have"), the value/percent label is **vertically centered on the bar's centerline**, not floating
   above or below it, and doesn't overlap the track. Use `meter_bar()` (which centers the value by
   construction) rather than hand-placing a number at a guessed `y`.
+- **Marker captions sit UNDER their marker** — on a timeline / tick row / numbered-step row, each
+  caption (date · title · sub) is **horizontally co-centered with its dot/marker**, *including the
+  first and last*. The classic bug: an end marker sits near the slide edge and its centered caption
+  gets clamped inward, so the caption drifts off to the side of its dot. Use `timeline()` or
+  `spaced_centers()` (which **inset the end markers** so every caption stays co-centered) — never
+  hand-roll a dots+captions row with a per-caption edge clamp.
 - **Diagrams** — arrows point the way the flow moves (down/up between stacked boxes); adjacent
   blocks have a visible gap (never touching); a lone glyph/icon optically centred (ASCII, not
   full-width, for a centred mark on a CJK deck).
