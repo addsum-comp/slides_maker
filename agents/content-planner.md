@@ -365,6 +365,13 @@ not by counting:
   - **Evidence → takeaway** → show the support, reveal the takeaway/callout last.
   - **Layered data / a chart with an annotation** → baseline first, then the comparison on top.
   - **Quadrant / matrix · timeline · step-cards** → reveal the cells / nodes / steps in order.
+  - **Equations** → build a complex equation **term by term** (one `step()` per term/factor).
+  - **Diagrams** → highlight / reveal **one region or component at a time**.
+  - **Comparisons** → reveal one side, then the other, for an easier compare.
+  - **What NOT to build — show it all at once** *(animating these is a flaw, not polish)*: **simple
+    titles, large paragraphs, reference/source lists**. And **tables / images only if** you'll walk
+    rows-columns / point out multiple regions **sequentially** — otherwise show them whole. The full
+    ✅/⚠️/❌ matrix by content type is in `animation.md` ("Appear-by-content-type"); plan to it.
   - **A result that IS motion** (a training run, a 4D/time-resolved/cine or rotating sequence, a
     segmentation-over-time, a sim) → embed the **GIF**, not a frozen frame (`deckkit.gif()`; it loops
     in PowerPoint/Keynote). Comes up in **any deck** — a product/UI demo (pitch), an interaction

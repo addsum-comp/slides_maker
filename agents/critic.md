@@ -55,6 +55,14 @@ something.
   structural beat dumped all at once (pipeline, argument-to-a-conclusion, evidence→takeaway) is up to
   *major* for a presented talk; a plain bullet list that would merely read better stepped is at most
   *minor* — don't force a build on every list (plain lists are often fine).
+  - **Judge builds against the appear-by-content-type matrix** (`references/animation.md`): the ✅ rows
+    (bullets · step-by-step · flowcharts/pipelines · equations built term-by-term · diagrams revealed a
+    region at a time · comparisons) are the build-candidates on a **presented** deck; the ⚠️ rows
+    (tables, images) build **only** when narrated sequentially. **Flag the inverse mistake too — a ❌
+    content type that IS animated:** a **simple title, a large paragraph, or a reference/source list**
+    revealing in is a *flaw* (a title must be visible immediately; a paragraph is unreadable while it
+    streams in) — call it out. And a **self-read / read-alone deck with appear builds** is wrong (no one
+    clicks it) — it should be static.
   Calibrate: a title/section/one-idea slide *should* be static (don't flag those), most
   individual slides stay static, and "designed to be static for reason X" is a valid answer —
   you're enforcing that the decision was *made*, not that everything animates. If no manifest

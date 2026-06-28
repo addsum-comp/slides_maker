@@ -50,6 +50,30 @@ fits, leave the rest plain. The recurring build-friendly layouts:
 - **Quadrant / matrix · timeline · step-cards.** Reveal the cells, the nodes left-to-right, or the
   steps in order, so the structure assembles as you talk through it.
 
+## Appear-by-content-type — the quick decision matrix
+For a **presented** deck, map each slide's dominant content to this table, then build (or don't).
+*(A **self-read / read-alone** deck has no presenter to click — it shows everything at once, so
+ignore this table and leave such decks static; see SKILL.md "delivery mode".)*
+
+| Content | Use appear? | Why |
+|---|---|---|
+| Bullet points | ✅ excellent | reveal one point as you discuss it |
+| Step-by-step processes | ✅ excellent | keeps the audience on the current step |
+| Flowcharts / pipelines | ✅ excellent | introduce components progressively (stage **+ its arrow** per click) |
+| Equations | ✅ excellent | build a complex equation **term by term** |
+| Diagrams | ✅ excellent | highlight one region / component at a time |
+| Comparisons | ✅ good | reveal one side, then the other, for an easier compare |
+| Tables | ⚠️ sometimes | only if you walk rows/columns **sequentially**; else show whole |
+| Images | ⚠️ sometimes | only when pointing out **multiple regions** in turn |
+| Large paragraphs | ❌ usually no | hard to read while text keeps appearing — show it at once |
+| Simple titles | ❌ no | must be visible immediately |
+| Reference / source lists | ❌ no | nothing to pace; the audience scans them |
+
+The ✅ rows are the default build-candidates; the ❌ rows must appear **all at once** (animating a
+title or a paragraph in is a *flaw*, not polish); the ⚠️ rows build **only** when you genuinely narrate
+them piece-by-piece. Still **taste, not a quota** (next section) — the matrix says *what's eligible*,
+your judgement says *whether this particular slide and moment need it*.
+
 ## Decide by taste and purpose — not by a rule or a quota
 Whether a slide builds is a **design call**, the same for every purpose (research/lab
 meeting, status update, conference, defense, exec, pitch, teaching): reach for a build where

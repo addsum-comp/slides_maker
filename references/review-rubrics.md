@@ -165,7 +165,9 @@ Score each dimension; cite specific slides.
    typically *major* for a presented talk (the all-at-once version genuinely confuses); a plain
    **multi-point bullet list** that would merely read better stepped is at most *minor* (plain lists
    are often perfectly fine — don't force a build on every list). Minor-to-none for read-alone decks
-   (no one clicks them). **The motion that counts is the in-slide appear build — NOT the
+   (no one clicks them). Also flag the **inverse**: a ❌ content type (a simple title, a large
+   paragraph, a reference list) that's been appear-animated — see the content-type matrix in
+   `animation.md`. **The motion that counts is the in-slide appear build — NOT the
    slide-to-slide transition.** A deck-wide fade is at most optional secondary polish, never the
    point: **flag the lazy pattern** of a fade transition on every slide standing in for real
    animation (especially with build-candidate slides left un-built) — that's "motion done" theatre,
