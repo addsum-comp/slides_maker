@@ -108,7 +108,11 @@ Score each dimension; cite specific slides.
    section label rather than echo a word the title already leads with**? In **diagrams**, do
    arrows point the way the flow moves (a *sideways* arrow between vertically-stacked boxes is
    wrong), are repeated blocks/connectors **evenly spaced**, and do **adjacent blocks have a
-   visible gap** (never touching)? Does **every shape of a native diagram sit inside its
+   visible gap** (never touching — *and not a near-zero sliver*, which reads as cramped even when
+   nothing technically overlaps)? Is each **feedback / repeat / return or non-adjacent link an
+   elbow / U-shape** (`elbow_connector` / `loop_path`), not a **straight** arrow (straight = direct
+   adjacent flow only; a straight "repeat" edge reads as forward flow and crosses other shapes)?
+   Does **every shape of a native diagram sit inside its
    card/panel** with a margin (a box/icon/node poking outside its frame, or an asymmetric
    off-centre cluster, is a real finding)? On **image slides**, is the key subject **whole and
    uncropped** — not sliced by the
@@ -142,13 +146,20 @@ Score each dimension; cite specific slides.
    photography/restraint, East-Asian/heritage, or brutalist preset — or icons used decoratively on a
    sober, figure-dominated academic deck (defense / conference-results / lab meeting) — is a finding
    **even if the five marks pass** (design-fits-purpose, item 11); the deck should use that preset's
-   native device (seal/`cjk_numeral`, photography + serif numerals, `year_badge`/duotone, heavy rules). **Corner-rounding** (rounded vs hard-edged) is a deck-wide language — a square-cornered
+   native device (seal/`cjk_numeral`, photography + serif numerals, `year_badge`/duotone, heavy rules).
+   **Conversely** — on an **icon-FIT preset** (`dark_tech` / `consulting` / `glassmorphism` / `blueprint`)
+   whose content is category/step-rich (named patterns, pipeline stages, tools/memory/protocols,
+   production/feature layers) — **shipping ZERO icons is itself a finding** (a miss, not restraint:
+   `icons.md` "actively plan an icon family"). **Corner-rounding** (rounded vs hard-edged) is a deck-wide language — a square-cornered
    image inside rounded cards (or vice-versa) is a consistency finding.
    **Deck-level rhythm (scan all slides together):** across a *long* deck, does the visual
    protagonist and density vary (a paced sequence — chart / diagram / photo / big-number / quote,
    dense slides spaced by airy ones), or does it read as **one template repeated**? A long deck where
    nearly every slide has the same shape is a deck-level finding (structural variety, not a per-slide
-   quota — a short or deliberately-uniform deck is fine).
+   quota — a short or deliberately-uniform deck is fine). **Also flag over-reliance on ONE component
+   format** (most often the rounded-card / panel grid) on **>~40–50% of content slides** — even
+   *mid-deck*, not only when literally every slide matches; the fix is to rework the weakest into the
+   format their content wants (a timeline, big-numeral, quote, chart, 2×2, step-list, table).
 10. **Factual fidelity** *(when source material exists — the check every system fails).*
    Does every number, label, and headline claim trace back to the source? Does the deck
    represent the source's *actual emphasis* (e.g. a comparison table foregrounds the
