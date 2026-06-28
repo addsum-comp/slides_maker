@@ -552,6 +552,26 @@ def spaced_centers(x, w, n, *, label_w=2.0, total_w=10.0, margin=0.05):
     return ([x0 + i * step for i in range(n)], x0, aw)
 
 
+def mid(*vals):
+    """Midpoint of the given coordinates — e.g. centre a connector endpoint on a block:
+    `connector(s, (ax, mid(by, by+bh)), ...)`, or a hub between two block centres."""
+    return sum(vals) / len(vals)
+
+
+def span_center(boxes, size):
+    """Top-left coord that centres a shape of length `size` on the COMBINED SPAN of `boxes`
+    (each box = (start, length) on the SAME axis). The one rule for a **converge / fan-out / hub**
+    node: a many→one, one→many, or hub-and-spoke node must sit on the geometric centre of the nodes
+    it links — never eyeballed to one member's level. Compute it:
+        hub_y = span_center([(y_top,h_top), (y_bot,h_bot), ...], hub_h)   # then place the hub at hub_y
+    so the hub's centre = (topmost member's top + bottommost member's bottom) / 2. Anchor every
+    connector at each member's centre via `mid(y, y+h)`. (Mirrors `spaced_centers` for the across-axis
+    case — both exist so diagram nodes are placed by computation, not by eye.)"""
+    starts = [b[0] for b in boxes]
+    ends = [b[0] + b[1] for b in boxes]
+    return (min(starts) + max(ends)) / 2.0 - size / 2.0
+
+
 def timeline(slide, x, y, w, events, *, orientation="h", highlight=None, accent=MAGENTA,
              ink=DEEP, axis_c=RGBColor(0x9A, 0xA0, 0xAE), h=1.4):
     """Native timeline. events = [(when, title[, caption]), ...]. orientation='h' (axis L→R, 3-6

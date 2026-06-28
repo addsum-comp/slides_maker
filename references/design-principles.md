@@ -216,6 +216,14 @@ design a slide and when you critique one. Each maps onto rules this skill alread
   alignment makes a slide read as organized; a single off-grid element reads as messy. Derive positions
   from `columns`/`rows`/`vstack`/`content_band` so edges line up — never hand-pick a coordinate. (See
   "Balanced split layouts", "measure or anchor, never hand-pick a y".)
+  - **Hub / converge / fan-out nodes sit on the CENTRE of the set they link — computed, not eyeballed.**
+    In a many→one (inputs converging into one node), one→many (one node fanning to several), or
+    hub-and-spoke diagram, the **shared node must be centred on the geometric span of its members**
+    (midway between the topmost member's top and the bottommost member's bottom), and **every connector
+    anchors at each member's centre**, not its top. Eyeballing the hub to one member's level (the classic
+    "the middle block isn't on the middle line of the two it joins") reads as broken. Compute it:
+    `hub_y = span_center([(y1,h1),(y2,h2),…], hub_h)` and anchor connectors with `mid(y, y+h)` — the
+    converge/fan analogue of `spaced_centers` for evenly-spaced rows. (deckkit, SKILL §4.)
 - **Proximity — group related items; separate unrelated ones with space.** What belongs together sits
   together; the gap *between* groups is clearly larger than the gap *within* one, so the eye parses the
   structure without lines or boxes. (See "Group by proximity — inter-group gap ≥ ~1.5–2× intra-group".)

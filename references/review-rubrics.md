@@ -109,7 +109,9 @@ Score each dimension; cite specific slides.
    arrows point the way the flow moves (a *sideways* arrow between vertically-stacked boxes is
    wrong), are repeated blocks/connectors **evenly spaced**, and do **adjacent blocks have a
    visible gap** (never touching — *and not a near-zero sliver*, which reads as cramped even when
-   nothing technically overlaps)? Is each **feedback / repeat / return or non-adjacent link an
+   nothing technically overlaps)? Is a **hub / converge / fan-out node centred on the set it links**
+   (a many→one or hub-and-spoke node on the geometric centre of its members, with symmetric connectors)
+   — not eyeballed to one member's level (`span_center`/`mid`)? Is each **feedback / repeat / return or non-adjacent link an
    elbow / U-shape** (`elbow_connector` / `loop_path`), not a **straight** arrow (straight = direct
    adjacent flow only; a straight "repeat" edge reads as forward flow and crosses other shapes)?
    Does **every shape of a native diagram sit inside its

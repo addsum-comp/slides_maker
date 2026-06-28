@@ -272,7 +272,13 @@ Do not just skim for the first few obvious issues. Run these passes:
      **wrong arrow SHAPE**: a **feedback/repeat loop, a return path, or a link between non-adjacent nodes
      drawn as a straight line** (it reads as forward flow, not a loop) — it should be an **elbow / U-shaped**
      connector (`elbow_connector` / `loop_path`); and a **straight arrow shoved diagonally across other
-     shapes** to reach a distant node (route it as an elbow instead).
+     shapes** to reach a distant node (route it as an elbow instead). Also flag a **hub / converge /
+     fan-out node not centred on the set it links** — in a many→one, one→many, or hub-and-spoke diagram
+     the shared node must sit on the **geometric centre of its members** (midway between the topmost
+     member's top and the bottommost member's bottom), with connectors anchored at each member's centre;
+     a hub eyeballed to one member's level (e.g. "the middle block isn't on the middle line of the two
+     it joins", or converging arrows that aren't symmetric) is a real misalignment — fix via
+     `span_center(...)` + `mid(...)`, not a one-off nudge.
    - **A single glyph/icon off-centre** in its box (a "?", number, or mark sitting low or to
      one side instead of optically centred). On a **CJK deck**, an off-centre large mark is
      usually a *full-width* punctuation glyph (`？！。`), which sits left-of-centre in its
