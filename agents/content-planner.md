@@ -146,6 +146,11 @@ For every slide, decide and record:
   **most acute in 中文** (translationese: `的…的…的` chains, `进行/实现`-nominalization, empty 强大/高效/赋能,
   机械排比, 破折号成瘾) — **read each 中文 line aloud: would a person actually say it?** See the "Write like a
   human" section of `references/multilingual.md`.
+  - **Required VOICE PASS before the Step-3 checkpoint.** Once the copy is drafted, re-read **every line
+    of text in the deck — titles, points, captions, callouts, the closing line** (not just body) — and
+    rewrite anything that reads machine-translated or press-release-generic. A deck whose text smells
+    AI-generated (esp. 中文 translationese) is **not ready**; this pass is the actor-side guarantee the
+    critic's Voice check then independently confirms.
 - **Visual source** — exactly one of: a **source figure** (name which one, used *whole*; note
   any trim of page margins), a **designed chart** generated from real data (name the *archetype*
   from §5's selection guide — donut+KPI / dumbbell / slope / dual-axis / Pareto / bubble — not a
