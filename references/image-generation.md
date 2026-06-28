@@ -30,6 +30,13 @@ says it helps, by design sense — and **propose plates for the user to opt into
 generating on every slide by reflex. Decide image-by-image, the same way you decide
 build-by-build.
 
+**This per-slide content-image opt-in is available on EVERY deck, regardless of template choice** —
+a registered template, a provided template, a clean design, or a generated template can all carry
+generated *content* images. It is **separate from** Q1's "generate a template with an image tool"
+path (that makes the text-free *visual identity*; this makes *content* plates for specific slides).
+Offer it whenever an image tool is available, let the user decide, and — critically — **even when the
+user opts in, generate for only the few slides that earn it, never every slide.**
+
 ## When to use image generation
 
 **Two gates before you generate any image: (1) does it help the audience UNDERSTAND or feel this

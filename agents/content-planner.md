@@ -515,7 +515,13 @@ builder can execute. Include:
 4. **Image opt-in list** — the **roll-up of every slide whose *Image* column is marked**: one
    explicit list, *"slides X, Y could carry a generated plate in <art-direction> — approve
    which, if any."* It must match the table exactly; it exists so the user makes one clear
-   decision, and nothing is generated until they say so.
+   decision, and nothing is generated until they say so. **Offer this on EVERY deck regardless of the
+   template choice** (registered / provided / clean / generated-template) whenever an image tool is
+   available — it's a cross-cutting *content*-image opt-in, separate from Q1's generate-a-template path.
+   **Be SMART and selective: mark only the few slides where a content-related plate genuinely earns its
+   place — NEVER every slide, even if the user has opted into image generation** (a context-free plate
+   on every slide is the thoughtless tell in `image-generation.md`). Each marked plate must depict
+   **that slide's actual subject** (topical), not generic decoration.
 5. **Forward-looking additions** — anything you drafted that isn't in the source, clearly
    flagged as proposed.
 6. **Open questions** — anything you couldn't verify or need the user to confirm (including any

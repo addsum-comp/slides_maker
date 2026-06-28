@@ -206,6 +206,11 @@ the direction gate** (the look is already decided). The four:
        emailed), so **don't infer it from the purpose or the density choice — ask it.** For self-read,
        there's no talking-time, so also get the **deck length** directly (short ~5–8 / medium ~9–15 /
        long 16+) instead of deriving it from minutes.
+     - **Deck length is ALWAYS the user's choice — surface it, never silently derive it.** Make it an
+       explicit interview option: a **self-read** deck → ask **short ~5–8 / medium ~9–15 / long 16+**; a
+       **spoken** deck → the **time budget** sets the working count (~1 slide/min), but still **confirm the
+       resulting slide count** with the user at the Step-3 plan checkpoint before building. Don't ship a
+       length the user never saw (e.g. quietly building 14 slides because the content "felt like 14").
      - **Primary goal / intent — inform & educate · support a decision · inspire / motivate action.**
        This sets the **rhetorical arc**: *inform* builds to the evidence; *decide* leads with the
        recommendation and the ask; *inspire* opens on stakes and closes on a call to action. Purpose
@@ -510,6 +515,15 @@ a misread before any build), then the narrative arc + the per-slide spec (takeaw
 visual source, layout, motion) + the **image opt-in list** (which slides you'd propose a
 generated plate for, in what style — the user chooses whether any are generated) + any flagged
 forward-looking content + open questions. Fold in their edits, then build.
+**The per-slide content-image opt-in is a CROSS-CUTTING choice, available on EVERY deck** — it is
+*not* tied to a template choice and is *separate from* Q1's "generate a template with an image tool"
+path (which makes the visual identity). Whenever an image tool is available, offer it regardless of how
+the deck was templated — a **registered** template, a **provided** template, a **clean** design, or a
+**generated** template can all carry generated *content* images. Two guardrails the planner enforces and
+the checkpoint shows: **(a) each proposed plate is *content-related* — it depicts THAT slide's actual
+subject, never generic "fancy" filler** (`image-generation.md`); and **(b) the planner is SMART about
+where — it proposes plates only for the few slides that genuinely earn one, NEVER every slide, even when
+the user has opted into image generation.** The user then approves which (if any) are generated.
 **Precondition — the comprehension gate:** before showing the plan, confirm it carries a
 *complete* comprehension brief (every field filled + traced) and claim ledger (no shipped
 `verified?=N` rows); a plan whose brief is empty/hedged/untraced is **not ready** — send it
