@@ -45,7 +45,9 @@ Everything describing what was *done* stays anchored to the source.
 **Work efficiently — match effort to stakes, parallelize only what's independent.**
 Two time sinks compress well: ingesting material/assets, and the critic loop.
 - **Parallelize independent work, never a single argument.** Fan out across *separate*
-  documents, or batch asset prep (figure crops, equation PNGs) — but never split one
+  documents, or batch asset prep (figure crops, equation PNGs) via the **asset-prep executor**
+  (`agents/asset-prep.md` — an execution-only worker that runs AFTER Step-3 approval and makes ZERO
+  design/fidelity decisions; the one constructive split that's safe to fan out) — but never split one
   paper's intro/method/results across blind agents; the through-line is one mind's job.
   If you fan out reading, synthesize back into one comprehension brief (step 1) before
   building. Parallelism speeds *gathering*, never *understanding*.
@@ -524,11 +526,14 @@ the checkpoint shows: **(a) each proposed plate is *content-related* — it depi
 subject, never generic "fancy" filler** (`image-generation.md`); and **(b) the planner is SMART about
 where — it proposes plates only for the few slides that genuinely earn one, NEVER every slide, even when
 the user has opted into image generation.** The user then approves which (if any) are generated.
-**Precondition — the comprehension gate:** before showing the plan, confirm it carries a
+**Precondition — the comprehension AND design gates:** before showing the plan, confirm it carries a
 *complete* comprehension brief (every field filled + traced) and claim ledger (no shipped
-`verified?=N` rows); a plan whose brief is empty/hedged/untraced is **not ready** — send it
-back to the planner rather than building on a shallow read.
-> **🔴 CHECKPOINT** — show the deck plan (brief + ledger first) and get the user's OK (including the image opt-in) before building.
+`verified?=N` rows) — AND that the **design side passes too**: a concrete **Design language** (a *named*
+signature motif + a deliberately-chosen palette/type, not a defaulted light/minimal/blue), and a **Form
+ledger** whose diversity gate passes (no one format-family on >~40–50% of content slides — the
+card-overuse guard). A plan that is empty/hedged/untraced **or** that defaults its look / over-relies on
+one format is **not ready** — send it back to the planner rather than building on a shallow or monotone plan.
+> **🔴 CHECKPOINT** — show the deck plan (brief + claim ledger + **Design language + Form ledger**) and get the user's OK (including the image opt-in) before building.
 
 ## Step 4 — Build with deckkit
 Write a small per-deck build script that imports `scripts/deckkit.py` (don't re-derive primitives;
@@ -1172,8 +1177,8 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
 - `extract_pdf.py` (crop a figure from a PDF — `figures`/`figure`/`autofig` auto-detect, `page`/`crop`
   manual) · `crop_helper.py` (crop/trim/panel **by looking, not guessing**) · `extract_deck.py` (pull
   content out of an existing deck — the redesign path).
-**Agents** (`agents/`): `content-planner.md` (Step-1 deep-understand + the build-ready per-slide plan; the Step-3 checkpoint) · `critic.md` (independent critic brief — the two review lenses + JSON schema) · `arbiter.md` (high-stakes finding cross-validation + fix-verification; no-op low-stakes) · `openai.yaml` (Codex display metadata).
+**Agents** (`agents/`): `content-planner.md` (Step-1 deep-understand + the build-ready per-slide plan incl. the Form ledger; the Step-3 checkpoint) · `critic.md` (independent critic brief — the two review lenses + JSON schema) · `arbiter.md` (high-stakes finding cross-validation + fix-verification; no-op low-stakes) · `asset-prep.md` (execution-only asset materializer — crops/equations/plates/icons after Step-3 approval; zero design decisions) · `openai.yaml` (Codex display metadata).
 
-**References** (`references/`, loaded on demand): `design-principles.md` (the craft / the "why"; incl. the **C.R.A.P. framework** — Contrast · Repetition · Alignment · Proximity) · `design-gallery.md` (style+component catalogue mined from 21 pro decks — pick a preset, reach for the right component) · `semantic-color-contract.md` (bind a hue to a concept deck-wide) · `review-rubrics.md` (universal + per-purpose review criteria) · `design-by-purpose.md` (per-purpose look for "design a clean one") · `data-viz.md` (pick the chart type; editable-native vs raster) · `image-generation.md` (when/how; topical, text-free, consistently placed) · `icons.md` (one coherent open-licensed icon family, recolored, restrained) · `generated-template.md` (Q1's image-tool template branch) · `style-analysis.md` (mimic a style example, Q4) · `font-guidance.md` (portable fonts, tofu recovery) · `multilingual.md` (non-Latin / CJK / RTL) · `east-asian-aesthetic.md` (Chinese ink / traditional looks — paper · seal · CJK numerals · `ink_wash`/`eastern_traditional`) · `animation.md` (when/why + `anim.py`) · `large-deck-orchestration.md` (section fan-out; default is single-author) · `collaborative-mode.md` (direction→outline→draft gates) · `redesign-existing-deck.md` (diagnose-then-rebuild) · `handoff-and-iteration.md` (delivery + iterate without clobbering edits) · `examples/` (`build_example_generic.py`, `style_example.py`, `section_example.py`).
+**References** (`references/`, loaded on demand): `design-principles.md` (the craft / the "why"; incl. the **C.R.A.P. framework** — Contrast · Repetition · Alignment · Proximity) · `design-gallery.md` (style+component catalogue mined from 21 pro decks — pick a preset, reach for the right component) · `semantic-color-contract.md` (bind a hue to a concept deck-wide) · `review-rubrics.md` (universal + per-purpose review criteria) · `design-by-purpose.md` (per-purpose look for "design a clean one") · `form-selection.md` (**content-shape → candidate FORMS** — the single design-decision map; generate a set, pick deliberately) · `data-viz.md` (pick the chart type; editable-native vs raster) · `image-generation.md` (when/how; topical, text-free, consistently placed) · `icons.md` (one coherent open-licensed icon family, recolored, restrained) · `generated-template.md` (Q1's image-tool template branch) · `style-analysis.md` (mimic a style example, Q4) · `font-guidance.md` (portable fonts, tofu recovery) · `multilingual.md` (non-Latin / CJK / RTL) · `east-asian-aesthetic.md` (Chinese ink / traditional looks — paper · seal · CJK numerals · `ink_wash`/`eastern_traditional`) · `animation.md` (when/why + `anim.py`) · `large-deck-orchestration.md` (section fan-out; default is single-author) · `collaborative-mode.md` (direction→outline→draft gates) · `redesign-existing-deck.md` (diagnose-then-rebuild) · `handoff-and-iteration.md` (delivery + iterate without clobbering edits) · `examples/` (`build_example_generic.py`, `style_example.py`, `section_example.py`).
 
 **Registry** (NOT part of the skill): `~/.codex/slide-templates/` (Codex) · `~/.claude/slide-templates/` (Claude Code) — the user's saved templates; read for choices, write new `profile.md`s to the active host. Empty for a new user.

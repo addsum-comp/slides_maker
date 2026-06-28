@@ -210,9 +210,14 @@ sample instead of a default template, and it's the planner's call to make once a
   then commit to them deck-wide. *(The icon family + image art-direction join this design language too —
   set in §6.)*
 
-**Step B — per slide, pick the FORM that makes the point land — do not default to a bullet list.**
-Match the kit to the content's *communicative intent* (charts → `data-viz.md`; layout patterns &
-components → `design-principles.md` + the component catalogue in `design-gallery.md`). A decision guide:
+**Step B — per slide, pick the FORM that makes the point land — do not default to a bullet list OR a
+card grid.** Work from the **content-shape → candidate-forms map in `references/form-selection.md`** (the
+single source; charts → `data-viz.md`, components → `design-gallery.md`). **Design is choosing, not
+matching:** for each content slide **generate the 2–3 forms the content could take, then pick with the
+tie-breaker and record why the winner beat the runner-up** (the Form ledger, below) — never record the
+first match. Cards are for *parallel, unordered, equal-weight* items only; the moment the content has
+order, magnitude, a relationship, time, or two axes, a non-card form usually says it better. The
+candidate sets in brief (full table in `form-selection.md`):
 - **Quantitative / data → pick the chart by the argument, not always a bar.** Part-to-whole + a
   headline number → donut+KPI; a before→after gap per item → dumbbell; a rank/level change between
   two points → slope; two trends on different scales → dual-axis; the "vital few" → Pareto; x vs y
@@ -226,8 +231,10 @@ components → `design-principles.md` + the component catalogue in `design-galle
   peers), `timeline` (chronology / roadmap), `before_after` (two-image compare), a chip pipeline
   (sequential steps), or a highlighted table (one comparison). A ranked list keyed to a chart →
   `leaderboard` (same colours as the chart).
-- **Enumerated items / sections →** numbered cards or `big_numeral` wayfinding (reuse the same
-  numeral+accent across TOC / divider / recap) — not a flat bullet list.
+- **Enumerated items / sections →** *first ask what distinguishes them:* order/sequence → `step_list` /
+  `timeline`; magnitude → `big_numeral` / `stat_row`; only if **truly parallel, unordered, equal-weight**
+  → numbered cards (reuse one numeral+accent across TOC / divider / recap). Not a flat bullet list — and
+  not cards by reflex.
 - **Many IDENTICAL-except-index units → show the PATTERN, never N duplicate blocks.** Whenever many
   units differ only by an index — in any domain (parallel model units / stacked layers, K service
   replicas or nodes, an M-model ensemble, N teams running one playbook, repeated pipeline stages) —
@@ -280,16 +287,16 @@ and pace the density (a dense slide followed by an airy one-idea breath), with s
 markers. This cross-slide check is the planner's to make — the actor builds each slide in isolation and
 the builder can't retrofit rhythm. See `design-principles.md` "Deck-level rhythm".
 
-**Vary the FORMAT, not only the protagonist — don't default every content slide to a card/panel grid.**
-The rounded-card / icon-card / feature-tile grid is the easy reflex, and reaching for it slide after
-slide is exactly what makes a deck read as one template (and trips the AI-slop tell). Having picked each
-slide's form above, read down the column once more and **deliberately rotate FORMATS** from §5's
-catalogue — a `timeline`, a `big_numeral`/`stat_row`, a `pull_quote`, a chart, a `diagram_island`, a
-`quadrant`/2×2, a `step_list`, a `before_after`, a comparison table — so the audience meets a fresh
-structure, not a 12th card row. Rule of thumb: if **more than ~40–50% of the content slides** resolve to
-the same block type (usually cards), that's over-reliance — rework the weakest into the form their
-content actually wants. Taste, not a quota: a genuinely card-shaped run is fine when the *content* asks
-for it, but prove it's the content, not the reflex.
+**Vary the FORMAT, not only the protagonist — and PROVE it with a Form ledger (a gated artifact, like
+the claim ledger).** The rounded-card / icon-card / feature-tile grid is the easy reflex; reaching for
+it slide after slide is what makes a deck read as one template (the AI-slop tell). So emit a **Form
+ledger** in the plan output — one row per *content* slide: `slide | visual protagonist | format-family
+(card · chart · diagram · quote · big-number · timeline · table · photo) | build?` — and run the
+**diversity gate against it**: if any one **format-family exceeds ~40–50% of the content slides**, the
+plan is **NOT ready** — rework the weakest into the form its content wants (from `form-selection.md`)
+*before* the Step-3 checkpoint. This replaces the old soft "read down the column" re-read with a counted,
+build-blocking check (taste, not a rigid quota: a genuinely card-shaped run is allowed, but only with a
+**one-clause justification recorded in the ledger** — the gate is auditable, never silent).
 
 Then lay it out. Layout is not afterthought polish — decide it deliberately for every slide. Name the
 concrete pattern and the balance:
@@ -534,7 +541,19 @@ builder can execute. Include:
    Be specific in *Layout* (e.g. "`columns(2)`: left = 3 bullets, right = Fig. 3 whole,
    takeaway bar full-width below") and in *Motion* (e.g. "build: reveal the 4 pipeline
    stages on click, then the takeaway" — or "—" for none). In *Image*, mark the slides where
-   your design sense calls for a plate (in the deck's art-direction), or "—".
+   your design sense calls for a plate (in the deck's art-direction), or "—". In *Layout*, for any
+   non-obvious slide also name the **runner-up form** the winner beat: `<form> — beats <alt> because
+   <reason>` (from `form-selection.md`) — design is choosing, not matching.
+3b. **Form ledger** (a gated artifact, like the claim ledger) — one row per *content* slide:
+   `# | visual protagonist | format-family (card · chart · diagram · quote · big-number · timeline ·
+   table · photo) | build?` — followed by the **diversity-gate** result. If any one format-family
+   exceeds **~40–50% of content slides**, the plan is **NOT ready**: rework the weakest into the form
+   its content wants (`form-selection.md`), or record a one-clause justification per the gate.
+3c. **Design self-verify (a hard gate, mirroring §1's comprehension gate)** — state the plan is not
+   ready unless: (a) **every slide has ONE named hero** that passes the squint test; (b) the Form-ledger
+   diversity gate passes; (c) every non-obvious slide names the **alternative its form beat**; (d) the
+   **Design language is concrete** — a *named* signature motif + a deliberately-chosen palette/type,
+   never a defaulted light/minimal/blue with no motif. If any fails, fix it before the Step-3 checkpoint.
 4. **Image opt-in list** — the **roll-up of every slide whose *Image* column is marked**: one
    explicit list, *"slides X, Y could carry a generated plate in <art-direction> — approve
    which, if any."* It must match the table exactly; it exists so the user makes one clear

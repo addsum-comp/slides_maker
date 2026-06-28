@@ -182,8 +182,9 @@ Do not just skim for the first few obvious issues. Run these passes:
      tiles; a sequence not drawn as a `timeline`/pipeline; a core-and-peers idea not a `hub_spoke`;
      a two-axis classification not a `quadrant`; a before→after not a `dumbbell`/`before_after`. Also
      flag the **wrong chart for the argument** (a bar where part-to-whole wants a donut, a grouped
-     bar where a trend wants a slope/dual-axis). The fix names the better form (see
-     `references/data-viz.md` + the planner's design-selection guide). Conversely, **don't reward a
+     bar where a trend wants a slope/dual-axis). The fix names the better form (judge against the
+     **content-shape → candidate-forms map in `references/form-selection.md`** + `data-viz.md`).
+     Conversely, **don't reward a
      pattern used where it doesn't fit** — a `quadrant` with no real second axis, a `hub_spoke` for a
      sequence, a `specimen_card`/`wireframe_grid` outside a type/design/systems deck.
    - **Duplicated content — N identical blocks where the content only repeats (real flaw, flag it):**
