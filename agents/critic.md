@@ -63,6 +63,11 @@ something.
     revealing in is a *flaw* (a title must be visible immediately; a paragraph is unreadable while it
     streams in) — call it out. And a **self-read / read-alone deck with appear builds** is wrong (no one
     clicks it) — it should be static.
+  - **A build should start from an EMPTY content area and reveal from the *first* item.** From the
+    manifest, flag a build that pre-shows its first beat — only the scaffold (title/frame/axes) should be
+    on screen when the slide opens; if the manifest reads "first bullet/stage static, rest build", the
+    slide never starts clean — the first content beat should also be in a step so the content area begins
+    empty and accumulates click-by-click.
   Calibrate: a title/section/one-idea slide *should* be static (don't flag those), and "designed to
   be static for reason X" is a valid answer — you're enforcing that the decision was *made by taste*,
   not that everything animates and not that most slides stay static (there is **no quota in either

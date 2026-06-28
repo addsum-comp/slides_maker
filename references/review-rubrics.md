@@ -114,7 +114,10 @@ Score each dimension; cite specific slides.
    visible gap** (never touching — *and not a near-zero sliver*, which reads as cramped even when
    nothing technically overlaps)? Is a **hub / converge / fan-out node centred on the set it links**
    (a many→one or hub-and-spoke node on the geometric centre of its members, with symmetric connectors)
-   — not eyeballed to one member's level (`span_center`/`mid`)? Is each **feedback / repeat / return or non-adjacent link an
+   — not eyeballed to one member's level (`span_center`/`mid`)? When a line mixes **font sizes** (a big
+   number + its unit/suffix, a value + a small label), do they **share one baseline** — sitting on the
+   same horizon, not the small run floating above/below (one `text()` box auto-aligns runs;
+   `_set_baseline` to centre; never top-align separate boxes)? Is each **feedback / repeat / return or non-adjacent link an
    elbow / U-shape** (`elbow_connector` / `loop_path`), not a **straight** arrow (straight = direct
    adjacent flow only; a straight "repeat" edge reads as forward flow and crosses other shapes)?
    Does **every shape of a native diagram sit inside its
@@ -207,7 +210,9 @@ Score each dimension; cite specific slides.
    are often perfectly fine — don't force a build on every list). Minor-to-none for read-alone decks
    (no one clicks them). Also flag the **inverse**: a ❌ content type (a simple title, a large
    paragraph, a reference list) that's been appear-animated — see the content-type matrix in
-   `animation.md`. **The motion that counts is the in-slide appear build — NOT the
+   `animation.md`. From the manifest, also flag a build that **doesn't start from an empty content
+   area** — its first beat pre-shown so only the later items animate; a build should open showing only
+   the scaffold (title/frame) and reveal **from the first item**, accumulating click-by-click. **The motion that counts is the in-slide appear build — NOT the
    slide-to-slide transition.** A deck-wide fade is at most optional secondary polish, never the
    point: **flag the lazy pattern** of a fade transition on every slide standing in for real
    animation (especially with build-candidate slides left un-built) — that's "motion done" theatre,
