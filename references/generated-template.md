@@ -34,14 +34,17 @@ layers**, and the split is what keeps it editable *and* on-brand:
   Pick whichever suits the style (a geometric style → native motifs; a painterly/photographic style
   → a faint imagery plate), and **apply the SAME treatment on every content slide** so they read as
   one system. Only the cover and dividers get the full, vivid imagery.
-  - **Make the content BLOCKS semi-transparent (frosted) when they sit on an imagery/textured plate.**
-    A flat *opaque* card on a rich background reads as "pasted on". Give cards/panels a **slight
-    transparency** so the plate shows through (~30–45%) and they belong to the scene — a low-alpha glass
-    tint of the block colour + a subtle lighter rim (`deckkit.glass_card`, or `box(grad=[(0,tint,α),
-    (1,tint,α)])` with α≈0.55–0.72), the **same treatment deck-wide**, with the tint/rim chosen to
-    **harmonise with the palette** (dark deck → dark glass + faint accent rim). **Keep text ≥4.5:1** —
-    raise α (more opaque) or strengthen the tint over a bright/busy patch. (design-principles.md "Block
-    fill must FIT the background".)
+  - **DEFAULT the content BLOCKS to a transparency degree (frosted) — it's the standard for a
+    generated-template deck.** A generated template's whole point is a rich, *designed* background, so a
+    flat **opaque** card reads as "pasted on"; frosted blocks are the default here, not an exception.
+    Give every card/panel/chip a **slight transparency** so the background shows through (~30–45%) and it
+    belongs to the scene — a low-alpha glass tint of the block colour + a subtle lighter rim
+    (`deckkit.glass_card`, or `box(grad=[(0,tint,α),(1,tint,α)])` with **α ≈ 0.55–0.72**), the **same
+    treatment deck-wide**, tint/rim **harmonised with the palette** (dark deck → dark glass + a faint
+    accent rim; light deck → white glass). **Pick α by how rich/busy the background is** — a busy plate →
+    a bit more opaque (higher α) for contrast; a faint shallow wash → more transparent. **Text ≥4.5:1 is
+    non-negotiable** — raise α or strengthen the tint over a bright/busy patch (never drop the transparency
+    just to pass contrast — adjust α instead). (design-principles.md "Block fill must FIT the background".)
 
 > Don't make every slide a generated image with text baked in — baked text isn't editable, wraps
 > badly in other languages, and can't be critiqued/fixed. Images set the mood on heroes/dividers;

@@ -186,8 +186,10 @@ the direction gate** (the look is already decided). The four:
      > subject/composition/lighting/motifs — then re-derive `style.py`; don't just recolour the old plate.
      > A minor palette/contrast tweak is a `style.py`-only change. See `references/generated-template.md`.)*
      Then **the look is decided — SKIP the 3-direction gate**, finish the interview normally, and build
-     (image cover/dividers with native title on top; content built natively in `style.py`); save the
-     confirmed template to the registry.
+     (image cover/dividers with native title on top; content built natively in `style.py` — **content
+     blocks DEFAULT to a frosted / semi-transparent treatment so they fit the generated background, not
+     flat opaque panels**, text kept ≥4.5:1; see `generated-template.md`); save the confirmed template to
+     the registry.
 
    **Never hardcode or assume a specific institution's template.** This skill ships
    to anyone: a brand-new user has an *empty* registry, so they see only generic choices
