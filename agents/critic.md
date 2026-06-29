@@ -138,9 +138,16 @@ Do not just skim for the first few obvious issues. Run these passes:
        aloud?* If a line reads like a press release / textbook abstract / translation when it shouldn't,
        flag it with a concrete human rewrite (see `references/multilingual.md` "Write like a human").
      - **Owns these named-flaw checks (below):** factual fidelity; source-figure faithfulness;
-       generated-image factual correctness + topical relevance; real brand/product-asset credibility;
-       build/meta-annotation leaks; formula transcription/derivation fidelity; claim currency (as-of
-       date); kicker-echoes-title;
+       generated-image factual correctness + topical relevance; **science-schematic domain-accuracy**
+       (a labelled force/ray/circuit/apparatus/reaction/geometry diagram is *physically correct* —
+       directions, topology, ray rules, polarity, a balanced equation — and faithful to the source; a
+       *wrong* schematic, however pretty, is a fidelity **blocker** — you have the domain + the source,
+       so this correctness call is yours, `references/schematic-diagrams.md` §5); **algorithm-block fidelity**
+       (the pseudocode faithfully matches the source's actual procedure — the steps, their **order**,
+       loops/conditions, and Input→Output — not invented, reordered, or mis-simplified; verify against
+       the paper's algorithm or the code it derives from — a wrong procedure is a fidelity blocker like a
+       wrong number); real brand/product-asset credibility; build/meta-annotation leaks; formula
+       transcription/derivation fidelity; claim currency (as-of date); kicker-echoes-title;
        language consistency; text-density vs delivery mode. *(Rubric items 1, 3, 6, 8, 10, 12a-fidelity.)*
    - **LENS B · Design, layout & legibility — *how it looks.***
      - **Diagnose layout with the C.R.A.P. lens** (`design-principles.md` "The C.R.A.P. framework") — the
@@ -199,12 +206,17 @@ Do not just skim for the first few obvious issues. Run these passes:
      tiles; a sequence not drawn as a `timeline`/pipeline; a core-and-peers idea not a `hub_spoke`;
      a two-axis classification not a `quadrant`; a before→after not a `dumbbell`/`before_after`;
      **a method's procedure / training loop written as prose where an `algorithm_block`** (numbered
-     pseudocode) would be exact and skimmable; **a principle / mechanism / experiment stated text-only
+     pseudocode) would be exact and skimmable — *and* the reverse: an `algorithm_block` so **dense or
+     long** it's an unreadable wall at slide scale (trim to the steps that carry the contribution, push
+     the rest to notes/appendix; keep it legible); **a principle / mechanism / experiment stated text-only
      where a labelled schematic diagram beside it** would let the reader *see* the
      forces/signal-path/apparatus/geometry/cause→effect (a physical schematic is built per
-     `references/schematic-diagrams.md`). **Also flag a schematic that is *wrong* — a flipped lens, a
-     mis-directed force, a backwards reaction, an unbalanced equation, the wrong topology — as a
-     fidelity blocker, not a nitpick** (a wrong schematic misleads worse than none). Also flag the
+     `references/schematic-diagrams.md`); and a schematic whose **labels are illegible** at slide scale
+     (too small, low-contrast, or — on an image-tool schematic — not present as native text at all).
+     *(Whether the schematic is **physically correct** — flipped lens, mis-directed force, backwards
+     reaction, wrong topology — is a fidelity blocker owned by Lens A and checked regardless of lens;
+     the design lens owns "is a schematic missing where one would help" + "are its labels readable.")*
+     Also flag the
      **wrong chart for the argument** (a bar where part-to-whole wants a donut, a
      grouped bar where a trend wants a slope/dual-axis). The fix names the better form (judge against the
      **content-shape → candidate-forms map in `references/form-selection.md`** + `data-viz.md`).
@@ -354,6 +366,15 @@ Do not just skim for the first few obvious issues. Run these passes:
      audience; flag it even on a "decorative" plate — the fix is to specify the fact in the
      prompt or **draw it natively** at correct proportions. Also flag a **label not aligned
      under the image feature** it names (a caption sitting away from the part it points to).
+   - **Baked-in / garbled text inside a generated image — including a generated SCHEMATIC:** any
+     real text, label, number, axis tick, or equation that lives *in the pixels* of an AI-generated
+     plate (the tell: misspelled, warped, gibberish, or simply uneditable lettering). Labels and
+     numbers must be **native editable text overlaid on top**, never inside the image
+     (`schematic-diagrams.md` §1b; `image-generation.md`). A generated schematic with baked-in labels
+     is a blocker — the fix is a **text-free** regenerated visual with the labels added natively (or
+     a matplotlib/domain-lib schematic if the geometry must be exact). *(Pairs with the schematic
+     domain-accuracy check above: a generated schematic must be both **right** and **label-free in
+     the raster**.)*
    - **Corner-rounding mismatch:** a **square-cornered image** inside a rounded frame, or sitting
      among rounded cards/panels (and the reverse — a rounded element on a hard-edged/Swiss deck) —
      reads as pasted-in. Corner rounding is a deck-wide language: flag mixed squared/rounded corners

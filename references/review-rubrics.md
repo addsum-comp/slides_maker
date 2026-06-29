@@ -177,15 +177,27 @@ Score each dimension; cite specific slides.
    format** (most often the rounded-card / panel grid) on **>~40–50% of content slides** — even
    *mid-deck*, not only when literally every slide matches; the fix is to rework the weakest into the
    format their content wants (a timeline, big-numeral, quote, chart, 2×2, step-list, table). For **any algorithmic procedure** (a training loop, optimizer, derivation, or protocol-as-computation — any field), is it shown as an `algorithm_block` (numbered pseudocode) rather than
-   buried in prose; and for a **principle/mechanism**, is there a labelled schematic diagram *beside* the
-   statement rather than text alone? (See `references/form-selection.md`.)
+   buried in prose; and for a **principle/mechanism/experiment**, is there a labelled schematic diagram
+   *beside* the statement rather than text alone, **with labels legible at slide scale** (and, on an
+   image-tool schematic, present as **native** text)? When a slide **explains a method**, does its form
+   match the question it answers — the **what/how/why triad**: *what* it is → schematic; *how* it works →
+   `algorithm_block`/data-path diagram; *why* it works → typeset equation (don't pile *how*/*why* onto the
+   *what* overview slide). (See `references/form-selection.md` + `references/schematic-diagrams.md`.)
 10. **Factual fidelity** *(when source material exists — the check every system fails).*
    Does every number, label, and headline claim trace back to the source? Does the deck
    represent the source's *actual emphasis* (e.g. a comparison table foregrounds the
    authors' comparison — baseline vs. the proposed thing — not a distracting one)? A
    caption that disagrees with its figure, a wrong number, or an over-claimed trend is a
    **blocker/major**, not a nitpick: it misleads the audience and exposes a shallow grasp
-   of the material. **Allowed exception — forward-looking content:** a *future work /
+   of the material. **A science schematic is held to the same fidelity bar:** it must be
+   *domain-accurate* (correct directions/topology/ray-rules/polarity, a balanced reaction,
+   faithful to the source) and carry **no baked-in text** inside a generated image (labels
+   must be native) — a pretty-but-wrong schematic is a fidelity **blocker**
+   (`references/schematic-diagrams.md` §5). **An `algorithm_block` is held to it too:** the pseudocode
+   must faithfully match the source's actual procedure — steps, **order**, loops/conditions, Input→Output
+   — verified against the paper's algorithm or the code it derives from; an invented, reordered, or
+   mis-simplified procedure is a fidelity **blocker**, and the block must stay **legible** at slide scale
+   (trim to the contribution-carrying steps, not a wall). **Allowed exception — forward-looking content:** a *future work /
    next steps / the ask* slide may carry content not in the source, **if** it is clearly
    flagged as proposed and follows correctly from the material. Don't flag a
    properly-flagged forward-looking slide; *do* flag forward-looking claims dressed as
