@@ -139,7 +139,7 @@ above: the real mark or an honest placeholder, never a faked one.
    context-free plate for every slide regardless of whether the design wants one — thoughtless,
    padded imagery. The script no longer pads to a count; it emits one prompt per heading in
    your sub-outline. (`--count` remains only as an optional *cap* that truncates the list.)
-4. Feed each prompt from `image_prompt_manifest.json` or `image_prompts.md` to the
+4. Feed each prompt from `image_prompt_manifest.json` to the
    agent's image generation skill/tool.
 5. Save the selected outputs to the manifest filenames in the deck folder. **Note the
    manifest numbers files `slide-01.png`, `slide-02.png`… over your *sub-outline*, not by
