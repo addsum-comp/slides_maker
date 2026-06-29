@@ -259,7 +259,12 @@ Do not just skim for the first few obvious issues. Run these passes:
      the cluster of the parts that produce it (e.g. a net-magnetization arrow overlapping the individual
      spin arrows) so it reads as just another part: it must be **separated into its own zone, linked by an
      explicit operator (⇒/Σ/=/arrow), and made the focal accent** (`design-principles.md` "Show an
-     aggregate separate from its constituents").
+     aggregate separate from its constituents"). And a **line/grid background competing with line-heavy
+     content** — a faint grid/hatch/blueprint motif showing *behind* a slide whose figure is itself dense
+     line-work (a timing diagram, k-space line stack, wave/axis plot, ruled table) so the two blend: flag
+     it; the fix is to suppress the motif on that slide (a grid-free variant, keeping the frame) or seat
+     the figure on a panel that masks it (`design-principles.md` "A textured / line / grid background must
+     not compete with line-heavy content").
    - **Layout:** overflow / clipped text, content occluded or jammed on the footer,
      **text spilling outside its own card/box** — a body that wraps to more lines than its card was
      sized for, so a line hangs *below the card edge* (a distinct, glaring tell; fix by sizing the

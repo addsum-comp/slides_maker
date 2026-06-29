@@ -343,6 +343,16 @@ ask of each element "is there suitable, balanced space around it, or is it crowd
   total beside its bars, an average among samples, a centroid among points, the merged result after a
   fan-out. *(Special case of Contrast + Proximity: the summary element earns its own visual level and its
   own region.)*
+- **A textured / line / grid BACKGROUND must not compete with line-heavy CONTENT.** A faint grid, hatch,
+  blueprint frame, or line motif is good chrome *behind ordinary content* — but when a slide's content is
+  **itself dense line-work** (a pulse-sequence timing diagram, a k-space line stack, a wave/axis plot, a
+  many-line schematic, a ruled table), the background lines **blend into and muddle the figure** (same
+  hue, same orientation → the eye can't separate signal from texture). On such slides: **(a) suppress the
+  background motif** — a grid-free variant of the same template (keep the frame/footer so the chrome stays
+  consistent); **or (b) seat the figure on a solid/frosted panel** that masks the motif behind it; **and/or
+  (c) strengthen the figure's line weight / contrast** so it clearly dominates the texture. The motif's job
+  is atmosphere *behind* content — when the content is the same visual language as the motif, the motif has
+  to yield. (Generalises to any motif-vs-content clash: dots behind a scatter, hatch behind hatched bars.)
 - **Block fill must FIT the background — on a rich/image background use SEMI-TRANSPARENT (frosted) blocks,
   not flat opaque panels.** A solid opaque card is right on a *plain/flat* background. But on a **textured,
   photographic, 3D, or generated-plate** background a fully opaque block reads as "pasted on" and

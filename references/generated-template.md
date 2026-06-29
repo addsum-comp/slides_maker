@@ -34,6 +34,13 @@ layers**, and the split is what keeps it editable *and* on-brand:
   Pick whichever suits the style (a geometric style → native motifs; a painterly/photographic style
   → a faint imagery plate), and **apply the SAME treatment on every content slide** so they read as
   one system. Only the cover and dividers get the full, vivid imagery.
+  - **But SUPPRESS the motif on a slide whose content is itself the same visual language** — e.g. a
+    **line/grid** shallow background (blueprint grid, hatch) behind a slide whose figure is **dense
+    line-work** (a timing diagram, a k-space line stack, a wave/axis plot, a ruled table): the motif and
+    the figure blend and muddle each other. Provide a **grid-free variant of the same background** (keep
+    the frame/footer chrome so it still reads as one system) or seat the figure on a solid/frosted panel
+    that masks the motif. This is the one place "same treatment on every slide" yields — see
+    `design-principles.md` "A textured / line / grid background must not compete with line-heavy content."
   - **DEFAULT the content BLOCKS to a transparency degree (frosted) — it's the standard for a
     generated-template deck.** A generated template's whole point is a rich, *designed* background, so a
     flat **opaque** card reads as "pasted on"; frosted blocks are the default here, not an exception.
