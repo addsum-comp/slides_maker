@@ -331,6 +331,18 @@ ask of each element "is there suitable, balanced space around it, or is it crowd
   no line shows through), and give a node a clear margin from any line it doesn't connect to. If a
   representation is hard to read (a row of chips on a bar), **rethink it** — a labelled container/mesh, a
   clear left→right flow, or a stack usually says it better than dots on a line.
+- **Show an AGGREGATE separate from its constituents — never buried among them.** When a diagram shows a
+  *derived/summary* quantity (a net or resultant vector, a total, a mean/centroid, a combined output)
+  alongside the individual elements that produce it, the aggregate must read as the **outcome**, not as
+  one more item in the crowd. Drawing the net arrow *inside* the cluster of component arrows (overlapping
+  them) makes it look like just another component — the exact failure to avoid. Instead: **(1) separate it
+  spatially** — give it its own zone beside/below the group, not on top of it; **(2) make the relationship
+  literal** with an explicit operator or connector (`⇒` / `Σ` / `=`, an arrow, a brace) so "these combine
+  into this" is unmistakable; **(3) distinguish it** by weight/size/colour (the focal accent, a heavier
+  stroke). The same pattern applies anywhere parts make a whole: a resultant among component vectors, a
+  total beside its bars, an average among samples, a centroid among points, the merged result after a
+  fan-out. *(Special case of Contrast + Proximity: the summary element earns its own visual level and its
+  own region.)*
 - **Block fill must FIT the background — on a rich/image background use SEMI-TRANSPARENT (frosted) blocks,
   not flat opaque panels.** A solid opaque card is right on a *plain/flat* background. But on a **textured,
   photographic, 3D, or generated-plate** background a fully opaque block reads as "pasted on" and

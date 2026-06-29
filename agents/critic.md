@@ -254,7 +254,12 @@ Do not just skim for the first few obvious issues. Run these passes:
      **stat numeral / label that wraps and collides** with the line below it (give each room or shrink/
      shorten). And a **node/block sitting ON a connector line** (a line passing under/through a box; chips
      dropped on a bar): route links in the **gaps** between nodes — and if a diagram is hard to read,
-     say so and propose a clearer form (a labelled mesh/container, a clean flow), not just a nudge.
+     say so and propose a clearer form (a labelled mesh/container, a clean flow), not just a nudge. Also
+     an **aggregate drawn buried among its constituents** — a net/resultant/total/centroid drawn *inside*
+     the cluster of the parts that produce it (e.g. a net-magnetization arrow overlapping the individual
+     spin arrows) so it reads as just another part: it must be **separated into its own zone, linked by an
+     explicit operator (⇒/Σ/=/arrow), and made the focal accent** (`design-principles.md` "Show an
+     aggregate separate from its constituents").
    - **Layout:** overflow / clipped text, content occluded or jammed on the footer,
      **text spilling outside its own card/box** — a body that wraps to more lines than its card was
      sized for, so a line hangs *below the card edge* (a distinct, glaring tell; fix by sizing the

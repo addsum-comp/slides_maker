@@ -96,6 +96,12 @@ Match the deck so the schematic reads as *part of* it, not a pasted-in textbook 
 - **`ax.set_aspect('equal')`** for anything with real geometry (force diagrams, optics, circuits) so
   angles and lengths aren't distorted; turn the axis frame off (`ax.axis('off')`) unless axes ARE
   the point (coordinate geometry).
+- **Draw an AGGREGATE separate from its constituents.** When the schematic shows a net/resultant/total
+  alongside the parts that produce it (a net magnetization among spin arrows, a resultant among component
+  vectors, a centroid among points), do NOT draw it *inside* the cluster — it then reads as just another
+  component. Give it its own zone, connect the group to it with an explicit operator (`⇒`/`Σ`/`=`/arrow),
+  and make it the focal accent (heavier/coloured). See `design-principles.md` "Show an aggregate separate
+  from its constituents."
 
 Shared canvas helper (copy into the build script, adapt per recipe):
 
