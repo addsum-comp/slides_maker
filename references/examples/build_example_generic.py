@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 from deckkit import (  # noqa: E402
     blank_deck, add_slide, title_bar, footer,
-    box, text, bullet, callout, arrow, chip, modbox, equation_png,
+    box, text, bullet, callout, arrow, chip, modbox, equation_native, equation_png,
     columns, picture,
     set_font, Inches, PP_ALIGN, MSO_ANCHOR,
     DEEP, BLUE, TEAL, MAGENTA, SLATE, MUTE, TINT, LIGHT, WHITE,
@@ -55,20 +55,19 @@ for i, name in enumerate(stages):
     if i < len(stages)-1:
         arrow(s, x+cw+0.02, y0+ch/2-0.12, g-0.04, 0.24)
 
-# --- an equation slide: PREFER equation_png (real typeset math) over ASCII eq_par ---
+# --- an equation slide: DEFAULT to equation_native (EDITABLE native math); equation_png only for 2-D ---
 s = add_slide(prs)
 title_bar(s, "Typeset math reads as formal", kicker="equations")
 footer(s, "demo deck", page=4)
-# render a LaTeX-style line to a PNG (Computer Modern), then place scaled to a target height
-# so glyph size is consistent across slides; color is RRGGBB hex without '#'.
-_eqp = os.path.join(tempfile.gettempdir(), "slide_maker_demo_eq.png")
-_wpx, _hpx = equation_png([r"\hat{x} = \mathrm{arg\,min}_{x}\,\|Ax-y\|_{2}^{2} + \lambda R(x)"],
-                          _eqp, color="003C66", fontsize=30, dpi=300, mathfont="cm")
-_th = 0.7; _tw = _th * _wpx / _hpx
-s.shapes.add_picture(_eqp, Inches((10 - _tw) / 2), Inches(2.2), width=Inches(_tw), height=Inches(_th))
+# equation_native renders a LaTeX subset as real, click-EDITABLE text runs (italic variables, upright
+# operators, true sub/superscripts) in a math font — renders everywhere the math font is present.
+equation_native(s, 0.8, 2.2, 8.4, 0.7,
+                r"\hat{x} = \arg\min_x \|A x - y\|_2^2 + \lambda R(x)",
+                size=20, align=PP_ALIGN.CENTER)
 callout(s, 0.6, 4.3, 8.8, 0.6, "WHY",
-        "equation_png typesets real math (italic variables, true sub/superscripts) — much "
-        "cleaner than ASCII; keep eq_par only for trivial inline math.")
+        "equation_native typesets real math as EDITABLE text runs (italic variables, true "
+        "sub/superscripts) — click-editable and renders everywhere; reach for equation_png only for "
+        "2-D math (fractions/matrices), and eq_par for one inline symbol.")
 
 # --- a balanced split layout: columns() gives equal panels + symmetric margins ---
 # The most common lopsided-slide tell is a left panel and right panel of different widths,

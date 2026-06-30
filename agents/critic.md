@@ -364,7 +364,7 @@ Do not just skim for the first few obvious issues. Run these passes:
    - **Formula pasted as a cropped image instead of typeset:** a math equation that's a **bitmap
      cropped from the source PDF** — low-res, carrying the paper's font/background, mismatched to the
      deck's colours, or clipped — rather than re-typeset math. Flag it: a formula must be **typeset**
-     with `equation_png`/`eq_par` (transcribed from a paper, or *derived* from code), faithful to the
+     with `equation_native` (editable) / `equation_png` (2-D) / `eq_par` (inline) — transcribed from a paper, or *derived* from code — faithful to the
      source. (Figures and tables are cropped whole; formulas are not.) If a formula was **derived from
      code**, sanity-check it expresses what the code actually computes — flag an invented or
      wrongly-simplified equation.
@@ -375,7 +375,7 @@ Do not just skim for the first few obvious issues. Run these passes:
      any **variable/symbol set as plain upright body text** instead of math format — *including a lone
      inline variable* (*x*, *λ*, `Aᵀ`, *R*(*x*)) — and any **Unicode super/subscript** (ᴴ ᵀ ᵣ, tofu
      risk): every variable must be italic math with real sub/superscripts (`eq_par`/native runs inline,
-     `equation_png` for a full expression).
+     `equation_native` for a full expression — editable — or `equation_png` for 2-D).
    - **Generated image is factually wrong about a real subject:** a generated plate of real,
      known things that gets a *visible fact* wrong — wrong **relative sizes/proportions** (two
      things drawn the wrong size relative to each other, e.g. a person as tall as a building),

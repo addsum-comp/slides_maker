@@ -147,7 +147,7 @@ bash ~/.claude/skills/slide-maker/scripts/check_env.sh
 - `SKILL.md` — モデルが従う運用指示（ステップ0〜6、ルール）。
 
 **エンジン（`scripts/`）**
-- `deckkit.py` — ビルドキット：テキスト/シェイプ/コンポーネントのヘルパー（`bullet`、`callout`、`chip`、`arrow`、`modbox`、`hrule`）、レイアウトヘルパー（等幅の分割・積み重ね用 `columns`/`rows` に加え、**測ってから置く**プリミティブ — `content_band`、`bottom_callout`（フッターに寄せて上へ伸びる）、`vstack`（等間隔・重なりなし・あふれたらエラー）、`measure_*` — で衝突をレンダリング後ではなくビルド時に表面化）、`picture`、`palette`（互いに区別でき、コントラストを点検した分類色 — グレーをカテゴリ色に使わない）、数式（`eq_par`、`equation_png`）、`speaker_notes`、コントラストチェック、ブランド色/フォント（CJK の `EAFONT` を含む）、テンプレート再利用（`open_template`、`content_slide`）、テンプレートなしのクローム（`blank_deck`、`title_bar`、`footer`）。インポートして使うこと。プリミティブを再実装しないこと。
+- `deckkit.py` — ビルドキット：テキスト/シェイプ/コンポーネントのヘルパー（`bullet`、`callout`、`chip`、`arrow`、`modbox`、`hrule`）、レイアウトヘルパー（等幅の分割・積み重ね用 `columns`/`rows` に加え、**測ってから置く**プリミティブ — `content_band`、`bottom_callout`（フッターに寄せて上へ伸びる）、`vstack`（等間隔・重なりなし・あふれたらエラー）、`measure_*` — で衝突をレンダリング後ではなくビルド時に表面化）、`picture`、`palette`（互いに区別でき、コントラストを点検した分類色 — グレーをカテゴリ色に使わない）、数式（`equation_native`(編集可・既定)、`equation_png`(2-D)、`eq_par`(インライン)）、`speaker_notes`、コントラストチェック、ブランド色/フォント（CJK の `EAFONT` を含む）、テンプレート再利用（`open_template`、`content_slide`）、テンプレートなしのクローム（`blank_deck`、`title_bar`、`footer`）。インポートして使うこと。プリミティブを再実装しないこと。
 - `render_deck.sh` — `.pptx` → スライドごとに1枚の PNG（LibreOffice → PDF → PNG）。クロスプラットフォーム。プライベートな LibreOffice プロファイルを使うため、並列/共存するレンダリングが衝突しません。
 - `check_env.sh` — ツールチェーンの一度きりのプリフライト。
 - `anim.py` — python-pptx が書けない PowerPoint のビルド/アニメーションのタイミング XML を注入。

@@ -108,8 +108,10 @@ Score each dimension; cite specific slides.
    text. *(Visual-only, not lint-backed)* **no node sitting ON a connector line** — links route in the gaps.
    On a **rich / image / 3D / generated-plate** background, are content **blocks semi-transparent (frosted)**
    (~30–45% show-through, one treatment deck-wide) rather than flat opaque, and does **every interior slide
-   carry the shallow background** (not a flat single colour) — text still ≥4.5:1? (Opaque is fine on a
-   plain/flat-by-design background.)
+   carry the shallow background** (not a flat single colour) — and on a deck built via the **image-tool
+   template** path, is that shallow background a **generated plate** (not just a native gradient), except a
+   deliberately minimal/flat style or an explicit clean-interiors request? — text still ≥4.5:1? (Opaque is
+   fine on a plain/flat-by-design background.)
    On **split layouts** (text + figure, two-up, image + caption), are the left and right
    regions — *and the white margins flanking them* — the **same width** (or a clearly
    intentional asymmetric split with equal outer margins)? Unequal panels, a lopsided
@@ -261,7 +263,7 @@ Score each dimension; cite specific slides.
    a **single highlight** on the one series that matters and a stated **so-what** (`takeaway_rail`),
    placed **whole** and legible at the deck's read distance? Do `scorecard`/`change_stat` **▲/▼ deltas
    / before→after** carry the **right polarity** (green for the genuinely-good direction)? Are
-   **formulas typeset** (`equation_png`), **never cropped bitmaps** — transcribed from a paper or
+   **formulas typeset** (`equation_native` editable, or `equation_png` for 2-D), **never cropped bitmaps** — transcribed from a paper or
    *derived faithfully from code* (a code-derived formula must express what the code computes)? Are
    formulas **sized to the body text** (glyphs ≈ content size and consistent across slides — not blown
    up to span the slide width, which oversizes the glyphs past the title, nor shrunk illegible), and is

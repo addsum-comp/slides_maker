@@ -2154,6 +2154,10 @@ _EQ_ACC = {'hat':'̂','widehat':'̂','tilde':'̃','widetilde':'̃','bar':'̄',
 'grave':'̀'}
 _EQ_2D = {'frac','dfrac','tfrac','sqrt','begin','overline','underline','binom','matrix','pmatrix',
 'bmatrix','vmatrix','overbrace','underbrace','substack'}
+# log-like operator names render as UPRIGHT roman text (correct LaTeX) — spelling their letters is right
+_EQ_OPNAMES = {'min','max','arg','sup','inf','lim','limsup','liminf','log','ln','lg','exp','sin','cos',
+'tan','cot','sec','csc','sinh','cosh','tanh','arcsin','arccos','arctan','det','dim','ker','deg','gcd',
+'hom','Pr','mod','bmod'}
 
 def _eq_read_group(s, i):
     depth = 0; j = i
@@ -2201,8 +2205,13 @@ def _eq_resolve(s):
             if name in ('left','right','displaystyle','textstyle','limits','nolimits','bigl','bigr','Bigl','Bigr'):
                 i = j; continue
             if name in ('quad','qquad'): out.append(('  ', False)); i = j; continue
-            for ch in name: out.append((ch, False))          # unknown command (\min,\arg,\log…) → upright
-            i = j; continue
+            if name in _EQ_OPNAMES:                           # log-like operator (\min \arg \log …) → upright roman
+                for ch in name: out.append((ch, False))
+                i = j; continue
+            # any OTHER unknown command (\mathscr \overrightarrow \stackrel \models …) is unsupported by
+            # the LINEAR parser — FAIL LOUD rather than spell its letters as garbage; the caller switches
+            # that one formula to equation_png.
+            raise NotImplementedError(f"\\{name} not supported by native math — use equation_png for this formula")
         if c in '{}': i += 1; continue
         if c == '|': out.append(('‖', False)); i += 1; continue
         if c == ' ': out.append((' ', False)); i += 1; continue
@@ -2237,10 +2246,12 @@ def latex_to_runs(latex):
         if c == '\\':
             j = i+1
             while j < len(s) and s[j].isalpha(): j += 1
+            if j == i+1 and j < len(s):            # escaped NON-alpha symbol (\| \{ \% …) — consume the symbol char
+                j += 1
             if j < len(s) and s[j] == '{': _, j = _eq_read_group(s, j)
             push(_eq_resolve(s[i:j]), 0); i = j; continue
         push(_eq_resolve(c), 0); i += 1
-    return out
+    return [(t, k) for t, k in out if t != '']   # drop any spurious empty runs (lone '\\', escaped delimiters)
 
 EQ_MATHFONT = "STIX Two Math"   # math font with ℒ Σ ‖ … ; 'Cambria Math' is the Office-portable alt
 

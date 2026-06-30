@@ -191,10 +191,12 @@ don't force any of them:
   baseline — so it reads as a table, not floating numbers. Include uncertainty
   (± std / error bars) when the source reports it. Distil — never paste a giant
   paper table; show the rows that carry the message.
-- **Formal math.** When equations should look polished, render them with
-  `deckkit.equation_png` (matplotlib mathtext: true italics, ⊙, fractions, proper
-  sub/superscripts) and place the image. Keep `eq_par` for quick, editable inline
-  math. Either way the notation must match the source's.
+- **Formal math.** Default to **`deckkit.equation_native`** (a LaTeX-subset rendered as real,
+  click-**editable** text runs — italic variables, true sub/superscripts, math glyphs — that stays
+  editable and renders the same in PowerPoint/Keynote/LibreOffice/PDF *where the math font is present*).
+  Reach for `deckkit.equation_png` (matplotlib mathtext raster) only for **2-D math it can't lay out**
+  (fractions, matrices, stacked limits) **or when the math font can't be guaranteed**; `eq_par` for a
+  single inline symbol. Either way the notation must match the source's.
 - **Formulas are TYPESET, never cropped — and may be derived from code.** Figures and tables you take
   *whole* from the PDF — but a formula you **re-typeset** with `equation_png` (or `eq_par`): a cropped
   equation bitmap is low-res, drags in the source's font/background, can't be recoloured/resized to

@@ -15,7 +15,7 @@ Reliable on Windows + macOS (and close enough on Linux/LibreOffice via metric cl
 LibreOffice (what `render_deck.sh` uses) substitutes Calibri→Carlito, Cambria→Caladea,
 etc. — metric-compatible, so the render is representative.
 
-`deckkit` defaults: `FONT="Calibri"`, `MONO="Consolas"`, `EQFONT="Arial"`. Override them
+`deckkit` defaults: `FONT="Calibri"`, `MONO="Consolas"`, `EQFONT="Arial"`, `EQ_MATHFONT="STIX Two Math"` (editable native math). Override them
 right after import to match a brand or to maximise portability (`deckkit.FONT="Arial"`).
 
 ## Type pairing — give different roles different fonts (don't ship one font everywhere)
@@ -44,10 +44,13 @@ CJK (or other) text should ride a clean Latin face while the script keeps its ow
 "私域营收 ≈40%" reads intentional, not like a fallback. deckkit does this via `FONT` (Latin) +
 `EAFONT` (CJK), and `DISPLAY`+`EADISPLAY` for headings. Full CJK pairing in `multilingual.md`.
 
-## Equations are font-independent
-`equation_png` rasterises math with matplotlib's bundled math fonts, so **equations carry
-no font dependency** — they render identically anywhere. Prefer it over `eq_par` when you
-want zero font risk on the math (see `design-principles.md`).
+## Equations: native math needs a math font; raster is font-independent
+**`equation_native`** (the editable default) renders real text runs in a **math font** (`EQ_MATHFONT`
+= STIX Two Math; `Cambria Math` for Office) — its glyphs (ℒ Σ ‖) **tofu if that font is absent** on the
+opening machine (STIX ships on neither stock macOS nor Windows; Cambria Math needs MS Office). **`equation_png`**
+rasterises math with matplotlib's bundled fonts, so it carries **no font dependency** and renders
+identically anywhere — so when the math font can't be guaranteed (or the formula is 2-D), **fall back to
+`equation_png`**. Flag the math-font dependency at hand-off (see `design-principles.md`).
 
 ## Non-Latin (CJK / etc.)
 Set `deckkit.EAFONT` to a script-appropriate font so every run is tagged with a CJK

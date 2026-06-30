@@ -60,7 +60,8 @@ The recipes render a themed PNG → place with `deckkit.picture(out, ..., fit="c
    axes: `lns = l1 + l2; ax.legend(lns, [h.get_label() for h in lns], loc="lower center",
    bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=False)`. Overlap can't always be perfectly avoided on a
    dense plot — when there's no empty region, going **outside** (right or above) is the answer; never ship
-   a legend sitting on the data.
+   a legend sitting on the data. (In a very small plot cell an outside legend can shrink the axes too far —
+   then omit the in-figure legend and label the series in the native slide caption instead.)
    Always **view the rendered PNG** and fix aliasing / an occluding legend / clipped labels before
    placing it — a wrong-*looking* plot misleads even when the numbers are right.
 

@@ -147,7 +147,7 @@ bash ~/.claude/skills/slide-maker/scripts/check_env.sh
 - `SKILL.md` — 모델이 따르는 운영 지침 (0–6단계, 규칙).
 
 **엔진 (`scripts/`)**
-- `deckkit.py` — 빌드 키트: 텍스트/도형/컴포넌트 헬퍼(`bullet`, `callout`, `chip`, `arrow`, `modbox`, `hrule`), 레이아웃 헬퍼(등폭 분할·스택용 `columns`/`rows`에 더해 **측정 후 배치** 기본 요소 — `content_band`, `bottom_callout`(푸터에 붙어 위로 자람), `vstack`(균등 간격·겹침 없음·넘치면 오류), `measure_*` — 로 충돌을 렌더링 후가 아니라 빌드 시점에 드러냄), `picture`, `palette`(서로 구별되고 대비를 점검한 범주 색 — 회색을 범주 색으로 쓰지 않음), 수식(`eq_par`, `equation_png`), `speaker_notes`, 대비 점검, 브랜드 색/폰트(CJK `EAFONT` 포함), 템플릿 재사용(`open_template`, `content_slide`), 그리고 템플릿 없는 크롬(`blank_deck`, `title_bar`, `footer`). 가져다 쓰세요 — 기본 요소를 다시 만들지 마세요.
+- `deckkit.py` — 빌드 키트: 텍스트/도형/컴포넌트 헬퍼(`bullet`, `callout`, `chip`, `arrow`, `modbox`, `hrule`), 레이아웃 헬퍼(등폭 분할·스택용 `columns`/`rows`에 더해 **측정 후 배치** 기본 요소 — `content_band`, `bottom_callout`(푸터에 붙어 위로 자람), `vstack`(균등 간격·겹침 없음·넘치면 오류), `measure_*` — 로 충돌을 렌더링 후가 아니라 빌드 시점에 드러냄), `picture`, `palette`(서로 구별되고 대비를 점검한 범주 색 — 회색을 범주 색으로 쓰지 않음), 수식(`equation_native` (editable default) · `equation_png` (2-D) · `eq_par` (inline)), `speaker_notes`, 대비 점검, 브랜드 색/폰트(CJK `EAFONT` 포함), 템플릿 재사용(`open_template`, `content_slide`), 그리고 템플릿 없는 크롬(`blank_deck`, `title_bar`, `footer`). 가져다 쓰세요 — 기본 요소를 다시 만들지 마세요.
 - `render_deck.sh` — `.pptx` → 슬라이드당 PNG 하나 (LibreOffice → PDF → PNG). 크로스 플랫폼; 전용 LibreOffice 프로파일을 사용해 병렬/공존 렌더가 충돌하지 않습니다.
 - `check_env.sh` — 툴체인을 위한 일회성 사전 점검.
 - `anim.py` — python-pptx가 쓸 수 없는 PowerPoint 빌드/애니메이션 타이밍 XML을 주입합니다.

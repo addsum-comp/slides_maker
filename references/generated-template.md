@@ -25,7 +25,8 @@ layers**, and the split is what keeps it editable *and* on-brand:
   contrast* background so the deck feels designed end-to-end, not "cover is gorgeous, body is
   blank." A flat one-colour content slide next to a lush cover is the #1 tell of a half-finished
   generated template. The shallow background is **faint by design** (it sits *behind* content and
-  must never fight the text — see the legibility guardrail), and it comes from one of:
+  must never fight the text — see the legibility guardrail), and — **in the general case (and on the
+  non-image-tool branches)** — it comes from one of (the image-tool MUST below then *picks* the plate):
   - a **faint native texture** in the palette — a soft two-stop gradient wash, a faint
     `backdrop_motif` field, or a tinted corner/band — the lightest-weight option, fully editable; **or**
   - a **subtle imagery plate** — a dedicated low-contrast, text-free background image generated in
@@ -34,13 +35,15 @@ layers**, and the split is what keeps it editable *and* on-brand:
   **🔴 MUST for the image-tool template — the interior shallow background is itself a GENERATED image
   plate, not a flat / merely-native fill.** Since the user chose a *generated visual identity*, every
   interior page carries a **dedicated low-contrast, text-free background image generated in the same
-  style** (the subtle imagery plate above), so the body reads as *designed* as the cover; a flat (or
-  merely-gradient) interior under a lush generated cover is the failure to avoid. Apply the **SAME plate
-  on every content slide** so they read as one system; only the cover and dividers get the full, vivid
-  imagery. *Carves (audit-scoped):* a deliberately **minimal / flat** generated style (Swiss ·
-  Scandinavian · Brutalist) whose aesthetic *is* near-flat may use a faint native texture instead (a busy
-  plate would fight that look), and **mask / suppress the plate** on a line-heavy figure slide (the
-  motif-suppression rule above). *(Outside this image-tool branch — e.g. a "design a clean one" deck — a
+  style** (the subtle imagery plate above), so the body reads as *designed* as the cover; a flat — or a
+  merely-native, gradient-only — interior under a lush generated cover is the failure to avoid. Apply the
+  **SAME plate on every content slide** so they read as one system; only the cover and dividers get the
+  full, vivid imagery. *Carves (audit-scoped) — the MUST yields to:* **(1)** a deliberately **minimal /
+  flat** generated style (Swiss · Scandinavian · Brutalist) whose aesthetic *is* near-flat; **(2)** the
+  **user explicitly asking for clean / flat / minimal interiors**, or a **brand identity that is itself a
+  flat colour field** (honour the request/brand — a faint native texture or the flat brand field is then
+  correct); **(3)** a **line-heavy figure slide**, where you **mask / suppress the plate** (the
+  motif-suppression rule above). Outside those, generate the plate. *(Outside this image-tool branch — e.g. a "design a clean one" deck — a
   faint native texture is still a fine shallow background; the generated-plate MUST is specific to having
   chosen the image tool.)*
   - **But SUPPRESS the motif on a slide whose content is itself the same visual language** — e.g. a

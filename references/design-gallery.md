@@ -65,7 +65,7 @@ Pick the preset to the purpose+mood, then **vary it** — these are starting lan
   doesn't fight the accent (riso/brutalist/ink/luxury/museum), then `picture(fit="cover")`.
 - **East-Asian:** `seal` (vermilion chop), `cjk_numeral` (壹贰叁), `bilingual_lockup` — see
   `east-asian-aesthetic.md`.
-- **Math:** `equation_png` (real LaTeX) for *math*; `concept_equation` for a *word*-equation headline.
+- **Math:** `equation_native` (editable LaTeX-subset) for *math* — `equation_png` for 2-D; `concept_equation` for a *word*-equation headline.
 - **Algorithms / pseudocode (CS·AI):** `algorithm_block` — a LaTeX-`algorithm`-environment-style block
   (booktabs rules or `boxed=True`, numbered indented lines, auto-bolded keywords Input/Output/for/if/
   while/return/end…) for a *training loop, optimizer, or method procedure*. Use a `MONO` font; pair the

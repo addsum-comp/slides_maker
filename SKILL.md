@@ -737,12 +737,12 @@ A few rules that matter (see `references/design-principles.md`):
     classic "sin curve looks weird" bug). **(b) The legend must NOT overlap the data — treat this as a
     rule, not a nicety.** `loc='best'` and any in-axes corner routinely land the legend ON a curve on a
     full/busy plot. The reliable fix is to put the legend **OUTSIDE the axes**: to the right
-    (`loc='center left', bbox_to_anchor=(1.0, 0.5)`) or **above** (`loc='lower center',
+    (`loc='center left', bbox_to_anchor=(1.02, 0.5)`) or **above** (`loc='lower center',
     bbox_to_anchor=(0.5, 1.0), ncol=…`); use an in-axes corner ONLY when that corner is provably empty.
     For a **dual-axis / twin-axis** plot don't draw two separate legends (they collide with each other and
     the twin ticks) — collect both handle sets and draw **one combined legend above** (`h1+h2`,
     `loc='lower center', bbox_to_anchor=(0.5,1.0), ncol=2`). It can't *always* be perfect on a dense plot
-    — when no empty region exists, going outside is the answer, never overlapping the data. **(c) Always
+    — when no empty region exists, going outside is the answer, never overlapping the data. *(In a tiny plot cell where an outside legend would shrink the axes too far, drop the legend and name the series in the native slide caption, or keep it inside a provably-empty corner.)* **(c) Always
     view the rendered PNG** and fix anything off (aliasing, clipped labels, an **occluding legend**, a
     squished aspect) — a wrong-looking plot misleads even when the math is right.
 - **Generated visual plates (atmosphere / conceptual) — by taste & purpose, opt-in; full mechanics in
@@ -841,17 +841,25 @@ A few rules that matter (see `references/design-principles.md`):
   is the fallback for 2-D layout only.** A formula the audience reads should default to
   **`deckkit.equation_native(slide, x, y, w, h, latex)`** — it renders a LaTeX-subset as **real,
   click-editable TEXT runs** (italic variables · upright operators · true sub/superscripts · Greek &
-  math glyphs) in a math font, so it stays **editable** AND renders identically in PowerPoint / Keynote /
-  LibreOffice / PDF. This is the editability users expect — a raster formula is a *frozen image they
-  cannot fix*, so don't ship one where native math works. Reach for **`equation_png()`** (rasterised
-  LaTeX) **only for 2-D math that linear runs can't lay out** — fractions, matrices, stacked limits, big
-  integrals with bounds (`equation_native` raises `NotImplementedError` on those, naming the construct).
-  *(A true PowerPoint OMML equation OBJECT is editable in PowerPoint but **invisible in the LibreOffice
-  render & PDF export** — so it is NOT the default; native runs render everywhere and are verifiable in
-  the loop.)* **Never** paste Unicode super/subscripts (ᴴ ᵀ ᵣ) — the display font may lack them and tofu.
-  **Math font:** `equation_native` needs a math font for ℒ Σ ‖ … (`deckkit.EQ_MATHFONT` = `'STIX Two
-  Math'`; set `'Cambria Math'` for Office portability) — **flag this font dependency at hand-off**; for
-  `equation_png` pick its `mathfont` (`'cm'` formal · `'stixsans'` crisp).
+  math glyphs) in a math font, so it stays **editable** AND renders the same in PowerPoint / Keynote /
+  LibreOffice / PDF — *as long as the math font is present* (see below). This is the editability users
+  expect — a raster formula is a *frozen image they cannot fix*, so don't ship one where native math
+  works. Reach for **`equation_png()`** (rasterised LaTeX) for math `equation_native` can't render: it
+  supports a **common LaTeX subset (linear math)** and **raises `NotImplementedError`, naming the
+  construct, on anything else** — both **2-D layout** (`\frac`, matrices/`\begin`, `\sqrt`, `\overline`,
+  `\binom`, over/under-braces) **and any unmapped command** (`\mathscr`, `\overrightarrow`, `\stackrel`,
+  `\models`, …). It does NOT silently mangle — but a *display-style* stacked sum/integral with bounds
+  (`\sum_{i=1}^{N}`) still renders *inline* (bounds beside, not stacked), so use `equation_png` when the
+  stacked 2-D look matters. **Always view each native equation in the render** and switch that one
+  formula to `equation_png` if a glyph is missing. *(A true PowerPoint OMML equation OBJECT is editable
+  in PowerPoint but **invisible in the LibreOffice render & PDF export** — so it is NOT the default;
+  native runs are verifiable in the loop.)* **Never** paste Unicode super/subscripts (ᴴ ᵀ ᵣ) — tofu.
+  **Math font (a real dependency):** `equation_native` needs a math font for ℒ Σ ‖ … (`deckkit.EQ_MATHFONT`
+  = `'STIX Two Math'`; set `'Cambria Math'` for Office portability). **STIX ships on neither stock macOS
+  nor Windows, and Cambria Math needs MS Office** — so on a machine with NEITHER, the math glyphs **tofu**
+  in the render/PDF: install the math font, or **fall back to `equation_png` (font-independent)** for that
+  deck. **Flag this dependency at hand-off.** For `equation_png` pick its `mathfont` (`'cm'` formal ·
+  `'stixsans'` crisp).
   - **Size the formula to the CONTENT text, not to fill the slide.** A formula's glyph
     height should read like the deck's **body/content** size — *never* blown up to span
     the slide width (which oversizes every glyph and breaks the title→content hierarchy),
