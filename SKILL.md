@@ -865,25 +865,29 @@ A few rules that matter (see `references/design-principles.md`):
     edge. Call the callout FIRST, then size content to end **a full `GUTTER` above** its returned
     top: `top = dk.bottom_callout(s, 0.6, W-1.2, "要点", "…"); card_h = top - GUTTER - card_y`. A
     *near-zero* overlap is not harmless — the bar draws on top and **clips the cards' rounded
-    corners** — so require a visible gap, not just non-collision. (The Step-5 self-check + lint now
-    flag a wide bar grazing the content above it, but reserving the space avoids it by construction.)
+    corners** — so require a visible gap, not just non-collision. (The Step-5 render self-check
+    flags a wide bar grazing the content above it; the build-time lint does NOT catch panel-on-panel
+    grazing, so reserving the space by construction is on you.)
 - **🔴 Gate the geometry at BUILD time — end the build script with `dk.lint_layout(prs)` before
   `prs.save()`, and clear every CRITICAL before you render.** This is the cheapest place to catch
   the mechanical layout faults: it runs in-process in milliseconds, *before* the slow render +
   visual-critic round, and walks **every** shape — however it was placed, the grid helpers or raw
-  coordinates. It flags text overflowing or escaping its card, two text boxes overlapping, a shape
-  off-canvas, and a panel reaching the footer — reasoning about each label's **ink** rectangle (where
-  the glyphs actually land), so it stays quiet on the generously-sized frames real builds use and
-  every fault it prints is real. It is a **net, not a substitute for looking** — it removes the
-  geometric errors so the critic spends its attention on meaning, balance, and fidelity. The layout
-  **contract** it enforces — and the helpers that satisfy each rule *by construction*, so you rarely
-  trip the net in the first place:
-  1. **Stay in the safe area.** Get the rect from `content_band()`; only full-bleed hero/divider art bleeds to the edge.
-  2. **Give text padding.** Inset every label ≥0.1in inside its card (place at `cx+0.2`, width `cw-0.4`) — text flush to a card edge reads as a mistake.
-  3. **No text-on-text.** One column/stack owns each region; never drop a second text box into the same rectangle.
-  4. **If it doesn't fit, resolve it — don't spill.** `fit_text_size(runs, w, h, start)` returns the largest size that fits; else shorten the text or grow the box.
-  5. **Grid/stack over hand-picked y.** `columns()/rows()` for equal panels, `vstack(…, bottom=…)` for content-height blocks (no overlap by construction), `content_band()` for the vertical extent.
-  6. **Leave a real gap (~`GUTTER`) between neighbours.** `vstack`/`palette` space them for you; crowding reads as amateur.
+  coordinates — reasoning about each label's **ink** rectangle (where the glyphs actually land), so it
+  stays quiet on the generously-sized frames real builds use. It **hard-fails (CRITICAL)** on three
+  things: text **off-canvas**, text **overflowing** a visible box, and **text-on-text** overlap; it
+  **warns** on a label/figure **escaping its card**, a **single line left off-centre** in a card, and
+  content **reaching the footer**. Every CRITICAL it prints is real *when the deck's fonts are
+  installed* — when a font is substituted for measurement it says so and carries ~1 line of slack
+  (conservative, may under-flag), so it never fabricates. It is a **net, not a substitute for
+  looking** (it can't see contrast, z-order, a figure smothering text, or shapes inside groups — the
+  critic's job). The rest of the **layout contract** below it doesn't hard-check; the named helpers
+  satisfy these *by construction*, so you rarely trip the net in the first place:
+  1. **Stay in the safe area** — get the rect from `content_band()`; only full-bleed hero/divider art bleeds.
+  2. **Give text padding** — inset every label ≥0.1in inside its card (`cx+0.2`, width `cw-0.4`); flush-to-edge reads as a mistake.
+  3. **No text-on-text** — one column/stack owns each region; never drop a second text box into the same rectangle.
+  4. **If it doesn't fit, resolve it** — `fit_text_size(runs, w, h, start)` gives the largest size that fits; else shorten or grow the box.
+  5. **One line in a block → vertically centre it** — anchor it `MIDDLE` with the card's rect; a lone line top-anchored leaves a lopsided gap (the `OFFCENTER` warn).
+  6. **Grid/stack over hand-picked y, and leave a real gap (~`GUTTER`)** — `columns()/rows()` for equal panels, `vstack(…, bottom=…)` for content-height blocks (no overlap, even gaps by construction), `content_band()` for the vertical extent.
   7. **For a diagram, compute all bounding boxes first, then draw into them** — lay out the rects (and reserve arrow channels), *then* place nodes/labels — never eyeball one shape against the previous one.
 - **Colour.** Rotate `deckkit.ACCENTS` so diagrams aren't monotone; reserve magenta
   for emphasis. For a **sequence of blocks** (chips / cards / pipeline stages) give each a

@@ -1377,6 +1377,22 @@ def _font_file(name, bold=False):
     return _FONT_PATH_CACHE[key]
 
 
+_FONT_SUB_CACHE = {}
+def _font_substituted(name):
+    """True when `name` is NOT actually installed and measurement silently falls back to a
+    metric-INcompatible face (matplotlib → DejaVu, which is wider than Calibri/Arial). Wrap
+    counts measured under substitution can be ~1 line off, so the linter must not assert a
+    CRITICAL on near-threshold geometry from a fabricated extra line."""
+    if name not in _FONT_SUB_CACHE:
+        try:
+            from matplotlib import font_manager as _fm
+            _fm.findfont(_fm.FontProperties(family=name), fallback_to_default=False)
+            _FONT_SUB_CACHE[name] = False
+        except Exception:
+            _FONT_SUB_CACHE[name] = True
+    return _FONT_SUB_CACHE[name]
+
+
 def _pil_font(name, size_pt, bold=False):
     """A cached Pillow font for `name` at `size_pt` (loaded at size*PREC px)."""
     key = (name, bold, round(size_pt, 2))
@@ -1442,13 +1458,11 @@ def _measure_lines(runs, size_pt, avail_in, font=None):
             if x > 0:
                 x += w
             continue
-        if w > avail:                                       # token alone wider than the line
-            if x > 0:
-                lines += 1
-            n = int(w // avail)
-            lines += n
-            x = w - n * avail
-            continue
+        if w > avail:                                       # an UNBREAKABLE token wider than the line:
+            if x > 0:                                        # the renderer keeps it on ONE line and lets
+                lines += 1                                   # it overflow horizontally — count 1 line, not
+            x = avail                                        # w//avail (which fabricated phantom height,
+            continue                                         # e.g. a scorecard's "99.9%" measured as 2 lines)
         if x + w > avail and x > 0:
             lines += 1
             x = 0.0
@@ -3121,7 +3135,7 @@ def _ink_rect(sh, bb):
     inner_w = max(0.1, bb[2]-ml-mr); inner_h = max(0.05, bb[3]-mt-mb)
     wrap = tf.word_wrap if tf.word_wrap is not None else True
     lines_total, ink_w, max_sz = 0, 0.0, 0.0
-    align = None
+    align = None; subbed = False
     for p in tf.paragraphs:
         runs, sz, fn = [], 0.0, None
         for r in p.runs:
@@ -3136,6 +3150,7 @@ def _ink_rect(sh, bb):
         if align is None: align = p.alignment
         if sz <= 0: sz = 18.0
         max_sz = max(max_sz, sz)
+        if _font_substituted(fn or FONT): subbed = True
         nat = _natural_width_in(runs, sz, fn)
         if wrap:
             nl = _measure_lines(runs, sz, inner_w, font=fn)
@@ -3160,7 +3175,10 @@ def _ink_rect(sh, bb):
     if   align == PP_ALIGN.CENTER: ix = bb[0] + (bb[2]-ink_w)/2.0
     elif align == PP_ALIGN.RIGHT:  ix = bb[0]+bb[2]-mr-ink_w
     else:                          ix = fx
-    return (ix, iy, ink_w, ink_h), (inner_w, inner_h), (max_sz, lines_total, wrap)
+    # measurement slack: when the text's font isn't installed (wrap count is ~1 line approximate),
+    # never let a single fabricated line trip a CRITICAL — tolerate ~0.9 line-height on height checks
+    slack = (0.9 * line_h) if subbed else 0.0
+    return (ix, iy, ink_w, ink_h), (inner_w, inner_h), (max_sz, lines_total, wrap, slack)
 
 def _has_fill(sh):
     # a VISIBLE fill only: solid/patterned/gradient/textured/picture — NOT BACKGROUND(5)/None
@@ -3184,6 +3202,16 @@ def _rectish(sh):
     try: return "RECT" in str(sh.auto_shape_type).upper()
     except Exception: return False
 
+def _is_watermark(sh):
+    # a giant faint index/ordinal numeral drawn BEHIND content (ghost_numeral / big_numeral mode='ghost')
+    # — decorative, not body text, so it must not register as a text collision or escape. Keyed on size:
+    # real reading text is <=~46pt; a watermark numeral is 50–220pt.
+    try:
+        szs = [r.font.size.pt for p in sh.text_frame.paragraphs for r in p.runs if r.font.size is not None]
+        return bool(szs) and max(szs) >= 50.0
+    except Exception:
+        return False
+
 def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol=0.07, edge_tol=0.03):
     """Build-time GEOMETRY self-check. Walk every shape on every slide — HOWEVER it was placed,
     manual coords or the grid/stack helpers — and report the high-signal faults that otherwise
@@ -3191,69 +3219,83 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
     land), so it stays quiet on the generously-sized frames real builds use:
 
       OFF_CANVAS   — a text box's INK, or a card/table, extends past the slide edge. Full-bleed
-                     PICTURES are exempt (cover/divider art is meant to bleed).
-      ESCAPES_CARD — a text box's ink / a figure / a labelled node pokes outside the card or panel
-                     that encloses its centre (the "bullet ran past the bottom of its card" bug).
-                     The host is the SMALLEST filled panel that contains the child and is bigger
-                     than it; full-bleed backgrounds are never hosts.
+                     PICTURES (and giant watermark numerals) are exempt — they're meant to bleed.
+      OVERFLOW     — a VISIBLE (filled/outlined) text box whose ink needs more height/width than it has.
+      ESCAPES_CARD — a text box's ink / a figure / a labelled node pokes outside the FILLED card or
+                     panel that encloses its centre (the "bullet ran past the bottom of its card" bug).
+                     The host is the SMALLEST filled rect-panel that contains the child and is bigger
+                     than it; full-bleed backgrounds and picture/outline-only cards are never hosts.
       TEXT_OVERLAP — two text boxes' INK rectangles overlap materially (real text-on-text). Text
-                     layered over a fill/photo is fine and is NOT flagged.
-      FOOTER       — a content text's ink, or a card, drops into the reserved bottom footer band.
+                     layered over a fill/photo is fine and NOT flagged; faint watermark numerals
+                     (>=50pt, e.g. ghost_numeral) are excluded as the decorative background they are.
+      FOOTER       — a content text's ink, or a card, reaches the actual footer chrome row (keyed to
+                     the real footer; a footer-less slide relies on OFF_CANVAS + the Step-5 lint_deck).
+      OFFCENTER    — a card whose ONLY content is a single line of text leaves a lopsided top/bottom
+                     gap (one line in a block reads best vertically centred — anchor it MIDDLE).
 
     Returns findings = [(slide_no, severity, code, msg)]. `verbose` prints a compact report;
-    `strict=True` raises if any CRITICAL remains (headless / CI). Stays deliberately silent on
-    what needs PIXELS not geometry (text on a busy image, contrast, aesthetic balance) — that is
-    the visual critic's job. The promise is narrow and kept: every fault it prints is real."""
+    `strict=True` raises if any CRITICAL remains (headless / CI). Stays deliberately silent on what
+    needs PIXELS not geometry (text on a busy image, contrast, balance, z-order, a figure smothering
+    bullets) and on shapes inside GROUPS — all the visual critic's / lint_deck.py's job.
+
+    Low false positives is the whole point (a noisy gate adds reviewer burden). The caveat: the
+    wrap-dependent checks measure with the text's font, so when that font ISN'T installed and
+    measurement falls back to a wider face, near-threshold flags carry ~1 line of slack and a one-time
+    note is printed — i.e. every CRITICAL it prints is real WHEN the deck's fonts are available, and
+    conservative (may under-flag a 1-line overrun) when they're substituted."""
     W, H = prs.slide_width/914400.0, prs.slide_height/914400.0
     foot_y = H - FOOTER_BAND
-    findings = []
+    findings = []; subbed_any = False
     for n, slide in enumerate(prs.slides, 1):
-        info = []   # (sh, bb, st, ink_or_None)
+        info = []   # (sh, bb, st, ink_or_None, r_full_or_None)  — watermark numerals carry ink=None (decorative)
         for sh in slide.shapes:
             bb = _bbox_in(sh)
             if bb is None: continue
             st = str(getattr(sh, "shape_type", ""))
-            ink = _ink_rect(sh, bb)[0] if _is_text(sh) else None
-            info.append((sh, bb, st, ink))
+            r = _ink_rect(sh, bb) if (_is_text(sh) and not _is_watermark(sh)) else None
+            info.append((sh, bb, st, (r[0] if r else None), r))
         # candidate CARD/PANEL/CHIP containers a label should sit inside: filled, boxy auto-shapes —
         # wide AND tall enough to be a panel (so thin accent rails, icon tiles and badges are excluded),
         # and not a full-bleed background. Chip/node-sized boxes count, so their labels get escape-checked.
         containers = []
-        for sh, bb, st, ink in info:
+        for sh, bb, st, ink, r in info:
             full_bleed = bb[2] >= W*0.92 and bb[3] >= H*0.92
             if _has_fill(sh) and "AUTO_SHAPE" in st and _rectish(sh) and not full_bleed \
                     and bb[2] >= 0.8 and bb[3] >= 0.35 and 0.5 <= bb[2]*bb[3] <= W*H*0.85:
                 containers.append(bb)
         # where the FOOTER chrome actually sits this slide (short text inks hugging the bottom edge),
         # so the footer check flags a REAL collision with it — not the conservative reserved band
-        foot_inks = [ink for sh, bb, st, ink in info if ink is not None and ink[1]+ink[3] >= H-0.14 and ink[3] < 0.45]
+        foot_inks = [ink for sh, bb, st, ink, r in info if ink is not None and ink[1]+ink[3] >= H-0.14 and ink[3] < 0.45]
         footer_top = min((ik[1] for ik in foot_inks), default=None)
         text_inks = []
-        for sh, bb, st, ink in info:
+        for sh, bb, st, ink, r in info:
             is_pic  = "PICTURE" in st
+            is_wm   = _is_text(sh) and _is_watermark(sh)
             is_conn = "CONNECTOR" in st or st == "LINE (4)" or "FREEFORM" in st
             full_bleed = bb[2] >= W*0.92 and bb[3] >= H*0.92
-            # ---- OFF_CANVAS (ink for text; frame for cards/tables; pictures get a bleed budget)
+            slack = (r[2][3] if r else 0.0)           # ~0.9 line-height IF the font was substituted, else 0
+            if slack > 0: subbed_any = True
+            # ---- OFF_CANVAS (ink for text; frame for cards/tables; pictures & watermarks get a bleed budget)
             ext = ink if ink is not None else bb
             if not is_conn:
-                budget = 0.30 if is_pic else edge_tol
+                budget = 0.30 if (is_pic or is_wm) else edge_tol
                 off = [s for s, c in (("left", ext[0] < -budget), ("top", ext[1] < -budget),
-                                      ("right", ext[0]+ext[2] > W+budget), ("bottom", ext[1]+ext[3] > H+budget)) if c]
-                if off and not (is_pic and full_bleed):
+                                      ("right", ext[0]+ext[2] > W+budget+slack),
+                                      ("bottom", ext[1]+ext[3] > H+budget+slack)) if c]
+                if off and not ((is_pic or is_wm) and full_bleed):
                     findings.append((n, "CRITICAL", "OFF_CANVAS",
                         f"{'text' if ink is not None else ('image' if is_pic else 'shape')} extends past the "
                         f"{', '.join(off)} edge"))
             if ink is not None:
                 text_inks.append((sh, ink, bb))
                 # ---- OVERFLOW of a VISIBLE box only (filled/outlined text box whose ink exceeds it)
-                _r = _ink_rect(sh, bb)
-                if _r and (_has_fill(sh) or _has_line(sh)):
-                    _ir, (inner_w, inner_h), _meta = _r
-                    if _ir[3] > inner_h + 0.06:
+                if r and (_has_fill(sh) or _has_line(sh)):
+                    _ir, (inner_w, inner_h), _meta = r
+                    if _ir[3] > inner_h + 0.06 + slack:
                         findings.append((n, "CRITICAL", "OVERFLOW",
                             f"text overflows its filled box (~{_ir[3]:.2f}in of text in {inner_h:.2f}in): "
                             f"\"{_snip(sh.text_frame.text)}…\" → shorten / shrink / grow box"))
-                    elif _ir[2] > inner_w + 0.06:   # no-wrap line wider than the visible box → clips
+                    elif _ir[2] > inner_w + 0.06 + slack:   # no-wrap line wider than the visible box → clips
                         findings.append((n, "CRITICAL", "OVERFLOW",
                             f"no-wrap text wider than its box (~{_ir[2]:.2f}in in {inner_w:.2f}in): "
                             f"\"{_snip(sh.text_frame.text)}…\" → shorten or widen the box"))
@@ -3262,8 +3304,10 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
                         and ink[1]+ink[3] > footer_top + 0.02 and ink[1] < footer_top + 0.10:
                     findings.append((n, "WARN", "FOOTER",
                         f"text collides with the footer row: \"{_snip(sh.text_frame.text)}…\""))
-        # ---- ESCAPES_CARD: child (text ink / figure / filled node) pokes outside its enclosing panel
-        for sh, bb, st, ink in info:
+        # ---- ESCAPES_CARD: child (text ink / figure / filled node) pokes outside its enclosing
+        #      panel; also record each card's children so the centering check below can run
+        kids = {}   # container index -> list of (kind, child_rect, sh, n_lines)
+        for sh, bb, st, ink, r in info:
             is_pic = "PICTURE" in st
             full_bleed = bb[2] >= W*0.92 and bb[3] >= H*0.92
             if full_bleed:
@@ -3276,25 +3320,54 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
                 child, kind = bb, "node"          # a labelled box that should sit inside a band
             else:
                 continue
+            etol = escape_tol + (r[2][3] if r else 0.0)        # tolerate ~1 fabricated line on substituted fonts
             ctr = (bb[0]+bb[2]/2.0, bb[1]+bb[3]/2.0)          # FRAME centre (where the author placed it),
             frame_a = bb[2]*bb[3]                              # so overflow that makes the INK huge can't hide the host
-            host, ha = None, 1e9
-            for cb in containers:
+            host, ha, hidx = None, 1e9, -1
+            for ci, cb in enumerate(containers):
                 if cb is bb: continue
                 if abs(cb[0]-bb[0])<1e-4 and abs(cb[1]-bb[1])<1e-4 and abs(cb[2]-bb[2])<1e-4: continue
                 a = cb[2]*cb[3]
                 if _contains(cb, ctr) and a < ha and a > frame_a*1.02:
-                    host, ha = cb, a
+                    host, ha, hidx = cb, a, ci
             if host is None:
                 continue
-            sides = [s for s, c in (("left", child[0] < host[0]-escape_tol), ("top", child[1] < host[1]-escape_tol),
-                                    ("right", child[0]+child[2] > host[0]+host[2]+escape_tol),
-                                    ("bottom", child[1]+child[3] > host[1]+host[3]+escape_tol)) if c]
+            nlines = (r[2][1] if (kind == "text" and r) else None)
+            kids.setdefault(hidx, []).append((kind, child, sh, nlines))
+            sides = [s for s, c in (("left", child[0] < host[0]-etol), ("top", child[1] < host[1]-etol),
+                                    ("right", child[0]+child[2] > host[0]+host[2]+etol),
+                                    ("bottom", child[1]+child[3] > host[1]+host[3]+etol)) if c]
             if sides:
                 lbl = f"\"{_snip(sh.text_frame.text,24)}…\" " if kind == "text" else ""
                 findings.append((n, "WARN", "ESCAPES_CARD",
                     f"{kind} {lbl}pokes past the {', '.join(sides)} of its card "
                     f"— inset it or grow the card"))
+        # ---- OFFCENTER: a card whose ONLY content is a single line of text, sitting clearly off the
+        #      vertical middle (decorative accent rails are 'node' children and ignored). One line in
+        #      a block reads best centred — top/bottom-anchored leaves a lopsided gap.
+        for ci, lst in kids.items():
+            texts = [k for k in lst if k[0] == "text"]
+            figs  = [k for k in lst if k[0] == "figure"]
+            # a thin accent rail is a 'node' but decorative; a real sub-box (a diagram node, a header
+            # band's sibling) is content that means the line is a HEADER, not the card's sole occupant
+            solid_nodes = [k for k in lst if k[0] == "node" and min(k[1][2], k[1][3]) > 0.25]
+            if len(texts) != 1 or figs or solid_nodes:        # the card's ONLY content is this one line
+                continue
+            _kind, child, sh, nlines = texts[0]
+            if nlines != 1:                                   # the rule is about a SINGLE line
+                continue
+            host = containers[ci]
+            if not (0.35 <= host[3] <= 3.5):
+                continue
+            top_gap = child[1] - host[1]
+            bot_gap = (host[1]+host[3]) - (child[1]+child[3])
+            if top_gap < -0.02 or bot_gap < -0.02:            # overflow/escape — handled elsewhere
+                continue
+            big, small = max(top_gap, bot_gap), max(0.0, min(top_gap, bot_gap))
+            if abs(top_gap-bot_gap) > 0.14 and big > 2.2*small + 0.02:
+                findings.append((n, "WARN", "OFFCENTER",
+                    f"single line sits {'high' if top_gap < bot_gap else 'low'} in its card — anchor it "
+                    f"MIDDLE to vertically centre: \"{_snip(sh.text_frame.text,26)}…\""))
         # ---- TEXT_OVERLAP: two text INK rects overlapping materially
         for i in range(len(text_inks)):
             for j in range(i+1, len(text_inks)):
@@ -3307,7 +3380,7 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
                         f"text ink overlaps ({ov:.2f}in²): \"{ta}…\" ✕ \"{tb}…\""))
         # ---- FOOTER intrusion for CARDS (a filled panel reaching the actual footer row)
         if footer_top is not None:
-            for sh, bb, st, ink in info:
+            for sh, bb, st, ink, r in info:
                 if ink is None and _has_fill(sh) and "AUTO_SHAPE" in st and bb[2]*bb[3] >= 1.3 \
                         and not (bb[2] >= W*0.92 and bb[3] >= H*0.92):
                     if bb[1]+bb[3] > footer_top+0.02 and bb[1] < footer_top+0.10:
@@ -3316,6 +3389,9 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
     if verbose:
         crit = sum(1 for f in findings if f[1] == "CRITICAL")
         warn = len(findings) - crit
+        if subbed_any:
+            print("[lint] note: a text font isn't installed for measurement (substituted) — wrap counts are "
+                  "approximate, so near-threshold flags carry ~1 line of slack")
         if not findings:
             print(f"[lint] ✓ no layout faults across {len(prs.slides._sldIdLst)} slides")
         else:
