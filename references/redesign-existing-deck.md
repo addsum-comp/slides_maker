@@ -55,6 +55,10 @@ with the user on it before spending effort. So:
 - **For a full re-author,** apply the normal build path (plan → deckkit → render → critic loop),
   but seed it with *their* real content and figures from the extraction — the point of a redesign
   is that the facts and figures are theirs; only the *presentation* changes.
+- **Which geometry net runs depends on the path.** A *re-author* has a deckkit build script, so end it
+  with the build-time `dk.lint_layout(prs)` gate (Step 4) before `prs.save()`. A *copy-in-place edit* has
+  no build script — there's nothing to call `lint_layout` from — so it relies on the **render-time**
+  `scripts/lint_deck.py` (Step 5) after rendering. Either way the deck reaches the critic geometry-clean.
 - **Carry their numbers and emphasis faithfully.** A redesign that "improves" a slide into saying
   something the source doesn't is a fidelity failure (see the critic's fidelity check) — the most
   damaging thing you can do to someone's own deck.

@@ -231,7 +231,8 @@ the direction gate** (the look is already decided). The four:
      > subject/composition/lighting/motifs — then re-derive `style.py`; don't just recolour the old plate.
      > A minor palette/contrast tweak is a `style.py`-only change. See `references/generated-template.md`.)*
      Then **the look is decided — SKIP the 3-direction gate**, finish the interview normally, and build
-     (image cover/dividers with native title on top; content built natively in `style.py`. **🔴 MUST,
+     (image cover/dividers with native title on top; content built natively in `style.py`. **🔴 MUST
+     (this generated/image-tool template branch ONLY — not provided-template or "design a clean one" decks),
      not a default: also GENERATE a faint interior-background PLATE and place it (lightly scrimmed) on
      every interior page — the shallow background is itself a generated image, not a flat/native fill —
      AND make content blocks FROSTED / semi-transparent (~30–45% see-through, α≈0.55–0.72), never flat
@@ -885,12 +886,12 @@ A few rules that matter (see `references/design-principles.md`):
   + text-on-text as CRITICALs) and *warns* on 5 (off-centre) and footer; the rest (padding, fit,
   grid-gap, diagram-bbox-first) it doesn't check — the named helpers satisfy those *by construction*, so
   you rarely trip the net in the first place:
-  1. **Stay in the safe area** — get the rect from `content_band()`; only full-bleed hero/divider art bleeds.
+  1. **Stay in the safe area** — get the rect from `content_band()`; only full-bleed hero/divider art bleeds. (On a provided/registered template, pass `content_band(slide, top=<the template's title-band bottom>)` so the safe rect honours the template's own header/footer instead of the deckkit default.)
   2. **Give text padding** — inset every label ≥0.1in inside its card (`cx+0.2`, width `cw-0.4`); flush-to-edge reads as a mistake.
   3. **No text-on-text** — one column/stack owns each region; never drop a second text box into the same rectangle.
   4. **If it doesn't fit, resolve it** — `fit_text_size(runs, w, h, start)` gives the largest size that fits; else shorten or grow the box.
-  5. **One line in a block → vertically centre it** — anchor it `MIDDLE` with the card's rect; a lone line top-anchored leaves a lopsided gap (the `OFFCENTER` warn).
-  6. **Grid/stack over hand-picked y, and leave a real gap (~`GUTTER`)** — `columns()/rows()` for equal panels, `vstack(…, bottom=…)` for content-height blocks (no overlap, even gaps by construction), `content_band()` for the vertical extent.
+  5. **One line in a *self-contained* block → vertically centre it** — anchor it `MIDDLE` with the card's rect; a lone line top-anchored leaves a lopsided gap (the `OFFCENTER` warn). *Carve:* a one-line reading column that must top-align with a taller sibling column under a shared header stays top-anchored (alignment beats centring) — the warn only fires on a card whose sole content is that line.
+  6. **Grid/stack over hand-picked y, and leave a real gap (~`GUTTER`)** — `columns()/rows()` for equal panels, `vstack(…, bottom=…)` for content-height blocks (no overlap, even gaps by construction), `content_band()` for the vertical extent. (On a provided template, the layout's **placeholders** already anchor content — these helpers are the no-template path; fill placeholders where the template gives them.)
   7. **For a diagram, compute all bounding boxes first, then draw into them** — lay out the rects (and reserve arrow channels), *then* place nodes/labels — never eyeball one shape against the previous one.
 - **Colour.** Rotate `deckkit.ACCENTS` so diagrams aren't monotone; reserve magenta
   for emphasis. For a **sequence of blocks** (chips / cards / pipeline stages) give each a
