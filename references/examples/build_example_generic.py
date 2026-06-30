@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 from deckkit import (  # noqa: E402
     blank_deck, add_slide, title_bar, footer,
     box, text, bullet, callout, arrow, chip, modbox, equation_native, equation_png,
-    columns, picture,
+    columns, picture, lint_layout,
     set_font, Inches, PP_ALIGN, MSO_ANCHOR,
     DEEP, BLUE, TEAL, MAGENTA, SLATE, MUTE, TINT, LIGHT, WHITE,
     GOLD, STEEL, VIOLET, ACCENTS,
@@ -90,5 +90,8 @@ for i, (name, detail) in enumerate([("Left rail", "text / bullets"), ("Right pan
 callout(s, L[0], 4.45, R[0] + R[2] - L[0], 0.6, "WHY",
         "Both panels come from one grid, so left/right widths and flanking margins match.")
 
+# --- build-time geometry gate: catch overflow / overlap / off-canvas / footer faults BEFORE
+#     rendering (in-process, milliseconds). Clear every CRITICAL, then render + run the critic. ---
+lint_layout(prs)
 prs.save(OUT)
 print("saved ->", OUT, "| slides:", len(prs.slides._sldIdLst))

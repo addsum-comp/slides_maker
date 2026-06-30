@@ -3062,3 +3062,285 @@ def catalogue_frame(slide, *, inset=0.32, gap=0.06, color=None, line_w=1.0, slid
     for k in (0, gap):
         box(slide, inset + k, inset + k, w_in - 2 * (inset + k), h_in - 2 * (inset + k),
             fill=None, line=c, line_w=line_w)
+
+
+# ===================================================================== build-time layout lint
+# A GEOMETRY self-check you run in-process right before prs.save() — so the mechanical layout
+# faults (overflow, off-canvas, collisions) surface in the terminal in milliseconds, BEFORE the
+# slow render + visual-critic round. It is a NET, not a replacement for the actor-critic loop:
+# it clears the geometric errors so the critic spends its attention on meaning and design.
+#
+# The one idea that keeps it QUIET (low false positives) and therefore TRUSTED: it reasons about
+# each text box's INK rectangle — where the glyphs actually land, given the measured line count,
+# the vertical anchor, and the alignment — NOT the text frame, which is routinely drawn taller
+# and wider than its text (top-anchored boxes with slack below, wide title boxes). Comparing
+# frames flags collisions that don't exist; comparing ink flags only the ones that do.
+SAFE_MARGIN  = 0.25     # inches — keep TEXT/cards this far from the slide edge (full-bleed imagery is exempt)
+_LINT_LINE_H = 1.20     # render line-height factor (LibreOffice ≈1.2×em); sizes the ink box vs the frame
+
+def _bbox_in(sh):
+    """(left, top, width, height) of a shape in inches, or None if unsized."""
+    try:
+        b = (sh.left/914400.0, sh.top/914400.0, sh.width/914400.0, sh.height/914400.0)
+        return b if (b[2] > 0 and b[3] > 0) else None
+    except Exception:
+        return None
+
+def _overlap_area(a, b):
+    ox = max(0.0, min(a[0]+a[2], b[0]+b[2]) - max(a[0], b[0]))
+    oy = max(0.0, min(a[1]+a[3], b[1]+b[3]) - max(a[1], b[1]))
+    return ox * oy
+
+def _contains(outer, pt):
+    return (outer[0] <= pt[0] <= outer[0]+outer[2]) and (outer[1] <= pt[1] <= outer[1]+outer[3])
+
+def _natural_width_in(runs, size_pt, font):
+    """Width (inches) the text would occupy on ONE unwrapped line, via the real font metrics."""
+    try:
+        fonts = {b: _pil_font(font or FONT, size_pt, b) for b in (False, True)}
+        return sum(fonts[b].getlength(t) for t, b in runs) / _MEAS_PREC / 72.0
+    except Exception:
+        flat = "".join(t for t, _ in runs)
+        return len(flat) * size_pt * 0.5 / 72.0
+
+def _ink_rect(sh, bb):
+    """The rectangle the GLYPHS actually fill inside a text frame `sh` (bbox `bb`), accounting for
+    measured wraps, the frame's inner margins, the vertical anchor and the paragraph alignment.
+    Returns (x, y, w, h) in inches, or None if there's no measurable text. The ink box can be
+    SHORTER/NARROWER than the frame (the common case) or, when text overflows, TALLER than it."""
+    try:
+        tf = sh.text_frame
+    except Exception:
+        return None
+    def _m(attr, d):
+        try:
+            v = getattr(tf, attr); return v/914400.0 if v is not None else d
+        except Exception:
+            return d
+    ml, mr, mt, mb = _m("margin_left",0.1), _m("margin_right",0.1), _m("margin_top",0.05), _m("margin_bottom",0.05)
+    inner_w = max(0.1, bb[2]-ml-mr); inner_h = max(0.05, bb[3]-mt-mb)
+    wrap = tf.word_wrap if tf.word_wrap is not None else True
+    lines_total, ink_w, max_sz = 0, 0.0, 0.0
+    align = None
+    for p in tf.paragraphs:
+        runs, sz, fn = [], 0.0, None
+        for r in p.runs:
+            t = r.text or ""
+            if not t: continue
+            runs.append((t, bool(r.font.bold)))
+            try:
+                if r.font.size is not None: sz = max(sz, r.font.size.pt)
+            except Exception: pass
+            if fn is None and r.font.name: fn = r.font.name
+        if not runs: continue
+        if align is None: align = p.alignment
+        if sz <= 0: sz = 18.0
+        max_sz = max(max_sz, sz)
+        nat = _natural_width_in(runs, sz, fn)
+        if wrap:
+            nl = _measure_lines(runs, sz, inner_w, font=fn)
+            ink_w = max(ink_w, inner_w if nl > 1 else nat)
+        else:
+            nl = 1
+            ink_w = max(ink_w, nat)                     # may exceed inner_w → horizontal overflow
+        lines_total += nl
+    if max_sz <= 0:
+        return None
+    line_h = max_sz/72.0 * _LINT_LINE_H
+    ink_h = lines_total * line_h
+    ink_w = min(ink_w, inner_w) if wrap else ink_w
+    # vertical placement by anchor
+    try: anc = str(tf.vertical_anchor)
+    except Exception: anc = "TOP"
+    fx, fy = bb[0]+ml, bb[1]+mt
+    if "MIDDLE" in anc:   iy = bb[1] + (bb[3]-ink_h)/2.0
+    elif "BOTTOM" in anc: iy = bb[1]+bb[3]-mb-ink_h
+    else:                 iy = fy
+    # horizontal placement by alignment
+    if   align == PP_ALIGN.CENTER: ix = bb[0] + (bb[2]-ink_w)/2.0
+    elif align == PP_ALIGN.RIGHT:  ix = bb[0]+bb[2]-mr-ink_w
+    else:                          ix = fx
+    return (ix, iy, ink_w, ink_h), (inner_w, inner_h), (max_sz, lines_total, wrap)
+
+def _has_fill(sh):
+    # a VISIBLE fill only: solid/patterned/gradient/textured/picture — NOT BACKGROUND(5)/None
+    # (a plain textbox reports fill.type == BACKGROUND, which must not read as a filled panel)
+    try: return int(sh.fill.type) in (1, 2, 3, 4, 6)
+    except Exception: return False
+
+def _has_line(sh):
+    try: return int(sh.line.fill.type) in (1, 2, 3, 4, 6) and sh.line.width is not None
+    except Exception: return False
+
+def _is_text(sh):
+    try: return sh.has_text_frame and sh.text_frame.text.strip() != ""
+    except Exception: return False
+
+def _snip(s, n=30):
+    return " ".join(str(s).split())[:n]
+
+def _rectish(sh):
+    # a card/panel is a RECTANGLE-family auto-shape — NOT an oval/glow/arrow (those aren't containers)
+    try: return "RECT" in str(sh.auto_shape_type).upper()
+    except Exception: return False
+
+def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol=0.07, edge_tol=0.03):
+    """Build-time GEOMETRY self-check. Walk every shape on every slide — HOWEVER it was placed,
+    manual coords or the grid/stack helpers — and report the high-signal faults that otherwise
+    cost a whole visual-critic round. Reasons about each text box's INK rectangle (where glyphs
+    land), so it stays quiet on the generously-sized frames real builds use:
+
+      OFF_CANVAS   — a text box's INK, or a card/table, extends past the slide edge. Full-bleed
+                     PICTURES are exempt (cover/divider art is meant to bleed).
+      ESCAPES_CARD — a text box's ink / a figure / a labelled node pokes outside the card or panel
+                     that encloses its centre (the "bullet ran past the bottom of its card" bug).
+                     The host is the SMALLEST filled panel that contains the child and is bigger
+                     than it; full-bleed backgrounds are never hosts.
+      TEXT_OVERLAP — two text boxes' INK rectangles overlap materially (real text-on-text). Text
+                     layered over a fill/photo is fine and is NOT flagged.
+      FOOTER       — a content text's ink, or a card, drops into the reserved bottom footer band.
+
+    Returns findings = [(slide_no, severity, code, msg)]. `verbose` prints a compact report;
+    `strict=True` raises if any CRITICAL remains (headless / CI). Stays deliberately silent on
+    what needs PIXELS not geometry (text on a busy image, contrast, aesthetic balance) — that is
+    the visual critic's job. The promise is narrow and kept: every fault it prints is real."""
+    W, H = prs.slide_width/914400.0, prs.slide_height/914400.0
+    foot_y = H - FOOTER_BAND
+    findings = []
+    for n, slide in enumerate(prs.slides, 1):
+        info = []   # (sh, bb, st, ink_or_None)
+        for sh in slide.shapes:
+            bb = _bbox_in(sh)
+            if bb is None: continue
+            st = str(getattr(sh, "shape_type", ""))
+            ink = _ink_rect(sh, bb)[0] if _is_text(sh) else None
+            info.append((sh, bb, st, ink))
+        # candidate CARD/PANEL/CHIP containers a label should sit inside: filled, boxy auto-shapes —
+        # wide AND tall enough to be a panel (so thin accent rails, icon tiles and badges are excluded),
+        # and not a full-bleed background. Chip/node-sized boxes count, so their labels get escape-checked.
+        containers = []
+        for sh, bb, st, ink in info:
+            full_bleed = bb[2] >= W*0.92 and bb[3] >= H*0.92
+            if _has_fill(sh) and "AUTO_SHAPE" in st and _rectish(sh) and not full_bleed \
+                    and bb[2] >= 0.8 and bb[3] >= 0.35 and 0.5 <= bb[2]*bb[3] <= W*H*0.85:
+                containers.append(bb)
+        # where the FOOTER chrome actually sits this slide (short text inks hugging the bottom edge),
+        # so the footer check flags a REAL collision with it — not the conservative reserved band
+        foot_inks = [ink for sh, bb, st, ink in info if ink is not None and ink[1]+ink[3] >= H-0.14 and ink[3] < 0.45]
+        footer_top = min((ik[1] for ik in foot_inks), default=None)
+        text_inks = []
+        for sh, bb, st, ink in info:
+            is_pic  = "PICTURE" in st
+            is_conn = "CONNECTOR" in st or st == "LINE (4)" or "FREEFORM" in st
+            full_bleed = bb[2] >= W*0.92 and bb[3] >= H*0.92
+            # ---- OFF_CANVAS (ink for text; frame for cards/tables; pictures get a bleed budget)
+            ext = ink if ink is not None else bb
+            if not is_conn:
+                budget = 0.30 if is_pic else edge_tol
+                off = [s for s, c in (("left", ext[0] < -budget), ("top", ext[1] < -budget),
+                                      ("right", ext[0]+ext[2] > W+budget), ("bottom", ext[1]+ext[3] > H+budget)) if c]
+                if off and not (is_pic and full_bleed):
+                    findings.append((n, "CRITICAL", "OFF_CANVAS",
+                        f"{'text' if ink is not None else ('image' if is_pic else 'shape')} extends past the "
+                        f"{', '.join(off)} edge"))
+            if ink is not None:
+                text_inks.append((sh, ink, bb))
+                # ---- OVERFLOW of a VISIBLE box only (filled/outlined text box whose ink exceeds it)
+                _r = _ink_rect(sh, bb)
+                if _r and (_has_fill(sh) or _has_line(sh)):
+                    _ir, (inner_w, inner_h), _meta = _r
+                    if _ir[3] > inner_h + 0.06:
+                        findings.append((n, "CRITICAL", "OVERFLOW",
+                            f"text overflows its filled box (~{_ir[3]:.2f}in of text in {inner_h:.2f}in): "
+                            f"\"{_snip(sh.text_frame.text)}…\" → shorten / shrink / grow box"))
+                    elif _ir[2] > inner_w + 0.06:   # no-wrap line wider than the visible box → clips
+                        findings.append((n, "CRITICAL", "OVERFLOW",
+                            f"no-wrap text wider than its box (~{_ir[2]:.2f}in in {inner_w:.2f}in): "
+                            f"\"{_snip(sh.text_frame.text)}…\" → shorten or widen the box"))
+                # ---- FOOTER intrusion: CONTENT text colliding with the actual footer chrome row
+                if footer_top is not None and ink not in foot_inks \
+                        and ink[1]+ink[3] > footer_top + 0.02 and ink[1] < footer_top + 0.10:
+                    findings.append((n, "WARN", "FOOTER",
+                        f"text collides with the footer row: \"{_snip(sh.text_frame.text)}…\""))
+        # ---- ESCAPES_CARD: child (text ink / figure / filled node) pokes outside its enclosing panel
+        for sh, bb, st, ink in info:
+            is_pic = "PICTURE" in st
+            full_bleed = bb[2] >= W*0.92 and bb[3] >= H*0.92
+            if full_bleed:
+                continue
+            if ink is not None:
+                child, kind = ink, "text"
+            elif is_pic:
+                child, kind = bb, "figure"
+            elif _has_fill(sh) and "AUTO_SHAPE" in st and _rectish(sh):
+                child, kind = bb, "node"          # a labelled box that should sit inside a band
+            else:
+                continue
+            ctr = (bb[0]+bb[2]/2.0, bb[1]+bb[3]/2.0)          # FRAME centre (where the author placed it),
+            frame_a = bb[2]*bb[3]                              # so overflow that makes the INK huge can't hide the host
+            host, ha = None, 1e9
+            for cb in containers:
+                if cb is bb: continue
+                if abs(cb[0]-bb[0])<1e-4 and abs(cb[1]-bb[1])<1e-4 and abs(cb[2]-bb[2])<1e-4: continue
+                a = cb[2]*cb[3]
+                if _contains(cb, ctr) and a < ha and a > frame_a*1.02:
+                    host, ha = cb, a
+            if host is None:
+                continue
+            sides = [s for s, c in (("left", child[0] < host[0]-escape_tol), ("top", child[1] < host[1]-escape_tol),
+                                    ("right", child[0]+child[2] > host[0]+host[2]+escape_tol),
+                                    ("bottom", child[1]+child[3] > host[1]+host[3]+escape_tol)) if c]
+            if sides:
+                lbl = f"\"{_snip(sh.text_frame.text,24)}…\" " if kind == "text" else ""
+                findings.append((n, "WARN", "ESCAPES_CARD",
+                    f"{kind} {lbl}pokes past the {', '.join(sides)} of its card "
+                    f"— inset it or grow the card"))
+        # ---- TEXT_OVERLAP: two text INK rects overlapping materially
+        for i in range(len(text_inks)):
+            for j in range(i+1, len(text_inks)):
+                a, b = text_inks[i][1], text_inks[j][1]
+                ov = _overlap_area(a, b)
+                if ov > overlap_tol and ov > 0.22*min(a[2]*a[3], b[2]*b[3]):
+                    ta = _snip(text_inks[i][0].text_frame.text,18)
+                    tb = _snip(text_inks[j][0].text_frame.text,18)
+                    findings.append((n, "CRITICAL", "TEXT_OVERLAP",
+                        f"text ink overlaps ({ov:.2f}in²): \"{ta}…\" ✕ \"{tb}…\""))
+        # ---- FOOTER intrusion for CARDS (a filled panel reaching the actual footer row)
+        if footer_top is not None:
+            for sh, bb, st, ink in info:
+                if ink is None and _has_fill(sh) and "AUTO_SHAPE" in st and bb[2]*bb[3] >= 1.3 \
+                        and not (bb[2] >= W*0.92 and bb[3] >= H*0.92):
+                    if bb[1]+bb[3] > footer_top+0.02 and bb[1] < footer_top+0.10:
+                        findings.append((n, "WARN", "FOOTER",
+                            f"a card/panel reaches the footer row (bottom {bb[1]+bb[3]:.2f}in vs footer at {footer_top:.2f}in)"))
+    if verbose:
+        crit = sum(1 for f in findings if f[1] == "CRITICAL")
+        warn = len(findings) - crit
+        if not findings:
+            print(f"[lint] ✓ no layout faults across {len(prs.slides._sldIdLst)} slides")
+        else:
+            for n, sev, code, msg in sorted(findings, key=lambda f: (f[0], f[1] != "CRITICAL")):
+                print(f"[lint] {'✗' if sev=='CRITICAL' else '•'} slide {n:>2} {code:<13} {msg}")
+            print(f"[lint] {crit} critical, {warn} warning(s) — clear the criticals before rendering")
+    if strict and any(f[1] == "CRITICAL" for f in findings):
+        raise RuntimeError(f"lint_layout: {sum(1 for f in findings if f[1]=='CRITICAL')} critical layout fault(s)")
+    return findings
+
+
+def fit_text_size(runs, w, h, start_size, *, font=None, min_size=9.0, line_h=_LINT_LINE_H, pad=0.0):
+    """Largest point size ≤ `start_size` at which `runs` = [(text, bold), ...] fits a `w`×`h`in box
+    — so 'if it doesn't fit, shrink the font' is one call, not a guess. Measures with the real font
+    metrics; returns `min_size` if even that overflows (then shorten the text or grow the box)."""
+    aw, ah = max(0.2, w-pad), max(0.1, h-pad)
+    s = start_size
+    while s > min_size:
+        if _measure_lines(runs, s, aw, font=font) * (s/72.0*line_h) <= ah:
+            return round(s, 1)
+        s -= 0.5
+    return min_size
+
+
+if __name__ == "__main__":          # `python deckkit.py deck.pptx` → lint a finished file
+    import sys
+    if len(sys.argv) > 1:
+        lint_layout(Presentation(sys.argv[1]))

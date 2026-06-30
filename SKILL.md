@@ -867,6 +867,24 @@ A few rules that matter (see `references/design-principles.md`):
     *near-zero* overlap is not harmless — the bar draws on top and **clips the cards' rounded
     corners** — so require a visible gap, not just non-collision. (The Step-5 self-check + lint now
     flag a wide bar grazing the content above it, but reserving the space avoids it by construction.)
+- **🔴 Gate the geometry at BUILD time — end the build script with `dk.lint_layout(prs)` before
+  `prs.save()`, and clear every CRITICAL before you render.** This is the cheapest place to catch
+  the mechanical layout faults: it runs in-process in milliseconds, *before* the slow render +
+  visual-critic round, and walks **every** shape — however it was placed, the grid helpers or raw
+  coordinates. It flags text overflowing or escaping its card, two text boxes overlapping, a shape
+  off-canvas, and a panel reaching the footer — reasoning about each label's **ink** rectangle (where
+  the glyphs actually land), so it stays quiet on the generously-sized frames real builds use and
+  every fault it prints is real. It is a **net, not a substitute for looking** — it removes the
+  geometric errors so the critic spends its attention on meaning, balance, and fidelity. The layout
+  **contract** it enforces — and the helpers that satisfy each rule *by construction*, so you rarely
+  trip the net in the first place:
+  1. **Stay in the safe area.** Get the rect from `content_band()`; only full-bleed hero/divider art bleeds to the edge.
+  2. **Give text padding.** Inset every label ≥0.1in inside its card (place at `cx+0.2`, width `cw-0.4`) — text flush to a card edge reads as a mistake.
+  3. **No text-on-text.** One column/stack owns each region; never drop a second text box into the same rectangle.
+  4. **If it doesn't fit, resolve it — don't spill.** `fit_text_size(runs, w, h, start)` returns the largest size that fits; else shorten the text or grow the box.
+  5. **Grid/stack over hand-picked y.** `columns()/rows()` for equal panels, `vstack(…, bottom=…)` for content-height blocks (no overlap by construction), `content_band()` for the vertical extent.
+  6. **Leave a real gap (~`GUTTER`) between neighbours.** `vstack`/`palette` space them for you; crowding reads as amateur.
+  7. **For a diagram, compute all bounding boxes first, then draw into them** — lay out the rects (and reserve arrow channels), *then* place nodes/labels — never eyeball one shape against the previous one.
 - **Colour.** Rotate `deckkit.ACCENTS` so diagrams aren't monotone; reserve magenta
   for emphasis. For a **sequence of blocks** (chips / cards / pipeline stages) give each a
   **distinct, deliberately-contrasted hue** via `deckkit.palette(n, ACCENTS)` — it returns `n`
@@ -990,6 +1008,11 @@ judges your motion *design* from this manifest plus the build-candidates it spot
 pixels). Keep it next to the build (a comment block in `build_<deck>.py` is fine).
 
 ## Step 5 — Render, verify, then run the actor–critic loop
+**You should already have run the build-time geometry gate** (`dk.lint_layout(prs)` at the end of
+Step 4) and cleared its CRITICALs — that catches overflow/overlap/off-canvas/footer faults in-process
+*before* any render, so they never reach this loop. What remains here are the faults that need real
+pixels (crop, contrast, balance, a tofu glyph, text on a busy image), which only the render shows.
+
 First **render and look** (`bash scripts/render_deck.sh <deck.pptx>` → one PNG per
 slide). python-pptx writes blind — overflow, low contrast, a callout on the footer,
 or a missing glyph only show up in the image. Fix mechanical issues and re-render.
