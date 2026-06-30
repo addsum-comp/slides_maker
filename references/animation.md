@@ -156,7 +156,7 @@ max_px=…)`** — the build-step companion that completes the loop **generate �
 (`gif_poster()`)**. Compute the frames in the deck's asset step exactly like the static figures (a
 matplotlib animation, a simulation, a k-space fill, a denoising / training trajectory, a chart that
 builds up) as PIL images / NumPy arrays / frame PNGs; `make_gif` stitches them into an optimised looping
-GIF (shared palette; `max_px` caps the longest side so the file stays well under `gif()`'s `max_mb`).
+GIF (shared palette; `max_px` caps the longest side to help keep the file under `gif()`'s `max_mb`).
 **Time:** the encode is a second or two for a short clip — the real cost is computing the frames, so a
 GIF slide fits the same compute-in-the-asset-step rhythm as a static figure, not a separate time sink.
 Keep it modest (a few-second loop, ~10–15 fps, longest side ~720–960px). *(This is for one looping clip

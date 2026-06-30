@@ -34,7 +34,11 @@ something.
   starts on a meaningful frame, or verify with a representative `gif_poster(...)` still); **(b)** is the
   GIF **whole and undistorted** (not stretched off-aspect — use `gif()`/`contain`) and integrated like a
   figure (assertion title + a "what to watch" caption, on a grid, beside its quant panel if paired) —
-  not a floating clip.
+  not a floating clip; **(c)** does the GIF **earn its place** — motion that *reveals* what a static
+  frame can't, not decoration (a looping clip where a single frame carries the same information is a flaw,
+  like a decorative plate — and GIFs should be **rare**, a few per deck at most); and if it was
+  **GENERATED** (no source GIF), does it show **real, source-supported dynamics** — fabricated or
+  embellished motion is a **fidelity** violation, not a visual.
 - The **motion manifest** (usually provided): one line per slide — `build: <reveals>` (an in-slide
   appear reveal) or `static: <why>`, plus a *separate* one-line `transition:` note. Use it to judge
   whether motion was *designed*, since you can't watch it. **The motion that counts is the in-slide

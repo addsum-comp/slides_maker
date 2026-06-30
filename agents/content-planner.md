@@ -452,10 +452,13 @@ not by counting:
     GIF only when it clears the **"When a GIF earns its place" rubric in `animation.md`** — *motion
     conveys what a single frame can't*, the change is the point, one frame would lose it. Strong fits you
     can compute: a **process / algorithm / optimisation** unfolding, a **reconstruction / enhancement /
-    simulation converging**, a **transformation or deformation**, **temporal/cine/4D** evolution, a
-    **rotating 3D** structure, a **progressive data-viz** building up. When it fits, plan
-    **`deckkit.make_gif`** (compute the frames in the asset step exactly like a static figure) → **`gif`**,
-    and record the *frame recipe + fps* in the visual/Motion column so the actor builds it directly. **Two
+    simulation converging**, a **transformation or deformation**, **temporal/cine/4D** evolution, or a
+    **rotating 3D** structure. *(A before/after or a progressive data-viz build-up is a **weaker** fit —
+    use a GIF only when the **transition itself** carries the meaning, per the rubric; else a static
+    two-panel or the final frame wins.)* When it fits, plan **`deckkit.make_gif`** (compute the frames in
+    the **build's computed-asset step, exactly like a computed figure** — not the parallel asset-prep
+    executor) → **`gif`**, and record the *frame recipe + fps* in the visual/Motion column so the actor
+    builds it directly. **Two
     hard guardrails:** **(1) Fidelity** — the GIF must animate a **REAL computable change the source
     supports** (the data/algorithm genuinely evolves); never fabricate motion or dynamics the source
     doesn't have — that's the same line as inventing a result, and it must be flagged like any
