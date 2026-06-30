@@ -334,9 +334,12 @@ ask of each element "is there suitable, balanced space around it, or is it crowd
 - **Avoid overlap by *construction*, then catch by lint — not by eyeballing.** The reliable way to
   "no overlaps, perfect layout" is to derive every position from the measured layout helpers
   (`content_band` for the safe rect, `columns`/`rows` for splits, `vstack(bottom=…)` for stacks,
-  `bottom_callout` for the bottom) so blocks *can't* collide, then run `lint_deck.py` as the safety
-  net (off-slide overflow · block/footer collisions · text-past-card · uneven rows). Hand-placed
-  coordinates are where overlaps creep in; measured placement + the lint is how they stay gone.
+  `bottom_callout` for the bottom) so blocks *can't* collide, then run the **two nets in order**:
+  `deckkit.lint_layout(prs)` at BUILD time (in-process, before any render — off-canvas · overflow ·
+  text-on-text · card-escape · footer · off-centre) and `scripts/lint_deck.py` AFTER render (re-checks
+  geometry on the final file + the render-only faults: CJK kinsoku/widow · missing EA font ·
+  whole-page-image · uneven rows). Hand-placed coordinates are where overlaps creep in; measured
+  placement + the build-time gate + the render lint is how they stay gone.
 - **Text must fit its box — and its CARD.** Never let text spill outside its callout/box, and never
   let an auto-growing text box extend **past the card/container drawn behind it** (the classic tell:
   a card sized for one line of body, but the body wraps to two — the second line hangs below the

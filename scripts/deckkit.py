@@ -3089,8 +3089,12 @@ def catalogue_frame(slide, *, inset=0.32, gap=0.06, color=None, line_w=1.0, slid
 # the vertical anchor, and the alignment — NOT the text frame, which is routinely drawn taller
 # and wider than its text (top-anchored boxes with slack below, wide title boxes). Comparing
 # frames flags collisions that don't exist; comparing ink flags only the ones that do.
-SAFE_MARGIN  = 0.25     # inches — keep TEXT/cards this far from the slide edge (full-bleed imagery is exempt)
-_LINT_LINE_H = 1.20     # render line-height factor (LibreOffice ≈1.2×em); sizes the ink box vs the frame
+_LINT_LINE_H = 1.20     # DETECTION line-height factor — the real LibreOffice render height (≈1.2×em).
+                        # Deliberately > the 1.12 PLACEMENT estimate the measure_*/vstack helpers use:
+                        # the lint models what actually renders (conservative), while those helpers pack
+                        # with their own built-in padding. The gap (~7%/line) stays under the lint's
+                        # +0.06 / escape_tol tolerances, so a measure_*-sized block is NOT false-flagged
+                        # (verified). For a FILLED/tight text box, size with fit_text_size (also 1.20).
 
 def _bbox_in(sh):
     """(left, top, width, height) of a shape in inches, or None if unsized."""
@@ -3204,11 +3208,13 @@ def _rectish(sh):
 
 def _is_watermark(sh):
     # a giant faint index/ordinal numeral drawn BEHIND content (ghost_numeral / big_numeral mode='ghost')
-    # — decorative, not body text, so it must not register as a text collision or escape. Keyed on size:
-    # real reading text is <=~46pt; a watermark numeral is 50–220pt.
+    # — decorative, not body text, so it must not register as a text collision or escape. Keyed on BOTH
+    # a huge size AND a short token (an index/ordinal/year: "01", "3", "2024") so a genuinely-large
+    # HEADING (>50pt but many chars) is still geometry-checked, not waved through.
     try:
         szs = [r.font.size.pt for p in sh.text_frame.paragraphs for r in p.runs if r.font.size is not None]
-        return bool(szs) and max(szs) >= 50.0
+        short = len("".join(sh.text_frame.text.split())) <= 4
+        return bool(szs) and max(szs) >= 50.0 and short
     except Exception:
         return False
 
@@ -3244,7 +3250,6 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
     note is printed — i.e. every CRITICAL it prints is real WHEN the deck's fonts are available, and
     conservative (may under-flag a 1-line overrun) when they're substituted."""
     W, H = prs.slide_width/914400.0, prs.slide_height/914400.0
-    foot_y = H - FOOTER_BAND
     findings = []; subbed_any = False
     for n, slide in enumerate(prs.slides, 1):
         info = []   # (sh, bb, st, ink_or_None, r_full_or_None)  — watermark numerals carry ink=None (decorative)
@@ -3287,7 +3292,10 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
                         f"{'text' if ink is not None else ('image' if is_pic else 'shape')} extends past the "
                         f"{', '.join(off)} edge"))
             if ink is not None:
-                text_inks.append((sh, ink, bb))
+                # overlap-deflation budget: only a MULTI-line box can carry a fabricated extra wrapped
+                # line under a substituted font; a single measured line can't, so it isn't deflated
+                ov_dfl = slack if (r and r[2][1] >= 2) else 0.0
+                text_inks.append((sh, ink, bb, ov_dfl))
                 # ---- OVERFLOW of a VISIBLE box only (filled/outlined text box whose ink exceeds it)
                 if r and (_has_fill(sh) or _has_line(sh)):
                     _ir, (inner_w, inner_h), _meta = r
@@ -3368,10 +3376,15 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
                 findings.append((n, "WARN", "OFFCENTER",
                     f"single line sits {'high' if top_gap < bot_gap else 'low'} in its card — anchor it "
                     f"MIDDLE to vertically centre: \"{_snip(sh.text_frame.text,26)}…\""))
-        # ---- TEXT_OVERLAP: two text INK rects overlapping materially
+        # ---- TEXT_OVERLAP: two text INK rects overlapping materially. Deflate each ink by its own
+        #      substitution slack first, so a fabricated extra line (wider fallback font) can't fabricate
+        #      a phantom overlap — keeping the "never fabricates when fonts are substituted" promise.
+        def _deflate(t):
+            ink, s = t[1], t[3]
+            return (ink[0], ink[1]+s/2.0, ink[2], max(0.03, ink[3]-s))
         for i in range(len(text_inks)):
             for j in range(i+1, len(text_inks)):
-                a, b = text_inks[i][1], text_inks[j][1]
+                a, b = _deflate(text_inks[i]), _deflate(text_inks[j])
                 ov = _overlap_area(a, b)
                 if ov > overlap_tol and ov > 0.22*min(a[2]*a[3], b[2]*b[3]):
                     ta = _snip(text_inks[i][0].text_frame.text,18)

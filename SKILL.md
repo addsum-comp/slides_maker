@@ -72,8 +72,8 @@ wrong wastes a whole build.
 *A navigation map only; the steps below are the source of truth.*
 
 **Pipeline:** Interview (Step 0) → Understand & plan (Step 1) → Set up canvas (Step 2) → Pace-check &
-approve the plan (Step 3) → Build with deckkit (Step 4) → Render · lint · actor-critic loop (Step 5) →
-Hand off & iterate (Step 6). Steps run in order; every **🔴 CHECKPOINT** is a hard stop.
+approve the plan (Step 3) → Build with deckkit + build-time geometry gate (Step 4) → Render · lint ·
+actor-critic loop (Step 5) → Hand off & iterate (Step 6). Steps run in order; every **🔴 CHECKPOINT** is a hard stop.
 **Steps:** 0 Interview · 1 Understand & plan · 2 Canvas · 3 Approve plan · 4 Build · 5 Render & critic ·
 6 Hand off · then **Anti-patterns** and **Files**.
 
@@ -107,6 +107,7 @@ Hand off & iterate (Step 6). Steps run in order; every **🔴 CHECKPOINT** is a 
 | Large / sectioned decks · collaborative gates | `references/large-deck-orchestration.md` · `references/collaborative-mode.md` |
 | East-Asian / ink looks | `references/east-asian-aesthetic.md` |
 | The build helpers (source of truth) | `scripts/deckkit.py` (docstrings) |
+| Geometry lint — build-time · render-time | `deckkit.lint_layout(prs)` (Step 4, pre-render) · `scripts/lint_deck.py` (Step 5, post-render) |
 
 *(Full file/script inventory: see **Files** at the end.)*
 
@@ -874,14 +875,16 @@ A few rules that matter (see `references/design-principles.md`):
   visual-critic round, and walks **every** shape — however it was placed, the grid helpers or raw
   coordinates — reasoning about each label's **ink** rectangle (where the glyphs actually land), so it
   stays quiet on the generously-sized frames real builds use. It **hard-fails (CRITICAL)** on three
-  things: text **off-canvas**, text **overflowing** a visible box, and **text-on-text** overlap; it
-  **warns** on a label/figure **escaping its card**, a **single line left off-centre** in a card, and
-  content **reaching the footer**. Every CRITICAL it prints is real *when the deck's fonts are
+  things: content (text ink / a card / a non-bleed image) **off-canvas**, text **overflowing** a visible
+  box, and **text-on-text** overlap; it **warns** on a label/figure **escaping its card**, a **single
+  line left off-centre** in a card, and content **reaching the footer**. Every CRITICAL it prints is real *when the deck's fonts are
   installed* — when a font is substituted for measurement it says so and carries ~1 line of slack
   (conservative, may under-flag), so it never fabricates. It is a **net, not a substitute for
   looking** (it can't see contrast, z-order, a figure smothering text, or shapes inside groups — the
-  critic's job). The rest of the **layout contract** below it doesn't hard-check; the named helpers
-  satisfy these *by construction*, so you rarely trip the net in the first place:
+  critic's job). The **layout contract** below maps to it as: the lint *enforces* rules 1 & 3 (off-canvas
+  + text-on-text as CRITICALs) and *warns* on 5 (off-centre) and footer; the rest (padding, fit,
+  grid-gap, diagram-bbox-first) it doesn't check — the named helpers satisfy those *by construction*, so
+  you rarely trip the net in the first place:
   1. **Stay in the safe area** — get the rect from `content_band()`; only full-bleed hero/divider art bleeds.
   2. **Give text padding** — inset every label ≥0.1in inside its card (`cx+0.2`, width `cw-0.4`); flush-to-edge reads as a mistake.
   3. **No text-on-text** — one column/stack owns each region; never drop a second text box into the same rectangle.
@@ -1013,9 +1016,10 @@ pixels). Keep it next to the build (a comment block in `build_<deck>.py` is fine
 
 ## Step 5 — Render, verify, then run the actor–critic loop
 **You should already have run the build-time geometry gate** (`dk.lint_layout(prs)` at the end of
-Step 4) and cleared its CRITICALs — that catches overflow/overlap/off-canvas/footer faults in-process
-*before* any render, so they never reach this loop. What remains here are the faults that need real
-pixels (crop, contrast, balance, a tofu glyph, text on a busy image), which only the render shows.
+Step 4) and cleared its CRITICALs (off-canvas · overflow · text-on-text) in-process, so the render
+loop starts mostly geometry-clean. `lint_deck.py` below then re-checks that geometry on the final file
+as a backstop and adds the render/parse-only faults; the rest is what needs real pixels (crop,
+contrast, balance, a tofu glyph, text on a busy image), which only the render shows.
 
 First **render and look** (`bash scripts/render_deck.sh <deck.pptx>` → one PNG per
 slide). python-pptx writes blind — overflow, low contrast, a callout on the footer,
@@ -1027,8 +1031,11 @@ sandbox even though `check_env.py` passes; in that case rerun only the render co
 unsandboxed execution, then continue the normal render -> lint -> critic loop. This is an environment
 permission issue, not evidence that the deck is malformed.
 
-**Then run the layout lint** — `python scripts/lint_deck.py <deck.pptx>` — a cheap, deterministic
-check that flags **off-slide overflow, text overflowing the card behind it, uneven card heights in a
+**Then run the layout lint** — `python scripts/lint_deck.py <deck.pptx>`. The build-time
+`dk.lint_layout` (Step 4) already cleared the pure-geometry faults *before* this render; **lint_deck.py
+is its render-time complement** — it re-checks geometry on the FINAL file and adds the faults that only
+the rendered/parsed deck reveals (which `lint_layout` deliberately leaves to it). A cheap, deterministic
+check, it flags **off-slide overflow, text overflowing the card behind it, uneven card heights in a
 row, two solid blocks/images overlapping (neither contained), footer collisions, orphaned punctuation
 / widow (a lone 。/，or single glyph on the last line — 避头尾), CJK text with no EA font (the kinsoku
 root cause), whole-page-image (editability), and orphan/empty slides**: exactly the failures the eye
@@ -1311,13 +1318,17 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
 **Scripts** (`scripts/`):
 - `deckkit.py` — the build helpers (template & blank decks), **incl. the editable native charts**
   (`native_chart`/`native_dual_axis`/`native_donut`/`native_pareto`/`native_bubble` — click-to-edit,
-  any-language-safe); the build's source of truth. Full signatures in its docstrings.
+  any-language-safe) **and the build-time geometry gate** (`lint_layout(prs)` — run before `prs.save()`;
+  the in-process pre-render net for overflow/off-canvas/text-overlap/card-escape/footer/off-centre — plus
+  `fit_text_size`); the build's source of truth. Full signatures in its docstrings.
 - `render_deck.py` — pptx → one PNG per slide (verify + critic loop); finds LibreOffice cross-platform
   or set `SOFFICE` (`.sh` is a shim). `check_env.py` — preflight if a render fails. `inspect_template.py`
   — a template's layouts/placeholders/logos. `requirements.txt` / `install_skill.py` — deps / installer.
-- `lint_deck.py` — deterministic layout lint (off-slide overflow · block/image collision [containment
-  excluded] · footer-zone intrusion · text-past-card · uneven rows); run after render, before critic;
-  non-zero on findings. `smoke_deckkit.py` — regression guard for the helpers.
+- `lint_deck.py` — deterministic **render-time** layout lint and complement to deckkit's build-time
+  `lint_layout`: re-checks geometry on the final file (off-slide overflow · block/image collision
+  [containment excluded] · footer-zone intrusion · text-past-card · uneven rows) AND adds the
+  render/parse-only faults (CJK kinsoku/widow · missing EA font · whole-page-image · orphan slides);
+  run after render, before critic; non-zero on findings. `smoke_deckkit.py` — regression guard for the helpers.
 - `anim.py` — PowerPoint click-builds/transitions (pair `references/animation.md`).
 - `designed_charts.py` — raster matplotlib chart recipes (use only for dumbbell or a deliberate
   look — prefer deckkit's native charts; `references/data-viz.md`). `presets.py` — named
