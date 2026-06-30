@@ -68,6 +68,48 @@ one line; never force it. See `references/collaborative-mode.md` (+ `scripts/arc
 proceed until the user confirms. Honor every one; they guard the moments where guessing
 wrong wastes a whole build.
 
+## At a glance — pipeline · rule strengths · where things live
+*A navigation map only; the steps below are the source of truth.*
+
+**Pipeline:** Interview (Step 0) → Understand & plan (Step 1) → Set up canvas (Step 2) → Pace-check &
+approve the plan (Step 3) → Build with deckkit (Step 4) → Render · lint · actor-critic loop (Step 5) →
+Hand off & iterate (Step 6). Steps run in order; every **🔴 CHECKPOINT** is a hard stop.
+**Steps:** 0 Interview · 1 Understand & plan · 2 Canvas · 3 Approve plan · 4 Build · 5 Render & critic ·
+6 Hand off · then **Anti-patterns** and **Files**.
+
+**Rule-strength vocabulary** (how to read the rules below):
+
+| Marker | Means |
+|---|---|
+| **🔴 MUST** / **Never …** | Required / forbidden — breaking it ships a broken or misleading deck |
+| **🔴 CHECKPOINT** | Hard stop — present, then wait for the user before proceeding |
+| **default** | The standard choice when the user hasn't said otherwise (override on request) |
+| **by taste / opt-in** | A judgment call (generated images, motion, icons) — apply where it helps, justify where not |
+| **carve / exception** | A named case where a rule deliberately yields — follow the carve, don't over-apply it |
+
+**Where things live** — the reference that *owns* each concern (read it when that concern is in play):
+
+| Concern | Owner |
+|---|---|
+| The craft / the "why" (contrast · hierarchy · C.R.A.P. · layout safety) | `references/design-principles.md` |
+| Per-purpose look (defense vs exec vs lecture …) | `references/design-by-purpose.md` |
+| Deep-understand + per-slide plan (Steps 1 & 3) | `agents/content-planner.md` |
+| Independent review + JSON schema | `agents/critic.md` · `agents/arbiter.md` · `references/review-rubrics.md` |
+| Charts (which type · editable-native vs raster) | `references/data-viz.md` |
+| Science schematics (force / ray / circuit / apparatus …) | `references/schematic-diagrams.md` |
+| Generated images (when/how · text-free · topical) | `references/image-generation.md` |
+| Generated-template branch (hero + shallow bg + frosted blocks) | `references/generated-template.md` |
+| Icons (one family · recolored · treatments) | `references/icons.md` |
+| Mimic a provided style example | `references/style-analysis.md` |
+| Fonts / portability / tofu · non-Latin & CJK | `references/font-guidance.md` · `references/multilingual.md` |
+| Animation / appear-builds | `references/animation.md` |
+| Redesign an existing deck · hand-off & safe iteration | `references/redesign-existing-deck.md` · `references/handoff-and-iteration.md` |
+| Large / sectioned decks · collaborative gates | `references/large-deck-orchestration.md` · `references/collaborative-mode.md` |
+| East-Asian / ink looks | `references/east-asian-aesthetic.md` |
+| The build helpers (source of truth) | `scripts/deckkit.py` (docstrings) |
+
+*(Full file/script inventory: see **Files** at the end.)*
+
 ## Step 0 — Interview the user first (always)
 **Run this interview every time, from scratch — do not skip it because earlier
 conversation, a previous deck, or context "obviously" implies an answer.** A terse
