@@ -95,6 +95,9 @@ actor-critic loop (Step 5) → Hand off & iterate (Step 6). Steps run in order; 
 | Per-purpose look (defense vs exec vs lecture …) | `references/design-by-purpose.md` |
 | Deep-understand + per-slide plan (Steps 1 & 3) | `agents/content-planner.md` |
 | Independent review + JSON schema | `agents/critic.md` · `agents/arbiter.md` · `references/review-rubrics.md` |
+| Which visual FORM a slide takes (avoid the card-grid default) | `references/form-selection.md` |
+| Colour-means-one-thing (bind a hue to a concept deck-wide) | `references/semantic-color-contract.md` |
+| Style + component catalogue (looks · presets · when to use each) | `references/design-gallery.md` |
 | Charts (which type · editable-native vs raster) | `references/data-viz.md` |
 | Science schematics (force / ray / circuit / apparatus …) | `references/schematic-diagrams.md` |
 | Generated images (when/how · text-free · topical) | `references/image-generation.md` |
@@ -107,7 +110,7 @@ actor-critic loop (Step 5) → Hand off & iterate (Step 6). Steps run in order; 
 | Large / sectioned decks · collaborative gates | `references/large-deck-orchestration.md` · `references/collaborative-mode.md` |
 | East-Asian / ink looks | `references/east-asian-aesthetic.md` |
 | The build helpers (source of truth) | `scripts/deckkit.py` (docstrings) |
-| Geometry lint — build-time · render-time | `deckkit.lint_layout(prs)` (Step 4, pre-render) · `scripts/lint_deck.py` (Step 5, post-render) |
+| Geometry lint — build-time · render-time | `deckkit.lint_layout(prs, strict=True)` (Step 4, pre-render) · `scripts/lint_deck.py` (Step 5, post-render) |
 
 *(Full file/script inventory: see **Files** at the end.)*
 
@@ -465,7 +468,10 @@ inventing — it's fidelity to what's *true now*.
   present an unverifiable claim as established fact. This matters because a no-source deck
   has **no paper to anchor it** — *you* are the only check on whether a confident-sounding
   statement is actually true, and an expert audience spots a wrong "fact" instantly (the
-  failure mode here is being *wrong*, not just vague).
+  failure mode here is being *wrong*, not just vague). **If the host exposes NO web tool** (no
+  search/fetch available), do not present falsifiable claims as established: mark each such claim
+  *open/unverified*, soften it to what you can defend, and **ask the user to confirm the numbers or
+  supply a source** — never ship an unchecked "fact" just because you couldn't check it.
   - **Ground to *today* — the current day, not just the year — and re-verify on every build.**
     You know today's date; use it: run **recency-bounded** searches (this month / the last few
     weeks for fast-moving topics) and fold in material recent events. Re-check anything
@@ -550,7 +556,8 @@ guidance + RTL limits in `references/multilingual.md`.
 **Font portability (any deck).** A `.pptx` stores font *names*, not the fonts — pick fonts
 present on every machine that will open it (a missing font substitutes, shifting metrics
 or, for non-Latin, producing tofu). Default to cross-platform-safe fonts (Arial/Calibri,
-Georgia, Consolas), set `deckkit.FONT/MONO/EQFONT` accordingly, and flag any brand-font
+Georgia, Consolas), set `deckkit.FONT/MONO` accordingly (and `deckkit.EQ_MATHFONT` — STIX Two Math /
+Cambria Math — for native `equation_native` math; `EQFONT` only affects inline `eq_par` runs), and flag any brand-font
 dependency at hand-off. Editable `equation_native` math needs a **math font** (STIX Two Math / Cambria
 Math) for its glyphs — flag that dependency; `equation_png` is font-independent (rasterised).
 Full list, fallbacks, and tofu recovery in `references/font-guidance.md`.
@@ -614,7 +621,9 @@ ready** — send it back to the planner.
 
 ## Step 4 — Build with deckkit
 Write a small per-deck build script that imports `scripts/deckkit.py` (don't re-derive primitives;
-full signatures + behaviour are in its docstrings). The helper set, by job:
+full signatures + behaviour are in its docstrings). **First, for each slide pick its visual FORM
+deliberately** — generate 2-3 candidate forms and choose with the tie-breaker in
+`references/form-selection.md`; **don't default every multi-item slide to a card grid.** The helper set, by job:
 - **Chrome:** `title_bar`/`content_slide`, `footer`, `editorial_header` (caps eyebrow + title +
   hairline), `part_eyebrow`/`page_marker` (mono eyebrow + page marker), `logo` (persistent
   brand/institution/product mark in a fixed corner on every page — see the brand-logo rule below).
@@ -880,8 +889,11 @@ A few rules that matter (see `references/design-principles.md`):
     corners** — so require a visible gap, not just non-collision. (The Step-5 render self-check
     flags a wide bar grazing the content above it; the build-time lint does NOT catch panel-on-panel
     grazing, so reserving the space by construction is on you.)
-- **🔴 Gate the geometry at BUILD time — end the build script with `dk.lint_layout(prs)` before
-  `prs.save()`, and clear every CRITICAL before you render.** This is the cheapest place to catch
+- **🔴 Gate the geometry at BUILD time — end the build script with `dk.lint_layout(prs, strict=True)`
+  before `prs.save()`.** `strict=True` makes it a *real* gate: an unresolved CRITICAL **raises and the
+  deck is never saved**, so you can't accidentally ship a broken layout to the render/critic (plain
+  `lint_layout(prs)` only *prints* and relies on you noticing — use it only when you deliberately want a
+  non-blocking report, e.g. a known off-canvas bleed). This is the cheapest place to catch
   the mechanical layout faults: it runs in-process in milliseconds, *before* the slow render +
   visual-critic round, and walks **every** shape — however it was placed, the grid helpers or raw
   coordinates — reasoning about each label's **ink** rectangle (where the glyphs actually land), so it
@@ -908,7 +920,10 @@ A few rules that matter (see `references/design-principles.md`):
   **distinct, deliberately-contrasted hue** via `deckkit.palette(n, ACCENTS)` — it returns `n`
   distinct fills and **warns if any two adjacent blocks aren't visibly different**; never reuse a
   hue for adjacent blocks and **never use a neutral gray as a category colour** (gray reads as
-  disabled, not a category — it makes a coloured row look half-finished). Name the closing slide
+  disabled, not a category — it makes a coloured row look half-finished). **Bind each hue to ONE
+  concept deck-wide** (the accent = the proposed method, or "risk", or one product) — a colour that
+  means the same thing on every slide is the biggest "this deck is credible" move: see
+  `references/semantic-color-contract.md`. Name the closing slide
   for its purpose, in the deck's language ("Conclusion" for an English talk; 结论/总结 on a Chinese deck).
 - **Accessibility.** Keep text ≥4.5:1 on its fill (`contrast_ratio`; `chip`/`modbox`
   auto-pick a readable text colour) and never encode meaning by colour alone. Set
@@ -1099,7 +1114,7 @@ critic round — full rationale in `references/design-principles.md`):
   a sliver clips their rounded corners — there must be a visible gap, so size content to the
   callout's returned top minus a `GUTTER` (reserve its space before sizing content, don't add it last).
 - **Adjacent / stacked blocks — a VISIBLE gap, not a sliver** — between any two same-axis blocks
-  (stacked panels, side-by-side cards, pipeline nodes) the gap must read clearly: **≥ ~0.12in
+  (stacked panels, side-by-side cards, pipeline nodes) the gap must read clearly: **≥ ~0.13in
   (~⅓ `GUTTER`)**. A ~0.02in seam (three panels at pitch 1.04 with height 1.02) reads as touching —
   a gap far smaller than the slide's own margins looks cramped even though nothing overlaps. Cause:
   a hand-picked pitch that nearly equals the block height. Fix: **derive the pitch from the region** —
@@ -1329,7 +1344,7 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
 **Scripts** (`scripts/`):
 - `deckkit.py` — the build helpers (template & blank decks), **incl. the editable native charts**
   (`native_chart`/`native_dual_axis`/`native_donut`/`native_pareto`/`native_bubble` — click-to-edit,
-  any-language-safe) **and the build-time geometry gate** (`lint_layout(prs)` — run before `prs.save()`;
+  any-language-safe) **and the build-time geometry gate** (`lint_layout(prs, strict=True)` — run before `prs.save()`;
   the in-process pre-render net for overflow/off-canvas/text-overlap/card-escape/footer/off-centre — plus
   `fit_text_size`); the build's source of truth. Full signatures in its docstrings.
 - `render_deck.py` — pptx → one PNG per slide (verify + critic loop); finds LibreOffice cross-platform

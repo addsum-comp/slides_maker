@@ -91,7 +91,9 @@ callout(s, L[0], 4.45, R[0] + R[2] - L[0], 0.6, "WHY",
         "Both panels come from one grid, so left/right widths and flanking margins match.")
 
 # --- build-time geometry gate: catch overflow / overlap / off-canvas / footer faults BEFORE
-#     rendering (in-process, milliseconds). Clear every CRITICAL, then render + run the critic. ---
-lint_layout(prs)
+#     rendering (in-process, milliseconds). strict=True RAISES on any CRITICAL so a broken deck
+#     can't be saved by accident — fix the geometry and re-run (or pass strict=False for a rare,
+#     deliberate off-canvas bleed). Then render + run the critic. ---
+lint_layout(prs, strict=True)
 prs.save(OUT)
 print("saved ->", OUT, "| slides:", len(prs.slides._sldIdLst))

@@ -151,6 +151,8 @@ def main(argv):
     for i, page in enumerate(doc, 1):
         page.get_pixmap(matrix=fitz.Matrix(2, 2)).save(os.path.join(out, "slide{:02d}.png".format(i)))
     print("rendered {} slides -> {}".format(doc.page_count, out))
+    print("next: python {} {}  # render-time lint, then the actor-critic loop".format(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "lint_deck.py"), argv[0] if argv else "<deck.pptx>"))
 
 
 if __name__ == "__main__":
