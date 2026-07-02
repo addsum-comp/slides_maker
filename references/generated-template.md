@@ -17,7 +17,7 @@ layers**, and the split is what keeps it editable *and* on-brand:
 
 - **Hero + section-divider slides → a full-bleed GENERATED image.** A rich, styled, **text-free**
   illustration carries the mood; the title and badges sit on top as **native** editable shapes.
-  These are the **two "end-page" treatments** that carry the full-strength imagery.
+  These carry the full-strength imagery (interior pages get only the faint plate). **And bookend the deck** — it OPENS on the hero cover and should CLOSE on a matching **ENDING page** in the same divider-strength imagery, so the deck doesn't simply stop on a faint body slide; the wrap-up sits natively on top (thank-you / recap / call-to-action / contact), the mirror of the cover. The ending page can reuse the divider/hero plate — no new generation needed.
 - **Content slides → built NATIVELY to match, on a SHALLOW background — never a flat single
   colour.** The content (cards/chips/bands) is native python-pptx that reuses the template's
   palette, motifs, and component treatments — that's why inserted blocks *fit*. But the slide
@@ -31,14 +31,14 @@ layers**, and the split is what keeps it editable *and* on-brand:
     `backdrop_motif` field, or a tinted corner/band — the lightest-weight option, fully editable; **or**
   - a **subtle imagery plate** — a dedicated low-contrast, text-free background image generated in
     the same style (placed `picture(fit="cover")`), or the hero re-placed full-bleed under a heavy
-    `scrim_overlay` so only a ghost of it remains.
+    `scrim_overlay` so a soft but **still-visible** ghost of it remains (a ghost you genuinely can't see is the same failure as no plate — see the visibility floor in the legibility guardrails).
   **🔴 MUST for the image-tool template — the interior shallow background is itself a GENERATED image
   plate, not a flat / merely-native fill.** Since the user chose a *generated visual identity*, every
   interior page carries a **dedicated low-contrast, text-free background image generated in the same
   style** (the subtle imagery plate above), so the body reads as *designed* as the cover; a flat — or a
   merely-native, gradient-only — interior under a lush generated cover is the failure to avoid. Apply the
   **SAME plate on every content slide** so they read as one system; only the cover and dividers get the
-  full, vivid imagery. *Carves (audit-scoped) — the MUST yields to:* **(1)** a deliberately **minimal /
+  full, vivid imagery. **The plate is a faint DERIVATIVE of the hero itself** — the hero's own signature motif and palette, softened, evenly-toned, low-saturation — **not a generic or unrelated texture** (a stock triangulated mesh, random grain): a plate whose motif differs from the hero reads as a second, unrelated design and quietly breaks the one-system illusion, so 'a plate on every page' is met on paper while the deck stops feeling like one identity. *Carves (audit-scoped) — the MUST yields to:* **(1)** a deliberately **minimal /
   flat** generated style (Swiss · Scandinavian · Brutalist) whose aesthetic *is* near-flat; **(2)** the
   **user explicitly asking for clean / flat / minimal interiors**, or a **brand identity that is itself a
   flat colour field** (honour the request/brand — a faint native texture or the flat brand field is then
@@ -218,7 +218,7 @@ them, and show both. The content slide is essential: it proves the blocks actual
 - The look is decided → **skip the 3-direction gate** and any style question; run the rest of the
   normal interview (purpose & audience & time, source material, language).
 - **Build (step 4 of SKILL.md):**
-  - **Cover + section dividers** → the generated image full-bleed (`picture(..., fit="cover")`),
+  - **Cover, section dividers, and the closing / ending page** → the generated image full-bleed (`picture(..., fit="cover")`),
     with the **title and badges native on top**, placed in the image's calm zone (add a soft
     scrim/plate behind the title if the area under it is busy, so contrast stays ≥ 4.5:1).
   - **Content slides** → built **natively** in `style.py`, in this order: **(1)** `content_bg(slide)`
@@ -256,7 +256,7 @@ them, and show both. The content slide is essential: it proves the blocks actual
 - **The shallow background must stay BEHIND the content** — it's atmosphere, not a competing layer.
   If it darkens or busies the area under text, mute it harder (lighter tint, stronger scrim, fewer
   motifs); body text must clear 4.5:1 against whatever the background leaves under it. A subtle
-  background that forces every text block onto its own opaque card has been made too strong.
+  background that forces every text block onto its own opaque card has been made too strong. **But there is a FLOOR as well: the plate must stay SUBTLY VISIBLE** — a viewer should be able to *see* the body page is textured, not have to guess. Muting is one-directional pressure, so it's easy to over-scrim the plate into a flat near-white field that satisfies 'a plate on every page' in code yet reads as absent — the same failure as no plate at all. If you can't tell the plate is there at a glance, the scrim is too heavy: lift it until the hero's motif is faintly but genuinely perceptible, and recover text contrast with the frosted blocks rather than by erasing the plate.
 - **Logo = the REAL mark, present where it belongs** — for a company/institution/product deck the
   logo appears on every page; use the real asset (image-generation.md's hierarchy), never a faked or
   recolored one, and if it's missing, ask the user or use an honest "logo here" placeholder.
@@ -281,6 +281,8 @@ them, and show both. The content slide is essential: it proves the blocks actual
       interior, except a deliberately minimal/flat style) + frosted blocks; the **real logo present and
       consistently placed** on every page if it's a company/institution/product deck; figures framed
       to sit on the template; legibility ≥ 4.5:1 everywhere.
+- [ ] The interior plate is a **faint DERIVATIVE of the hero** (same motif/palette, not a generic texture) and stays **subtly visible** on every body page — not scrimmed into a flat near-white field.
+- [ ] A **closing / ending page bookends the cover** — full-strength divider-style imagery with a native wrap-up (thank-you / recap / CTA / contact), so the deck doesn't stop on a body slide.
 - [ ] Template **saved to the registry** for reuse.
 
 ## Style library — well-known starting styles (seed, then tailor)

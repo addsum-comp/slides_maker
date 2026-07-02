@@ -242,7 +242,7 @@ the direction gate** (the look is already decided). The four:
      not a default: also GENERATE a faint interior-background PLATE and place it (lightly scrimmed) on
      every interior page — the shallow background is itself a generated image, not a flat/native fill —
      AND make content blocks FROSTED / semi-transparent (~30–45% see-through, α≈0.55–0.72), never flat
-     opaque panels. Only the end pages (cover + section dividers) carry full-strength imagery; interior
+     opaque panels. Only the end pages — the cover, the section dividers, AND a closing/ending page that bookends the cover — carry full-strength imagery; interior
      pages get the faint plate.** Carve: a deliberately minimal/flat style (Swiss/Scandinavian/Brutalist)
      may use a faint native texture instead. Text kept ≥4.5:1; see `generated-template.md`); save the
      confirmed template to the registry.
