@@ -157,7 +157,7 @@ It:   (after reading the paper) Here is the plan: 15 slides.
       Confirm the direction and I will build.
 ```
 
-Codex has no slash command; saying "use slide-maker to build a PPT from paper.pdf" triggers the same flow, with the questions arriving as short follow-up text. Either way short answers are enough, "you decide" is always a valid answer, and "show me a few style directions first" gets you rendered style candidates to pick from.
+Both tools are fully supported, but Claude Code gives the nicer experience: the interview is a clickable form you walk through with arrow keys and Enter. Codex has no slash command; saying "use slide-maker to build a PPT from paper.pdf" triggers the same flow, with the questions arriving as plain text you answer by typing. Either way short answers are enough, "you decide" is always a valid answer, and "show me a few style directions first" gets you rendered style candidates to pick from.
 
 Other ways to open:
 
