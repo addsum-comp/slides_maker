@@ -118,6 +118,10 @@ To be plain about it: it does not promise a perfect deck in one shot. It promise
 
 ## Quick start
 
+<p align="center">
+  <img src="docs/assets/quickstart_en.png" alt="Quick start: install once, start talking, pick answers, confirm the plan, get the pptx">
+</p>
+
 ### Step 1: Install
 
 ```bash

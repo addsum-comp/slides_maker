@@ -118,6 +118,10 @@
 
 ## 快速开始
 
+<p align="center">
+  <img src="docs/assets/quickstart_zh.png" alt="快速开始：装一次，开聊，点选回答，确认结构稿，拿到 pptx">
+</p>
+
 ### 第一步：安装
 
 ```bash
