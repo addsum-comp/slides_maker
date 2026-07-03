@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "slides-maker",
+  "owner": {
+    "name": "Leo-Lyu",
+    "url": "https://github.com/dong845"
+  },
+  "metadata": {
+    "description": "slide-maker skill — editable PPTX generation for academic talks, code repo presentations, and general decks",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "slide-maker",
+      "source": "./",
+      "description": "Generate editable PowerPoint decks from papers, PDFs, code repositories, documents, and existing slides.",
+      "author": {
+        "name": "Leo-Lyu",
+        "url": "https://github.com/dong845"
+      },
+      "homepage": "https://github.com/dong845/slides_maker",
+      "repository": "https://github.com/dong845/slides_maker",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "pptx",
+        "powerpoint",
+        "presentation",
+        "agent-skill",
+        "academic-presentation",
+        "paper-reading",
+        "code-repo",
+        "editable-slides",
+        "python-pptx",
+        "research"
+      ]
+    }
+  ]
+}

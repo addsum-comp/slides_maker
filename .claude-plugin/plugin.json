@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "slide-maker",
+  "description": "Generate editable PowerPoint decks from papers, PDFs, code repositories, documents, and existing slides.",
+  "author": {
+    "name": "Leo-Lyu",
+    "url": "https://github.com/dong845"
+  },
+  "homepage": "https://github.com/dong845/slides_maker",
+  "repository": "https://github.com/dong845/slides_maker",
+  "license": "MIT",
+  "keywords": [
+    "pptx",
+    "powerpoint",
+    "presentation",
+    "agent-skill",
+    "academic-presentation",
+    "paper-reading",
+    "code-repo",
+    "editable-slides",
+    "python-pptx",
+    "research"
+  ],
+  "skills": "./"
+}
