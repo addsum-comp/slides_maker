@@ -129,24 +129,24 @@ python3 scripts/install_skill.py --target both
 
 If you only use one tool, replace `both` with `codex` or `claude`. Then go back to the chat and send your request.
 
-### Step 2: Say what you want, in one line
+### Step 2: Type /slide-maker and just talk
+
+The cheapest way to start is zero prompt. In Claude Code, type:
+
+```text
+/slide-maker
+```
+
+The interview starts immediately: a tabbed form (Topic, Template, Audience, Style) where every question ships with ready-made options. Arrow keys to move, Enter to pick. The topic tab even guesses candidates from your recent projects; type your own if it guessed wrong. Submit, and it gets to work.
+
+If you already have material, one line also works, and it skips the topic question:
 
 ```text
 Use slide-maker to create a PPT from paper.pdf.
-```
 
-That one line is enough. slide-maker is interview-driven: it does not need a long, perfect prompt, because it asks. A real first exchange looks like this:
-
-```text
-You:  Use slide-maker to create a PPT from paper.pdf.
-
-It:   Before I build, four quick things:
-      1. Template: one from the gallery, your own reference PPT,
-         a clean design by me, or an AI-generated visual identity?
-      2. Audience and setting: presented live, screen-shared,
-         or sent to be read? How long is the talk?
-      3. Source scope: just this PDF, or also code, figures, other docs?
-      4. Language and density: English or Chinese? Visual-first or more text?
+It:   Before I build: which template? Who is the audience, how long,
+      live or self-read? Is this PDF the only source?
+      English or Chinese, visual-first or balanced?
 
 You:  For my advisor and labmates, 12 minutes, live. Only paper.pdf.
       English, visual and concise. You pick the look.
@@ -157,9 +157,9 @@ It:   (after reading the paper) Here is the plan: 15 slides.
       Confirm the direction and I will build.
 ```
 
-In Claude Code the questions show up as clickable options; in Codex they arrive as short follow-up text. Either way short answers are enough, "you decide" is always a valid answer, and "show me a few style directions first" gets you rendered style candidates to pick from.
+Codex has no slash command; saying "use slide-maker to build a PPT from paper.pdf" triggers the same flow, with the questions arriving as short follow-up text. Either way short answers are enough, "you decide" is always a valid answer, and "show me a few style directions first" gets you rendered style candidates to pick from.
 
-Other ways to open the conversation:
+Other ways to open:
 
 ```text
 Use slide-maker to create a technical presentation from this repository.
