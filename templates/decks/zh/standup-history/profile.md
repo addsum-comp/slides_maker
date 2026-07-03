@@ -13,7 +13,7 @@
 ## 结构
 
 - 页面尺寸 10.00 x 5.62 英寸（16:9）。页数 12。版式 11 套。
-- 字体：正文 PingFang SC；英文副题与数字用 Arial / Arial Black。
+- 字体：正文 Hiragino Sans GB；英文副题与数字用 Arial / Arial Black。
 
 ## 适合
 
@@ -24,7 +24,7 @@
 
 - 保留编年节奏：定义 → 分时代 → 当下 → 结语，一个时代一页。
 - 复用分节小标题（中文主标题 + 英文副题）的排版，替换成用户的题材与年代。
-- CJK 字体沿用 PingFang SC，避免中文豆腐块。
+- CJK 字体沿用 Hiragino Sans GB，避免中文豆腐块。
 
 ## Agent 提示
 

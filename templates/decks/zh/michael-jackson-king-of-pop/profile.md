@@ -13,7 +13,7 @@
 ## 结构
 
 - 页面尺寸 10.00 x 5.62 英寸（16:9）。页数 14。版式 11 套。含 1 个专辑柱状图。
-- 字体：正文 PingFang SC；运行页眉用 Courier New（等宽）；数字与装饰用 Arial / Arial Black。
+- 字体：正文 Hiragino Sans GB；运行页眉用 Courier New（等宽）；数字与装饰用 Arial / Arial Black。
 
 ## 适合
 
@@ -24,7 +24,7 @@
 
 - 保留节奏：整屏封面 → 编号内容页 → 时间线 → 数据 → 荣誉 → 光与影 → 谢幕与遗产。
 - 复用深色 + 金色的聚光灯视觉，替换成用户的人物、数据与图片。
-- CJK 字体沿用 PingFang SC，避免中文豆腐块。
+- CJK 字体沿用 Hiragino Sans GB，避免中文豆腐块。
 
 ## Agent 提示
 
