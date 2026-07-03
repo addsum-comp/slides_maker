@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>slide-maker — deck viewer</title>
+<script src="decks.js"></script>
+<style>
+:root { --ink:#1f2430; --paper:#fbfaf7; --mute:#8a8f9a; --accent:#c2410c; --line:#e3e0d8; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  min-height:100vh; display:flex; flex-direction:column; }
+header { display:flex; align-items:center; gap:14px; padding:14px 22px; border-bottom:1px solid var(--line); }
+header a.back { color:var(--accent); text-decoration:none; font-weight:600; font-size:14px; white-space:nowrap; }
+header .title { font-weight:700; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+header .spacer { flex:1; }
+header a.dl { color:#fff; background:var(--ink); padding:7px 14px; border-radius:8px;
+  text-decoration:none; font-size:13px; white-space:nowrap; }
+header a.dl:hover { background:var(--accent); }
+main { flex:1; display:flex; align-items:center; justify-content:center; padding:18px; position:relative; }
+.stage { position:relative; max-width:1100px; width:100%; }
+.stage img { width:100%; display:block; border:1px solid var(--line); border-radius:10px;
+  background:#fff; box-shadow:0 10px 34px rgba(31,36,48,.10); }
+.hot { position:absolute; top:0; bottom:0; width:50%; cursor:pointer; }
+.hot.prev { left:0; } .hot.next { right:0; }
+.nav { display:flex; align-items:center; justify-content:center; gap:22px; padding:0 0 22px; }
+.nav button { border:1px solid var(--line); background:#fff; color:var(--ink); width:42px; height:42px;
+  border-radius:50%; font-size:17px; cursor:pointer; }
+.nav button:hover { border-color:var(--accent); color:var(--accent); }
+.nav .count { font-variant-numeric:tabular-nums; color:var(--mute); font-size:14px; min-width:72px; text-align:center; }
+.hint { text-align:center; color:var(--mute); font-size:12px; padding-bottom:16px; }
+.err { text-align:center; padding:80px 20px; color:var(--mute); }
+.err a { color:var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="index.html">&larr; Gallery</a>
+  <div class="title" id="deckTitle">slide-maker deck</div>
+  <div class="spacer"></div>
+  <a class="dl" id="dlBtn" href="#" download>Download .pptx</a>
+</header>
+<main>
+  <div class="stage" id="stage">
+    <img id="slide" src="" alt="slide">
+    <div class="hot prev" onclick="go(-1)" title="Previous"></div>
+    <div class="hot next" onclick="go(1)" title="Next"></div>
+  </div>
+</main>
+<div class="nav">
+  <button onclick="go(-1)" aria-label="Previous">&larr;</button>
+  <div class="count" id="count">–</div>
+  <button onclick="go(1)" aria-label="Next">&rarr;</button>
+</div>
+<div class="hint">Use arrow keys, click the left / right half of the slide, or swipe.</div>
+<script>
+const params = new URLSearchParams(location.search);
+const id = params.get('deck') || 'en/transformer-talk';
+const deck = (window.DECKS || []).find(d => d.id === id);
+let page = 1;
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function src(n) { return `templates/decks/${id}/render/slide${pad(n)}.png`; }
+
+function show() {
+  const img = document.getElementById('slide');
+  img.src = src(page);
+  document.getElementById('count').textContent = `${page} / ${deck.pages}`;
+  if (page < deck.pages) { const pre = new Image(); pre.src = src(page + 1); }
+}
+function go(d) {
+  page = Math.min(Math.max(1, page + d), deck.pages);
+  show();
+}
+
+if (!deck) {
+  document.querySelector('main').innerHTML =
+    '<div class="err">Unknown deck. <a href="index.html">Back to the gallery</a></div>';
+  document.querySelector('.nav').style.display = 'none';
+} else {
+  document.getElementById('deckTitle').textContent = `${deck.title} (${deck.lang === 'zh' ? '中文' : 'English'})`;
+  document.title = `${deck.title} — slide-maker viewer`;
+  const dl = document.getElementById('dlBtn');
+  dl.href = `templates/decks/${id}/template.pptx`;
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') go(1);
+    if (e.key === 'ArrowLeft') go(-1);
+  });
+  let x0 = null;
+  const stage = document.getElementById('stage');
+  stage.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, {passive:true});
+  stage.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    x0 = null;
+  }, {passive:true});
+  show();
+}
+</script>
+</body>
+</html>

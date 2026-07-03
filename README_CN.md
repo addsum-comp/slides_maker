@@ -14,6 +14,7 @@
 > 在 Codex 或 Claude Code 里聊几句，它先读懂你的材料，再交给你一份真正的 PowerPoint：每个文本、形状、图表都能点开就改，讲稿写在备注里，要点是原生的点击渐显。
 
 <p align="center">
+  <a href="https://dong845.github.io/slides_maker/"><strong>在线预览</strong></a> ·
   <a href="#最快的感受方式下载一份成品"><strong>下载成品</strong></a> ·
   <a href="#模板库"><strong>模板库</strong></a> ·
   <a href="#slide-maker-不一样在哪"><strong>不一样在哪</strong></a> ·
@@ -26,7 +27,7 @@
 
 **[下载「组会 / 论文汇报」这份 .pptx](templates/decks/zh/transformer-talk/template.pptx?raw=1)，在 PowerPoint 里打开。** 这是一份 15 页的《Attention Is All You Need》论文精读：论文原图直接裁自 PDF，注意力公式是可编辑的原生文本，BLEU 对比是双击就能改数字的原生图表，每页备注里有完整讲稿，放映时要点逐条渐显。
 
-判断一个 AI PPT 工具，别看宣传图，打开它生成的文件点两下就知道了。
+想先在浏览器里看？[在线翻页看全部 16 套](https://dong845.github.io/slides_maker/)。但判断一个 AI PPT 工具，最终还是打开它生成的文件点两下最诚实。
 
 ## 模板库
 
@@ -35,50 +36,50 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/assets/screenshots/preview_transformer-talk.png" alt="组会 / 论文汇报模板预览"><br/>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/transformer-talk"><img src="docs/assets/screenshots/preview_transformer-talk.png" alt="组会 / 论文汇报模板预览"></a><br/>
       <sub><strong>组会 / 论文汇报</strong><br/>论文精读、组会、方法综述、实验结果汇报<br/>
-      <a href="templates/decks/zh/transformer-talk/template.pptx?raw=1">下载 .pptx</a></sub>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/transformer-talk">在线翻页</a> · <a href="templates/decks/zh/transformer-talk/template.pptx?raw=1">下载 .pptx</a></sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/assets/screenshots/preview_nvidia-overview.png" alt="公司 / 产品介绍模板预览"><br/>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/nvidia-overview"><img src="docs/assets/screenshots/preview_nvidia-overview.png" alt="公司 / 产品介绍模板预览"></a><br/>
       <sub><strong>公司 / 产品介绍</strong><br/>公司介绍、产品矩阵、客户沟通、融资介绍<br/>
-      <a href="templates/decks/zh/nvidia-overview/template.pptx?raw=1">下载 .pptx</a></sub>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/nvidia-overview">在线翻页</a> · <a href="templates/decks/zh/nvidia-overview/template.pptx?raw=1">下载 .pptx</a></sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/assets/screenshots/preview_nl-job-market-2026.png" alt="数据 / 市场分析模板预览"><br/>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/nl-job-market-2026"><img src="docs/assets/screenshots/preview_nl-job-market-2026.png" alt="数据 / 市场分析模板预览"></a><br/>
       <sub><strong>数据 / 市场分析</strong><br/>行业研究、趋势解读、结构化汇报<br/>
-      <a href="templates/decks/zh/nl-job-market-2026/template.pptx?raw=1">下载 .pptx</a></sub>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/nl-job-market-2026">在线翻页</a> · <a href="templates/decks/zh/nl-job-market-2026/template.pptx?raw=1">下载 .pptx</a></sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/assets/screenshots/preview_solo-company-talk.png" alt="AI 趋势 / 个人演讲模板预览"><br/>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/solo-company-talk"><img src="docs/assets/screenshots/preview_solo-company-talk.png" alt="AI 趋势 / 个人演讲模板预览"></a><br/>
       <sub><strong>AI 趋势 / 个人演讲</strong><br/>趋势解读、个人表达、创业分享<br/>
-      <a href="templates/decks/zh/solo-company-talk/template.pptx?raw=1">下载 .pptx</a></sub>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/solo-company-talk">在线翻页</a> · <a href="templates/decks/zh/solo-company-talk/template.pptx?raw=1">下载 .pptx</a></sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/assets/screenshots/preview_kids-ai-explainer.png" alt="课程 / 知识分享模板预览"><br/>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/kids-ai-explainer"><img src="docs/assets/screenshots/preview_kids-ai-explainer.png" alt="课程 / 知识分享模板预览"></a><br/>
       <sub><strong>课程 / 知识分享</strong><br/>课程讲解、读书分享、培训材料<br/>
-      <a href="templates/decks/zh/kids-ai-explainer/template.pptx?raw=1">下载 .pptx</a></sub>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/kids-ai-explainer">在线翻页</a> · <a href="templates/decks/zh/kids-ai-explainer/template.pptx?raw=1">下载 .pptx</a></sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/assets/screenshots/preview_chengdu.png" alt="视觉叙事 / 文化介绍模板预览"><br/>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/chengdu"><img src="docs/assets/screenshots/preview_chengdu.png" alt="视觉叙事 / 文化介绍模板预览"></a><br/>
       <sub><strong>视觉叙事 / 文化介绍</strong><br/>城市、文化、活动、品牌故事<br/>
-      <a href="templates/decks/zh/chengdu/template.pptx?raw=1">下载 .pptx</a></sub>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/chengdu">在线翻页</a> · <a href="templates/decks/zh/chengdu/template.pptx?raw=1">下载 .pptx</a></sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/assets/screenshots/preview_standup-history.png" alt="历史 / 演变叙事模板预览"><br/>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/standup-history"><img src="docs/assets/screenshots/preview_standup-history.png" alt="历史 / 演变叙事模板预览"></a><br/>
       <sub><strong>历史 / 演变叙事</strong><br/>历史脉络、行业演进、时间线故事<br/>
-      <a href="templates/decks/zh/standup-history/template.pptx?raw=1">下载 .pptx</a></sub>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/standup-history">在线翻页</a> · <a href="templates/decks/zh/standup-history/template.pptx?raw=1">下载 .pptx</a></sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/assets/screenshots/preview_michael-jackson-king-of-pop.png" alt="人物 / 品牌故事模板预览"><br/>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/michael-jackson-king-of-pop"><img src="docs/assets/screenshots/preview_michael-jackson-king-of-pop.png" alt="人物 / 品牌故事模板预览"></a><br/>
       <sub><strong>人物 / 品牌故事</strong><br/>名人传记、品牌档案、文化回顾<br/>
-      <a href="templates/decks/zh/michael-jackson-king-of-pop/template.pptx?raw=1">下载 .pptx</a></sub>
+      <a href="https://dong845.github.io/slides_maker/viewer.html?deck=zh/michael-jackson-king-of-pop">在线翻页</a> · <a href="templates/decks/zh/michael-jackson-king-of-pop/template.pptx?raw=1">下载 .pptx</a></sub>
     </td>
   </tr>
 </table>
