@@ -25,6 +25,11 @@
   <a href="#troubleshooting"><strong>Troubleshooting</strong></a>
 </p>
 
+**See it work in 2½ minutes** · one prompt, one interview, one editable deck:
+
+https://github.com/user-attachments/assets/60f65e33-80fd-40e3-8e51-371e98cebda2
+
+
 ## The honest test: open the file, not the screenshot
 
 Any AI slide tool looks great in a screenshot. The real question is what you get *back*. So open one and click around:
