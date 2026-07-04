@@ -13,6 +13,8 @@
 
 > Chat with it in Codex or Claude Code. It reads your material first, then hands you a real PowerPoint: every text box, shape, and chart is click-to-edit, the script lives in speaker notes, and bullet reveals are native click builds.
 
+<p align="center"><sub>Free and open source, built by <a href="https://addsum.top/en/"><strong>Addsum</strong></a></sub></p>
+
 <p align="center">
   <a href="https://addsumtech.github.io/slides_maker/"><strong>Live demo</strong></a> ·
   <a href="#the-fastest-way-to-judge-it-download-a-deck"><strong>Download a deck</strong></a> ·

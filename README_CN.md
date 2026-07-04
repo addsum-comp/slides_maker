@@ -13,6 +13,8 @@
 
 > 在 Codex 或 Claude Code 里聊几句，它先读懂你的材料，再交给你一份真正的 PowerPoint：每个文本、形状、图表都能点开就改，讲稿写在备注里，要点是原生的点击渐显。
 
+<p align="center"><sub><a href="https://addsum.top/"><strong>增和科技 Addsum</strong></a> 出品 · 免费开源</sub></p>
+
 <p align="center">
   <a href="https://addsumtech.github.io/slides_maker/"><strong>在线预览</strong></a> ·
   <a href="#最快的感受方式下载一份成品"><strong>下载成品</strong></a> ·
