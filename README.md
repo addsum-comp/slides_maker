@@ -16,7 +16,7 @@
 > Chat with it in Codex or Claude Code. A small team of specialized agents **reads your material, or researches the web when you have none**, then plans the deck, builds it, and has an independent critic review it before you see it. You get a real PowerPoint: every text box, shape, and chart is click-to-edit, the script lives in speaker notes, and bullet reveals are native click builds.
 
 <p align="center">
-  <a href="https://addsumtech.github.io/slides_maker/"><strong>Live demo</strong></a> ·
+  <a href="https://slides.addsum.top/"><strong>Live demo</strong></a> ·
   <a href="#the-honest-test-open-the-file-not-the-screenshot"><strong>Open a real deck</strong></a> ·
   <a href="#template-gallery"><strong>Templates</strong></a> ·
   <a href="#what-makes-slide-maker-different"><strong>What's different</strong></a> ·
@@ -32,7 +32,7 @@ Any AI slide tool looks great in a screenshot. The real question is what you get
 - **[Paper / lab-meeting deck ↓](templates/decks/en/transformer-talk/template.pptx?raw=1)**: a 15-slide reading of *Attention Is All You Need*. Double-click the BLEU chart and re-number it; click into the attention formula and edit it like text; open **View ▸ Notes** for the full spoken script; press Play and watch the bullets reveal one click at a time. Every figure is cropped straight from the paper's PDF.
 - **[Visual / culture deck ↓](templates/decks/en/chengdu/template.pptx?raw=1)**: the other end of the range, a fully generated visual identity where cover, dividers, and interior read as one system.
 
-Rather browse first? **[Flip through all 16 decks online](https://addsumtech.github.io/slides_maker/).** But don't judge an AI slide tool by its gallery. Judge it by the file it hands you: open it, and click anything.
+Rather browse first? **[Flip through all 16 decks online](https://slides.addsum.top/).** But don't judge an AI slide tool by its gallery. Judge it by the file it hands you: open it, and click anything.
 
 ---
 
@@ -43,50 +43,50 @@ Eight directions, one set in English and one in Chinese. Each is a complete exam
 <table>
   <tr>
     <td align="center" width="50%">
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/transformer-talk"><img src="docs/assets/screenshots/preview_en_transformer-talk.png" alt="Lab Meeting / Paper Talk template preview"></a><br/>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/transformer-talk"><img src="docs/assets/screenshots/preview_en_transformer-talk.png" alt="Lab Meeting / Paper Talk template preview"></a><br/>
       <sub><strong>Lab Meeting / Paper Talk</strong><br/>paper reading, lab meeting, method overview, experiment report<br/>
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/transformer-talk">Flip online</a> · <a href="templates/decks/en/transformer-talk/template.pptx?raw=1">Download .pptx</a></sub>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/transformer-talk">Flip online</a> · <a href="templates/decks/en/transformer-talk/template.pptx?raw=1">Download .pptx</a></sub>
     </td>
     <td align="center" width="50%">
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/nvidia-overview"><img src="docs/assets/screenshots/preview_en_nvidia-overview.png" alt="Company / Product Intro template preview"></a><br/>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/nvidia-overview"><img src="docs/assets/screenshots/preview_en_nvidia-overview.png" alt="Company / Product Intro template preview"></a><br/>
       <sub><strong>Company / Product Intro</strong><br/>company overview, product matrix, customer communication, fundraising intro<br/>
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/nvidia-overview">Flip online</a> · <a href="templates/decks/en/nvidia-overview/template.pptx?raw=1">Download .pptx</a></sub>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/nvidia-overview">Flip online</a> · <a href="templates/decks/en/nvidia-overview/template.pptx?raw=1">Download .pptx</a></sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/nl-job-market-2026"><img src="docs/assets/screenshots/preview_en_nl-job-market-2026.png" alt="Data / Market Analysis template preview"></a><br/>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/nl-job-market-2026"><img src="docs/assets/screenshots/preview_en_nl-job-market-2026.png" alt="Data / Market Analysis template preview"></a><br/>
       <sub><strong>Data / Market Analysis</strong><br/>industry research, trend explanation, structured analysis<br/>
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/nl-job-market-2026">Flip online</a> · <a href="templates/decks/en/nl-job-market-2026/template.pptx?raw=1">Download .pptx</a></sub>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/nl-job-market-2026">Flip online</a> · <a href="templates/decks/en/nl-job-market-2026/template.pptx?raw=1">Download .pptx</a></sub>
     </td>
     <td align="center" width="50%">
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/solo-company-talk"><img src="docs/assets/screenshots/preview_en_solo-company-talk.png" alt="AI Trends / Solo Talk template preview"></a><br/>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/solo-company-talk"><img src="docs/assets/screenshots/preview_en_solo-company-talk.png" alt="AI Trends / Solo Talk template preview"></a><br/>
       <sub><strong>AI Trends / Solo Talk</strong><br/>trend talk, personal presentation, startup story<br/>
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/solo-company-talk">Flip online</a> · <a href="templates/decks/en/solo-company-talk/template.pptx?raw=1">Download .pptx</a></sub>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/solo-company-talk">Flip online</a> · <a href="templates/decks/en/solo-company-talk/template.pptx?raw=1">Download .pptx</a></sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/kids-ai-explainer"><img src="docs/assets/screenshots/preview_en_kids-ai-explainer.png" alt="Teaching / Knowledge Sharing template preview"></a><br/>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/kids-ai-explainer"><img src="docs/assets/screenshots/preview_en_kids-ai-explainer.png" alt="Teaching / Knowledge Sharing template preview"></a><br/>
       <sub><strong>Teaching / Knowledge Sharing</strong><br/>class explanation, reading share, training material<br/>
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/kids-ai-explainer">Flip online</a> · <a href="templates/decks/en/kids-ai-explainer/template.pptx?raw=1">Download .pptx</a></sub>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/kids-ai-explainer">Flip online</a> · <a href="templates/decks/en/kids-ai-explainer/template.pptx?raw=1">Download .pptx</a></sub>
     </td>
     <td align="center" width="50%">
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/chengdu"><img src="docs/assets/screenshots/preview_en_chengdu.png" alt="Visual Storytelling / Culture template preview"></a><br/>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/chengdu"><img src="docs/assets/screenshots/preview_en_chengdu.png" alt="Visual Storytelling / Culture template preview"></a><br/>
       <sub><strong>Visual Storytelling / Culture</strong><br/>city, culture, event, brand story<br/>
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/chengdu">Flip online</a> · <a href="templates/decks/en/chengdu/template.pptx?raw=1">Download .pptx</a></sub>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/chengdu">Flip online</a> · <a href="templates/decks/en/chengdu/template.pptx?raw=1">Download .pptx</a></sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/standup-history"><img src="docs/assets/screenshots/preview_en_standup-history.png" alt="History / Evolution Narrative template preview"></a><br/>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/standup-history"><img src="docs/assets/screenshots/preview_en_standup-history.png" alt="History / Evolution Narrative template preview"></a><br/>
       <sub><strong>History / Evolution Narrative</strong><br/>historical arc, industry evolution, timeline story<br/>
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/standup-history">Flip online</a> · <a href="templates/decks/en/standup-history/template.pptx?raw=1">Download .pptx</a></sub>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/standup-history">Flip online</a> · <a href="templates/decks/en/standup-history/template.pptx?raw=1">Download .pptx</a></sub>
     </td>
     <td align="center" width="50%">
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/michael-jackson-king-of-pop"><img src="docs/assets/screenshots/preview_en_michael-jackson-king-of-pop.png" alt="Biography / Brand Story template preview"></a><br/>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/michael-jackson-king-of-pop"><img src="docs/assets/screenshots/preview_en_michael-jackson-king-of-pop.png" alt="Biography / Brand Story template preview"></a><br/>
       <sub><strong>Biography / Brand Story</strong><br/>public figure, brand archive, cultural retrospective<br/>
-      <a href="https://addsumtech.github.io/slides_maker/viewer.html?deck=en/michael-jackson-king-of-pop">Flip online</a> · <a href="templates/decks/en/michael-jackson-king-of-pop/template.pptx?raw=1">Download .pptx</a></sub>
+      <a href="https://slides.addsum.top/viewer.html?deck=en/michael-jackson-king-of-pop">Flip online</a> · <a href="templates/decks/en/michael-jackson-king-of-pop/template.pptx?raw=1">Download .pptx</a></sub>
     </td>
   </tr>
 </table>
