@@ -258,10 +258,10 @@ Research talks are the home turf, because it parses the problem, method, results
 
 | What you have | What you can make |
 | --- | --- |
-| Papers, experiment results, paper figures | Lab meeting & paper reading, **conference oral talk, poster**, proposal, thesis defense, experiment report |
-| Code repositories, README files, technical docs | **Lab meeting**, repo walkthrough, architecture talk, progress update, engineering recap |
+| Papers, experiment results, paper figures | Lab meeting & paper reading, conference oral talk, poster, proposal, thesis defense, experiment report |
+| Code repositories, README files, technical docs | Lab meeting, repo walkthrough, architecture talk, progress update, engineering recap |
 | Course material, product docs, market data | Class talk, product introduction, market analysis, proposal |
-| **Nothing yet — just a topic in your head** | **Hand it a topic; the agents web-research current, up-to-date information, agree a structure with you, then build the deck from scratch** |
+| Nothing yet — just a topic in your head | Hand it a topic; the agents web-research current, up-to-date information, agree a structure with you, then build the deck from scratch |
 | A reference PPT | New topic, new content, reorganized story — its look, your material |
 
 ---
