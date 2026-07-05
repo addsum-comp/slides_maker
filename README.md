@@ -36,9 +36,9 @@ https://github.com/user-attachments/assets/71950303-0f0c-4a7c-9a44-dc3035b79452
 
 ## The honest test: open the file, not the screenshot
 
-Any AI slide tool looks great in a screenshot. The real question is what you get *back*. So open one and click around:
+Any AI slide tool looks great in a screenshot. The real question is what you get back. So open one and click around:
 
-- **[Paper / lab-meeting deck ↓](https://slides.addsum.top/templates/decks/en/transformer-talk/template.pptx)**: a 15-slide reading of *Attention Is All You Need*. Double-click the BLEU chart and re-number it; click into the attention formula and edit it like text; open **View ▸ Notes** for the full spoken script; press Play and watch the bullets reveal one click at a time. Every figure is cropped straight from the paper's PDF.
+- **[Paper / lab-meeting deck ↓](https://slides.addsum.top/templates/decks/en/transformer-talk/template.pptx)**: a 15-slide reading of "Attention Is All You Need". Double-click the BLEU chart and re-number it; click into the attention formula and edit it like text; open **View ▸ Notes** for the full spoken script; press Play and watch the bullets reveal one click at a time. Every figure is cropped straight from the paper's PDF.
 - **[Visual / culture deck ↓](https://slides.addsum.top/templates/decks/en/chengdu/template.pptx)**: the other end of the range, a fully generated visual identity where cover, dividers, and interior read as one system.
 
 Rather browse first? **[Flip through all 16 decks online](https://slides.addsum.top/).** But don't judge an AI slide tool by its gallery. Judge it by the file it hands you: open it, and click anything.
@@ -151,10 +151,10 @@ AI presentation tools roughly fall into four categories. slide-maker only does t
 
 ### A small team of agents: separate jobs, separate incentives
 
-slide-maker isn't one prompt doing everything. It's a set of **specialized agents**, each with a single role, deliberately kept independent so that no one mind both *builds* the deck and *grades* it:
+slide-maker isn't one prompt doing everything. It's a set of **specialized agents**, each with a single role, deliberately kept independent so that no one mind both builds the deck and grades it:
 
 - **Content-planner**: the lead strategist and designer. It does the reading nobody else did and decides what each slide says, which figure or chart goes where, the deck's rhythm, and where animation actually earns its place. Because the whole deck flows through one mind, it holds together as an argument instead of a pile of slides.
-- **Critic**: an independent reviewer who did *not* build the deck. It judges the *rendered* slides against the talk's purpose (cramped layout, weak contrast, a number that doesn't match the source) and sends fixes back. Having no stake in the draft is exactly what makes it honest.
+- **Critic**: an independent reviewer who did not build the deck. It judges the rendered slides against the talk's purpose (cramped layout, weak contrast, a number that doesn't match the source) and sends fixes back. Having no stake in the draft is exactly what makes it honest.
 - **Arbiter**: for high-stakes decks, a second independent check that confirms a critic's finding is real before anything changes, so the loop fixes true problems, not noise.
 - **Asset-prep**: a build-time executor that materializes the plan's assets (figure crops, equation images, diagrams) in parallel once you've approved the plan. It makes zero design decisions, so even large decks build fast.
 
@@ -162,7 +162,7 @@ The split is the point: a constructive planner proposes, independent judges disp
 
 On top of that, it does four things most tools skip:
 
-- **It reads before it draws.** A paper gets read end to end, a repo starts from its README, and when you have *no* material it researches the topic online first. Every number and figure is traced back to a source, and you confirm a structure draft before any slide is drawn. It will not paste the abstract onto slide one and call it a day.
+- **It reads before it draws.** A paper gets read end to end, a repo starts from its README, and when you have no material it researches the topic online first. Every number and figure is traced back to a source, and you confirm a structure draft before any slide is drawn. It will not paste the abstract onto slide one and call it a day.
 - **It gets reviewed before you see it.** After generation, every slide is rendered to an image and handed to the independent critic. Cramped layout, weak contrast, numbers that don't match the source: all get sent back for fixes. You receive the deck only after the critic signs off.
 - **More than text stays editable.** Data charts are built as native PowerPoint charts you can double-click and re-number. Formulas are editable native math text, not screenshots. Paper figures are cropped from the PDF as-is, never redrawn.
 - **Script and motion come included.** Presentation decks carry a full per-slide script in speaker notes, and bullets are native PowerPoint click builds. You can walk on stage with it.
@@ -180,7 +180,7 @@ To be plain about it: it does not promise a perfect deck in one shot. It promise
 3. **The content-planner shows you the plan.** The planner agent turns its reading into a per-slide plan: what each slide says, which figure goes where, what gets animated, and how the deck flows. You confirm before it builds, which is the cheapest moment to change direction.
 4. **It generates the PPTX.** Layout is guaranteed by code, with automatic layout checks both at build time and on the rendered output. Overflow, overlap, and font problems get caught there.
 5. **An independent critic reviews it.** Rendered slides go to the critic agent (with an arbiter cross-checking on high-stakes decks), judged against presentation standards. Fixes land, the deck is re-checked, and only then is it delivered to `~/Downloads/<deck-name>/`.
-6. **You tune it in plain language.** Not perfect? Just say so in the chat (*"turn slide 7 into a chart," "cut the intro," "warmer palette," "make it 10 slides," "shorten the notes"*) and it rebuilds cleanly from the same script. No dragging boxes by hand; keep refining until it's right.
+6. **You tune it in plain language.** Not perfect? Just say so in the chat ("turn slide 7 into a chart," "cut the intro," "warmer palette," "make it 10 slides," "shorten the notes") and it rebuilds cleanly from the same script. No dragging boxes by hand; keep refining until it's right.
 
 **What it costs:** the tool is free; you pay only your AI usage. The read-plan-build path is cheap; the independent review loop is the expensive part, and it scales with stakes: a quick internal deck gets a light single-pass check, while a conference-grade deck with a multi-critic panel can consume a few hundred thousand tokens. Say "light review" or "skip the critic" any time to trade polish for cost.
 
@@ -221,6 +221,15 @@ npx skills add addsumtech/slides_maker
 
 It prompts for the agent and scope. The skill lives under `skills/slide-maker/` and the repo carries no heavy assets (the gallery and demo site live in [slides_maker-site](https://github.com/addsumtech/slides_maker-site)), so the install stays small and fast. Add `-g` to install globally (all projects), `-a claude-code` (or `-a codex`) to skip the agent prompt, and `-y` for a fully non-interactive run. You still need the runtime dependencies above: LibreOffice, an SVG rasterizer, and `python3 -m pip install -r skills/slide-maker/requirements.txt`.
 
+**On Claude Code, you can also add it as a plugin** so it stays updated with a normal plugin command:
+
+```text
+/plugin marketplace add addsumtech/slides_maker
+/plugin install slide-maker@slides-maker
+```
+
+This is the same skill, just managed by Claude Code's plugin system instead of copied into your skills folder. The runtime dependencies above still apply.
+
 ### Step 2: Invoke it and answer the interview (the recommended path)
 
 The best, most reliable result comes from **invoking the skill and answering its short interview step by step**:
@@ -229,7 +238,7 @@ The best, most reliable result comes from **invoking the skill and answering its
 /slide-maker
 ```
 
-The interview opens as a clickable, tabbed form (Topic · Template · Audience · Style): arrow keys to move, Enter to pick, and every question ships with ready-made options. The topic tab even guesses candidates from your recent projects. **Answering each question is what makes the deck *yours* instead of generic**: audience, length, live-vs-self-read, density, language, and look all steer the plan. Short answers are fine, and **"you decide" is always a valid answer**. But letting the skill *ask* beats making it *guess*.
+The interview opens as a clickable, tabbed form (Topic · Template · Audience · Style): arrow keys to move, Enter to pick, and every question ships with ready-made options. The topic tab even guesses candidates from your recent projects. **Answering each question is what makes the deck yours instead of generic**: audience, length, live-vs-self-read, density, language, and look all steer the plan. Short answers are fine, and **"you decide" is always a valid answer**. But letting the skill ask beats making it guess.
 
 **In a hurry? A one-liner works too, but treat it as a shortcut, not the best path:**
 
@@ -237,7 +246,7 @@ The interview opens as a clickable, tabbed form (Topic · Template · Audience �
 Use slide-maker to create a PPT from paper.pdf.
 ```
 
-It starts straight from your file and skips the topic question, which is convenient. But every question you *don't* answer becomes an assumption the skill has to make, so you'll usually spend more time tuning afterward. **When the deck matters, answer the interview.** (In Codex there's no slash command; the same questions arrive as plain text. Fully supported, just less clicking. Claude Code is the smoother ride.)
+It starts straight from your file and skips the topic question, which is convenient. But every question you don't answer becomes an assumption the skill has to make, so you'll usually spend more time tuning afterward. **When the deck matters, answer the interview.** (In Codex there's no slash command; the same questions arrive as plain text. Fully supported, just less clicking. Claude Code is the smoother ride.)
 
 Either way, what follows is a short conversation, not a prompt-writing exercise:
 

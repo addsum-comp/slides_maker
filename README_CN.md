@@ -29,7 +29,7 @@
 
 <div align="center">
 
-https://github.com/user-attachments/assets/76f7662c-112a-45b7-a90a-fcd7b300dde0
+https://github.com/user-attachments/assets/43085240-403a-4751-b30a-eebbb4787587
 
 </div>
 
@@ -221,6 +221,15 @@ npx skills add addsumtech/slides_maker
 
 它会先问装到哪个 agent、哪个范围。技能位于仓库的 `skills/slide-maker/` 下，而画廊和演示站在独立仓库 [slides_maker-site](https://github.com/addsumtech/slides_maker-site)，主仓库没有大文件，所以安装小而快。加 `-g` 装到全局（所有项目），加 `-a claude-code`（或 `-a codex`）跳过 agent 选择，加 `-y` 全程免确认。仍需上面的运行依赖：LibreOffice、一个 SVG 栅格化器，以及 `python3 -m pip install -r skills/slide-maker/requirements.txt`。
 
+**用 Claude Code 的话，也可以把它当插件装**，之后用普通插件命令就能更新：
+
+```text
+/plugin marketplace add addsumtech/slides_maker
+/plugin install slide-maker@slides-maker
+```
+
+装的是同一个技能，只是交给 Claude Code 的插件系统管理，而不是复制到你的技能目录。上面那几个运行依赖照样需要。
+
 ### 第二步：敲 /slide-maker，逐题回答（最推荐）
 
 效果最稳的方式，是**把它的简短访谈逐题答完**：
@@ -254,7 +263,7 @@ npx skills add addsumtech/slides_maker
 
 还有两点值得知道：
 
-- 回**「先给我几个风格方向」**，能拿到渲染好的风格候选挑一个，再开始正式生成。
+- 回一句 **「先给我几个风格方向」**，就能拿到几个渲染好的风格候选，挑一个再正式生成。
 - 材料放进当前项目，或在请求里写完整路径。**什么材料都没有？** 给个主题就行，它先联网调研，再和你对结构。
 
 其他开场方式：
