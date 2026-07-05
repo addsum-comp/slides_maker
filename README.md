@@ -203,6 +203,14 @@ python3 scripts/install_skill.py --target both
 
 If you only use one tool, replace `both` with `codex` or `claude`. Not sure what's missing? The [check command](#troubleshooting) prints the exact fix.
 
+**Prefer a one-liner? Install just the skill with [`npx skills`](https://github.com/vercel-labs/skills)** (no clone, about 1.1 MB):
+
+```bash
+npx skills add addsumtech/slides_maker#skill-dist -a claude-code -g -y
+```
+
+`#skill-dist` is a lightweight, skill-only branch (no gallery or website), so the install stays small and fast. Use `-a codex` for Codex, and drop `-g` for a project-local install. You still need the runtime dependencies above: LibreOffice, an SVG rasterizer, and `python3 -m pip install -r requirements.txt`.
+
 ### Step 2: Invoke it and answer the interview (the recommended path)
 
 The best, most reliable result comes from **invoking the skill and answering its short interview step by step**:
