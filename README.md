@@ -190,7 +190,7 @@ You need **Python 3.9+**, **LibreOffice** (renders slide previews for the automa
 | Linux | `sudo apt install libreoffice` | `sudo apt install librsvg2-bin` |
 | Windows | `winget install TheDocumentFoundation.LibreOffice` | Chrome or Edge installed (used headless) |
 
-**Windows note:** the pipeline is cross-platform Python and is exercised in CI on Linux, but day-to-day development happens on macOS. If you hit a Windows-specific issue, `check_env.py` below will name the missing piece; issues with error output are welcome.
+**Windows note:** slide-maker is plain cross-platform Python, so it runs on Windows too. We just test mostly on macOS and Linux, so Windows gets less mileage and you may hit the odd environment quirk. If you do, run `check_env.py` below and it will tell you what is missing; if that does not fix it, open an issue with the error output and we will help.
 
 ```bash
 git clone --depth 1 https://github.com/addsumtech/slides_maker.git

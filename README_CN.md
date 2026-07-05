@@ -190,7 +190,7 @@ slide-maker 不是一个 prompt 包办一切，而是一组各有专职的 **age
 | Linux | `sudo apt install libreoffice` | `sudo apt install librsvg2-bin` |
 | Windows | `winget install TheDocumentFoundation.LibreOffice` | 装好 Chrome 或 Edge（无头调用） |
 
-**Windows 说明：** 流水线是跨平台 Python，CI 在 Linux 上跑，日常开发在 macOS。遇到 Windows 特有问题，下方的 `check_env.py` 会指出缺什么；欢迎带报错开 issue。
+**Windows 说明：** slide-maker 就是跨平台的 Python，Windows 上一样能用。只是我们主要在 macOS 和 Linux 上测试，Windows 跑得少，偶尔可能碰到个别环境问题。真遇到了，先跑下面的 `check_env.py`，它会告诉你缺什么；还搞不定就带上报错信息开个 issue，我们跟进。
 
 ```bash
 git clone --depth 1 https://github.com/addsumtech/slides_maker.git
