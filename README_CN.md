@@ -17,7 +17,6 @@
 
 <p align="center">
   <a href="https://slides.addsum.top/"><strong>在线预览</strong></a> ·
-  <a href="#最诚实的检验打开文件而不是截图"><strong>打开真实文件</strong></a> ·
   <a href="#模板库"><strong>模板库</strong></a> ·
   <a href="#slide-maker-不一样在哪"><strong>不一样在哪</strong></a> ·
   <a href="#它是怎么干活的"><strong>工作流程</strong></a> ·
@@ -33,17 +32,6 @@ https://github.com/user-attachments/assets/43085240-403a-4751-b30a-eebbb4787587
 
 </div>
 
-
-## 最诚实的检验：打开文件，而不是截图
-
-任何 AI PPT 工具，截图都好看。真正见分晓的，是你拿回来的文件。所以打开一份，点两下：
-
-- **[论文 / 组会 deck ↓](https://slides.addsum.top/templates/decks/zh/transformer-talk/template.pptx)**：一份 15 页的《Attention Is All You Need》精读。双击 BLEU 图表改数字；点进注意力公式，像改文字一样直接编辑；打开 **视图 ▸ 备注** 看完整讲稿；按放映，看要点逐条渐显。每张图都直接裁自论文 PDF。
-- **[视觉 / 文化 deck ↓](https://slides.addsum.top/templates/decks/zh/chengdu/template.pptx)**：能力的另一端，一整套 AI 生成的视觉识别，封面、分隔页、内页浑然一体。
-
-想先在浏览器里翻？**[在线翻页看全部 16 套](https://slides.addsum.top/)。** 但判断一个 AI PPT 工具，别看它的画廊，看它交给你的文件：打开它，点哪都能改。
-
----
 
 ## 模板库
 

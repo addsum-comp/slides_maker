@@ -17,7 +17,6 @@
 
 <p align="center">
   <a href="https://slides.addsum.top/"><strong>Live demo</strong></a> ·
-  <a href="#the-honest-test-open-the-file-not-the-screenshot"><strong>Open a real deck</strong></a> ·
   <a href="#template-gallery"><strong>Templates</strong></a> ·
   <a href="#what-makes-slide-maker-different"><strong>What's different</strong></a> ·
   <a href="#how-it-works"><strong>How it works</strong></a> ·
@@ -33,17 +32,6 @@ https://github.com/user-attachments/assets/71950303-0f0c-4a7c-9a44-dc3035b79452
 
 </div>
 
-
-## The honest test: open the file, not the screenshot
-
-Any AI slide tool looks great in a screenshot. The real question is what you get back. So open one and click around:
-
-- **[Paper / lab-meeting deck ↓](https://slides.addsum.top/templates/decks/en/transformer-talk/template.pptx)**: a 15-slide reading of "Attention Is All You Need". Double-click the BLEU chart and re-number it; click into the attention formula and edit it like text; open **View ▸ Notes** for the full spoken script; press Play and watch the bullets reveal one click at a time. Every figure is cropped straight from the paper's PDF.
-- **[Visual / culture deck ↓](https://slides.addsum.top/templates/decks/en/chengdu/template.pptx)**: the other end of the range, a fully generated visual identity where cover, dividers, and interior read as one system.
-
-Rather browse first? **[Flip through all 16 decks online](https://slides.addsum.top/).** But don't judge an AI slide tool by its gallery. Judge it by the file it hands you: open it, and click anything.
-
----
 
 ## Template gallery
 
