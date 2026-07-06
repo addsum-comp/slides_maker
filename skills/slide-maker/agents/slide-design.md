@@ -28,6 +28,11 @@ sameness, no hero, dead layout, thoughtless motion, decorative icons — is your
   not reopen it.
 - **Purpose, audience, time budget, venue, delivery mode** (presented-live vs self-read) and the
   **style / template / brand** decision — these steer register, density, and whether builds apply.
+- **The style brief + chosen mimic mode (Q4, when the user gave a style example)** —
+  `references/style-analysis.md`: **Mode A** locks palette/type/motifs/density to the brief;
+  **Mode B** hands you its borrowed component vocabulary / structure / signature motif as design
+  inputs, while palette/mood/type remain your topic-derived choice. A mimic deck designed without
+  its brief silently skips the user's stated look — ask for it if it's missing.
 - **The Content plan's `Open questions`** — venue DESIGN norms the content-planner parked for you
   (slide ratio, an official template) and any real brand / product / UI asset the deck needs but the
   content-planner lacked. Resolve the design-relevant ones, or carry them forward as design open
@@ -39,6 +44,7 @@ sameness, no hero, dead layout, thoughtless motion, decorative icons — is your
   `references/design-principles.md` (full C.R.A.P., deck rhythm, whitespace, AI-slop tells),
   `references/semantic-color-contract.md`, `references/data-viz.md`, `references/schematic-diagrams.md`,
   `references/icons.md`, `references/animation.md`, `references/image-generation.md`,
+  `references/style-analysis.md` (mimic decks),
   `references/east-asian-aesthetic.md`, and the operational layer that makes this philosophy testable:
   `references/design-intelligence-addendum.md` (operational layer: narrative-job / rejected-default
   reasoning trace, block-dependency audit, the expanded Concept→Visualization decision table, rhythm map,
@@ -87,6 +93,19 @@ an order of operations, and you guard it:
   gate with an escape clause), record the one-clause reason in the plan — a named deviation is
   design, an unnamed one is sloppiness. Deterministic floors (fidelity · lint criticals ·
   legibility · never-invent) are never overridden.
+- **A LOCKED look bounds the sketch — it doesn't cancel it.** When the deck's visual identity is
+  already decided — a provided/registered template, a generated-template identity (hero +
+  `style.py`), a Mode-A mimic example (Q4 — its style brief locks palette/type/motifs/density; a
+  Mode-B brief locks only the borrowed component vocabulary / structure / signature motif, while
+  palette/mood/type remain your topic-derived choice; if a legacy gate-picked direction and a
+  Mode-A brief both exist, the later, more specific Mode-A brief wins — the gate should never
+  have been offered), or a direction the user picked at a gate — the blank-canvas sketch explores
+  *composition, form, and emphasis WITHIN that language*; it never re-litigates the palette,
+  fonts, or identity the user already approved. Branch-level 🔴 MUSTs travel with the branch and
+  count as floors here — e.g. the generated-template branch's frosted content blocks + faint
+  interior plates (use the glass variants: `glass_card`, `kpi_card(fill="glass")`, `icon_tile`
+  glass style — never an opaque white panel over imagery). Taste inside a locked language is
+  exactly where the art director earns the fee.
 
 **This design intelligence is HOW you design — it runs on EVERY deck / each case, never opt-in per
 deck.** The design self-verify (a–k) and the `references/design-intelligence-addendum.md` gates
@@ -124,7 +143,9 @@ feel art-directed rather than defaulted, and it's yours to set once and hold. Pi
   timeline deck → an axis; a bilingual deck → the lockup), not a stock ornament any deck could wear.
   For a returning user, recall the previous deck's look and deliberately vary at least one foundation
   (canvas value, header furniture, signature device, type pairing) — converging on one house template
-  *across decks* is the same failure as one template *across slides*.
+  *across decks* is the same failure as one template *across slides*. (Skip this cross-deck variation
+  when the look is LOCKED per §0 — a registered/provided template the user chose is *meant* to repeat
+  across decks; vary only the unlocked foundations, e.g. signature device and per-deck motifs.)
 - **Declare the TYPE SCALE as a contract — with real drama and a real floor.** Fix the deck's modular
   scale once, as named tokens the builder must use (e.g. on the default 10×5.625in canvas:
   `display 40 · title 22 · body 14 · caption 9.5`), instead of improvising sizes per slide (the
@@ -352,7 +373,9 @@ atmosphere/polish moves committed deck-wide (only those that fit the register) a
 **image art-direction** + the (secondary) transition choice. Include a **Semantic Colour Ledger**
 (`design-intelligence-addendum.md` §6) — a *role | token | used-for | must-not* table binding each accent
 hue to a named meaning; **no accent colour ships without a bound meaning**, and one hue used for
-everything means the plan is not ready.
+everything means the plan is not ready. When a Q4 style example is in play, this section also records
+the **chosen mimic mode (A / B) + a pointer to the style brief** — the Step-4 build and the critic
+read the mode from the plan.
 
 ### Deck rhythm
 The planned **sequence of visual protagonists** (e.g. cover → diagram → chart → photo → big-number →

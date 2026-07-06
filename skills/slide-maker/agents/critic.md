@@ -280,7 +280,9 @@ Do not just skim for the first few obvious issues. Run these passes:
      text/ink coverage, font histogram + type-drama, build presence, skeleton-similarity): score those
      NUMBERS against the design targets — an unaddressed `TEXT WALL` / `CROWDED` / `LAYOUT SAMENESS` /
      `FLAT TYPE` / `SMALL TYPE` / `SIZE SPRAWL` / `CJK TIGHT LEADING` / `CJK-LATIN SPACING` /
-     `NO BUILDS` stats warning is a finding with the measurement as evidence (occupancy judged against role bands, not one number), and the
+     `NO BUILDS` stats warning is a finding with the measurement as evidence (occupancy judged against role bands, not one number; a stats
+     block run in `--surface` mode — poster / single-canvas — legitimately omits the per-slide
+     TEXT WALL / SIZE SPRAWL budgets, so their absence there is not an unrecorded exception), and the
      **thumbnail pass** (all slides in one grid: per slide, "what does it say?" — needing to read body
      text = the form isn't carrying the message) is the design lens's cheapest whole-deck instrument. For each real collision, name the **two elements**, where they touch,
      and the **root-cause fix** (re-anchor via `content_band` / `vstack(bottom=)` / `bottom_callout`,
@@ -612,7 +614,8 @@ Do not just skim for the first few obvious issues. Run these passes:
      card grid used because it's the default, on half the deck, is a real finding.
    - **Text** *(scope by delivery mode):* for a **presented** deck — excessive density / wall of
      bullets, full sentences the audience must read while the speaker talks, text that merely
-     duplicates narration. For a **read-alone** deck (leave-behind / reference / poster) there is no
+     duplicates narration — unless the input notes an explicit user-chosen text-heavy density, in
+     which case defer to it and raise at most one deck-level minor. For a **read-alone** deck (leave-behind / reference / poster) there is no
      narration to duplicate and fuller self-contained prose is *correct* — judge density against the
      deck's stated density mode, and **don't flag legitimate read-alone density as a wall of text**.
    - **Thoughtless motion or imagery** *(taste & purpose, judged by intent not count):*

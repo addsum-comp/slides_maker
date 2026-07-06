@@ -3065,12 +3065,20 @@ def kpi_card(slide, x, y, w, h, label, value, *, unit="", delta=None, delta_colo
     pass delta_color its semantic hue), the big value+unit, a muted sub, and an optional
     accent-tinted conclusion `strip` at the bottom. One call = the modern result-card
     pattern; grid several for a KPI dashboard — or prefer `dumbbell_board` when the
-    before->after MAGNITUDE should be shown spatially. Returns bottom y."""
+    before->after MAGNITUDE should be shown spatially. Returns bottom y.
+
+    `fill="glass"` swaps the opaque body for a frosted `glass_card` (low-alpha tint of the
+    accent) — REQUIRED on image-backed pages (the generated-template branch bans flat opaque
+    panels over its interior plates; also the right call on any dark/photographic canvas).
+    On glass, pass a light `ink`/`mute` so the text clears 4.5:1 against the imagery."""
     ic_ = ink if ink is not None else DEEP
     mc = mute if mute is not None else MUTE
     acc = _as_rgbc(accent) if accent is not None else BLUE
-    box(slide, x, y, w, h, fill=fill if fill is not None else WHITE,
-        line=line if line is not None else RGBColor(0xE3, 0xE8, 0xEE), line_w=1.0, round=True, r=0.09)
+    if fill == "glass":
+        glass_card(slide, x, y, w, h, tint(acc, 0.30), r=0.09)
+    else:
+        box(slide, x, y, w, h, fill=fill if fill is not None else WHITE,
+            line=line if line is not None else RGBColor(0xE3, 0xE8, 0xEE), line_w=1.0, round=True, r=0.09)
     tx = x + 0.22
     if icon:
         icon_chip(slide, x + 0.2, y + 0.18, 0.38, icon, acc)

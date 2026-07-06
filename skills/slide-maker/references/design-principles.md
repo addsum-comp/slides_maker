@@ -9,7 +9,8 @@ few seconds." But first know the *delivery mode*, because the density rules flex
 
 ## Delivery mode — scope the density rules to how the deck is consumed
 **Before applying the rules below, know how the deck will be consumed** (the interview captures it):
-- **Presented (spoken)** — a speaker narrates; the slide shows the *phrase*, the speaker says the
+- **Presented (spoken)** — a speaker narrates (a live room OR a screen-shared meeting/webinar both
+  count as presented); the slide shows the *phrase*, the speaker says the
   *sentence*. **The default.** One-idea-per-slide, few-words, big "read-from-the-back" type, "more
   slides not denser," and "spoken prose lives in speaker notes" all apply *here*.
 - **Read-alone** (leave-behind, pre-read, emailed status, reference / appendix deck) — **no speaker**,

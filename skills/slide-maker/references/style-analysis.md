@@ -41,12 +41,18 @@ screenshot). Zoom to read fonts, measure spacing, sample exact hex. Capture conc
 Build with `deckkit` but **override the defaults to the brief**: set the palette to the example's hex,
 the fonts to its fonts, the title/footer treatment, corner style, bullet/rule/band motifs, and the
 table/figure/equation styling. Re-create the *system + decorations*, applied to the **user's** content.
+A Mode-A example decides the look the way a provided template does: even on a no-template
+(Q1 "design a clean one") deck, **skip the 3-direction gate** — the example IS the direction, and
+offering invented directions against it is a false gate. (Mode B stays gate-eligible: its
+palette/mood is re-chosen for the topic, so the lighter "unsure / brand-defining" offer remains
+legitimate there.)
 
 ## Mode B — borrow the components & layout, restyle to the topic (the "inspired by" path)
 Keep the example's **structure and component vocabulary** (brief items 1–2 and the named components from
 item 6 + the signature motif from item 5), but **re-choose the visual style for the user's topic**:
 - **Palette & mood:** design a *new* palette fit to the topic/purpose (via `design-by-purpose.md` or a
-  `presets.py` preset) — do NOT carry the example's colours. (A finance example reused for a marine-biology
+  `presets.py` preset — or, if a direction gate already ran, the gate-picked direction's token-set IS
+  the new palette and outranks a fresh pick) — do NOT carry the example's colours. (A finance example reused for a marine-biology
   talk keeps the *card + step-row layout*, but goes teal/sand, not the example's corporate navy.)
 - **Type:** a topic-appropriate pairing, not necessarily the example's fonts (keep portability).
 - **Components:** recreate the 2–4 borrowed components as `deckkit` constructs (the card with its accent

@@ -7,7 +7,8 @@ content block fits it. Use it for a *vivid, designed* deck — a product launch,
 a brand or culture deck, a playful pitch — where a clean default look isn't enough.
 
 This branch **decides the look up front**, so after it's confirmed you **skip the 3-direction
-gate** and run the rest of the interview (purpose, audience, source, language) normally.
+gate** and any LOOK question — the rest of the interview (purpose, audience, source, language,
+and Q4's density + tone, which the visual identity does not decide) still runs normally.
 
 ## The construction model (this is the whole idea)
 A good generated template is a **cohesive visual SYSTEM**, not one pretty picture — a palette, a
@@ -65,6 +66,11 @@ layers**, and the split is what keeps it editable *and* on-brand:
     whose interior background is flat by design — there a crisp **opaque** card is correct, matching
     design-principles.md "Block fill must FIT the background". Otherwise cards / panels / chips default
     frosted.)
+    **The composite card components default OPAQUE — switch them to their glass variants here:**
+    `kpi_card(fill="glass")` (frosted body instead of the white default), `icon_tile(style="glass")`,
+    or seat any other component (`dumbbell_board`, `flow_compare`, a stat block) on a `glass_card`
+    first and pass `fill`-less content on top. A stock component dropped at its white-canvas default
+    onto an interior plate is exactly the "opaque card on generated background" failure above.
     Give every card/panel/chip a **slight transparency** so the background shows through (~30–45%) and it
     belongs to the scene — a low-alpha glass tint of the block colour + a subtle lighter rim
     (`deckkit.glass_card`, or `box(grad=[(0,tint,α),(1,tint,α)])` with **α ≈ 0.55–0.72**), the **same
@@ -115,14 +121,22 @@ later in the normal interview):
     - **"D — describe your own / provide a reference"** — synthesize a fresh token-set from their words /
       reference image / brand and **regenerate the HTML** so they still pick from something they can *see*.
   Auto is **not a blind commit**: every path — pick, auto, or own — resolves to a concrete look the user
-  reacts to at the 🔴 hero checkpoint, which is the real gate.
+  reacts to at the 🔴 hero checkpoint, which is the real gate in the default flow (a full per-deck
+  "decide everything yourself / just show me the result" directive downgrades it to an FYI — post the
+  renders and proceed; see SKILL.md "The per-deck AUTO WAIVER").
 - **Vibe / mood (if describing your own)** — the aesthetic in words: energy (calm↔loud), era,
   references. Use this to pick/blend a library style or to author a fresh one.
 - **Brand colours / must-haves** — any fixed colours, a logo, words that must appear.
 - **Reference material — invite drop-ins.** Explicitly offer: *"drop in any reference images, a
   logo, a mood board, screenshots of a look you like, or a brand guide and I'll steer the
   generation by them."* Use provided references to anchor the style (and, if a logo/photo is
-  given, place it natively, not regenerated).
+  given, place it natively, not regenerated). If the user frames a dropped-in example as
+  **"mimic this"**, first ask Q4's intent question before generating — a Q4 mimic answer lands
+  HERE on this branch, with the example as the anchor reference: **Mode A** — its style brief
+  (`style-analysis.md`) seeds the token-set and hero prompt directly, steering the generation to
+  faithfully clone its look (skip the library pick); **Mode B** — the chosen generated style sets
+  palette/mood, and the example's 2–4 borrowed components/structure are recreated in the native
+  helpers (the generated identity restyles them).
 
 **Then TAILOR the chosen style to *this* deck before generating** — fold in the topic, the brand
 colours, the energy, and anything from the reference materials. The library entry is the *starting
@@ -199,6 +213,7 @@ slide** (native, using the derived components: a few cards + an emphasis band + 
 them, and show both. The content slide is essential: it proves the blocks actually fit.
 > **🔴 CHECKPOINT** — show the generated template (hero + a sample content slide) and get the
 > user's OK. Iterate on their feedback until they confirm. Only then proceed.
+> *(Under a full per-deck auto directive this stop is posted as an FYI and you proceed.)*
 
 **Match the FIX to what they asked to change — don't reflexively recolor:**
 - **A small palette / contrast tweak** ("warmer accent", "lighter background", "less saturated", "bigger
@@ -215,8 +230,10 @@ them, and show both. The content slide is essential: it proves the blocks actual
   unclear whether they mean a tweak or a new atmosphere, ask in one line before spending a generation.
 
 ### 5 — Continue the interview, then build to the template
-- The look is decided → **skip the 3-direction gate** and any style question; run the rest of the
-  normal interview (purpose & audience & time, source material, language).
+- The look is decided → **skip the 3-direction gate** and any LOOK question; the rest of the
+  normal interview still runs — purpose & audience & time, source material, language, AND Q4's
+  density (text-per-point) and tone: those are content/register choices a generated visual
+  identity does not decide (density stays an ALWAYS-surfaced choice per SKILL.md Q4).
 - **Build (step 4 of SKILL.md):**
   - **Cover, section dividers, and the closing / ending page** → the generated image full-bleed (`picture(..., fit="cover")`),
     with the **title and badges native on top**, placed in the image's calm zone (add a soft
@@ -275,7 +292,7 @@ them, and show both. The content slide is essential: it proves the blocks actual
       fonts/chrome, a **`content_bg(slide)`** for the shallow interior background, and a
       **`brand(slide)`** logo helper if the deck is about a company/institution/product.
 - [ ] Sample **cover + content slide** rendered and **confirmed by the user** (🔴 checkpoint).
-- [ ] Direction gate **skipped**; rest of the interview completed.
+- [ ] Direction gate **skipped**; rest of the interview (incl. density/tone) completed.
 - [ ] Built: dividers use the image; content is native and **on-system** with the **GENERATED shallow-
       background plate on every interior page** (🔴 MUST — no flat single-colour or merely-gradient
       interior, except a deliberately minimal/flat style) + frosted blocks; the **real logo present and

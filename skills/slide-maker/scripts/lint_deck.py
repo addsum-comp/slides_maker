@@ -450,7 +450,10 @@ def _print_stats(rows, mode, sw, sh):
               f"{r['max_pt']:5.1f}  {r['n_shapes']:3d}  {r['n_pic']:3d}  {r['n_chart']:3d}    "
               f"{'✓' if r['build'] else '—'}   {sim}")
         budget = 70 if mode == "presented" else 120
-        if r["load"] > budget:
+        # surface: a poster/single-canvas artifact has no per-slide word budget (judge density per
+        # the fixed-surface overlay); textheavy: the user explicitly chose text-heavy density (Q4),
+        # so the presented budget is waived — measurements still print, the warn is suppressed.
+        if mode not in ("surface", "textheavy") and r["load"] > budget:
             warns.append(f"TEXT WALL: slide {i+1} carries a reading load of ~{r['load']} words "
                          f"({mode} budget ≈{'40' if mode=='presented' else '90'}, warn >{budget}) — move prose "
                          f"to speaker notes or split the slide")
@@ -458,7 +461,7 @@ def _print_stats(rows, mode, sw, sh):
             warns.append(f"CROWDED: slide {i+1} occupancy {r['ink_cov']*100:.0f}% — role bands: cover "
                          f"25-35 · exec/summary 45-60 · technical/dense 55-70; past ~70% the slide reads "
                          f"crowded — subtract or split, don't shrink")
-        if len(r["size_clusters"]) > 4:
+        if mode != "surface" and len(r["size_clusters"]) > 4:
             warns.append(f"SIZE SPRAWL: slide {i+1} uses {len(r['size_clusters'])} distinct font sizes "
                          f"({', '.join(f'{s:g}' for s in r['size_clusters'])}) — target ≤3-4 per slide, drawn "
                          f"from the deck's declared type-scale tokens")
@@ -476,13 +479,19 @@ def _print_stats(rows, mode, sw, sh):
     print(f"     fonts: body-median {body_med:.0f}pt · deck max {max((r['max_pt'] for r in rows), default=0):.0f}pt "
           f"· type drama {drama:.1f}× · size tokens in use {len(tokens)} (target 4-5 deck-wide) | "
           f"builds {builds}/{n} · transitions {transd}/{n} · avg occupancy {avg_ink*100:.0f}%")
+    if mode == "surface":
+        print("     single-canvas surface: per-slide word/size budgets not applied — judge density "
+              "per the fixed-surface overlay (review-rubrics.md poster section)")
+    elif mode == "textheavy":
+        print("     user-chosen text-heavy density: the presented per-slide word budget not applied — "
+              "judge density against the recorded interview choice (review-rubrics.md scope note)")
     # canvas-relative body floor: ≈18pt on a standard 13.33in-wide slide, scaled to THIS canvas
     floor = 18.0 * (sw / 13.333)
-    if mode == "presented" and body_med and body_med < floor * 0.92 and n > 2:
+    if mode in ("presented", "textheavy") and body_med and body_med < floor * 0.92 and n > 2:
         warns.append(f"SMALL TYPE: body-median {body_med:.0f}pt is under the ~{floor:.0f}pt floor for this "
                      f"{sw:.1f}in-wide canvas (≈18-22pt on a standard 13.3in slide) — a presented deck's body "
                      f"text must read from the back of the room; fewer words, bigger type")
-    if mode == "presented" and builds == 0 and n > 2:
+    if mode in ("presented", "textheavy") and builds == 0 and n > 2:
         warns.append("NO BUILDS: a presented deck with zero appear-builds — the motion manifest "
                      "should name build:/static:+reason per slide (anim.py Build)")
     import platform
@@ -777,6 +786,10 @@ if __name__ == "__main__":
     argv = sys.argv[1:]
     args = [a for a in argv if not a.startswith("--")]
     mode = "selfread" if any(a in ("--mode=selfread", "--selfread") for a in argv) else "presented"
+    if any(a in ("--mode=surface", "--surface") for a in argv):
+        mode = "surface"          # poster / single-canvas artifact: no per-slide word/size budgets
+    elif any(a in ("--mode=textheavy", "--textheavy") for a in argv):
+        mode = "textheavy"        # user-chosen text-heavy presented deck: TEXT WALL waived only
     json_out = None
     for i, a in enumerate(argv):
         if a == "--json" and i + 1 < len(argv):
@@ -786,5 +799,5 @@ if __name__ == "__main__":
         elif a.startswith("--json="):
             json_out = a.split("=", 1)[1]
     if not args:
-        print("usage: python lint_deck.py <deck.pptx> [--selfread] [--json out.json]"); sys.exit(2)
+        print("usage: python lint_deck.py <deck.pptx> [--selfread] [--surface] [--textheavy] [--json out.json]"); sys.exit(2)
     sys.exit(1 if lint(args[0], mode, json_out) > 0 else 0)

@@ -39,7 +39,10 @@ Score each dimension; cite specific slides.
 > narrates. For a **read-alone** deck (leave-behind, pre-read, reference / appendix) or a **fixed
 > surface** (poster, single-slide infographic), denser self-contained slides with fuller prose are
 > *correct, not a flaw* — judge density against the deck's **stated density mode / purpose**, never
-> the talk default; do **not** flag legitimate read-alone density as "wall of text." Set the
+> the talk default; do **not** flag legitimate read-alone density as "wall of text." Likewise, when
+> the interview recorded an explicit user choice of **text-heavy density for a presented deck**,
+> judge density against that stated choice — note the readability risk once, deck-level, as a
+> minor, never a major or per-slide findings. Set the
 > legibility floor by the **medium** (back-of-room for a talk, screen for a webinar, arm's-length /
 > print for a read-alone or poster). What never relaxes in any mode: results legibility (≥4.5:1, no
 > clipped figures), source fidelity, no overlap.
@@ -254,7 +257,9 @@ Score each dimension; cite specific slides.
    `CROWDED` / `LAYOUT SAMENESS` / `FLAT TYPE` / `SMALL TYPE` / `SIZE SPRAWL` / `CJK TIGHT LEADING` /
    `CJK-LATIN SPACING` / `NO BUILDS` stats warning left unaddressed (no one-clause exception recorded) is a finding with the measurement as
    its evidence (occupancy is judged against the ROLE bands — cover 25–35% · exec 45–60% ·
-   technical 55–70% — not one number).
+   technical 55–70% — not one number). A stats block run in `--surface` mode (poster /
+   single-canvas artifact) legitimately omits the per-slide TEXT WALL / SIZE SPRAWL budgets —
+   judge its density per the poster overlay below, not as an unrecorded exception.
 10. **Factual fidelity** *(when source material exists — the check every system fails).*
    Does every number, label, and headline claim trace back to the source? **Fidelity includes
    COVERAGE:** diff the deck against the source's own key points / contributions / headline

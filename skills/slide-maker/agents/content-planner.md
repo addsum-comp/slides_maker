@@ -123,7 +123,8 @@ Use the web for **three jobs**, and run it whether or not you have a source:
   review — or a **neutral-academic** talk needs no such global mark; name entities inline.)
 
 For a **conference talk**, research the named venue (talk length, audience composition, what a
-strong talk there argues and covers) and fold the *content* norms into the arc. *(Venue design
+strong talk there argues and covers) — start from the Step-0 venue findings if provided (build
+on them; re-verify, don't re-research) — and fold the *content* norms into the arc. *(Venue design
 norms — slide ratio, official template — you note in an open question for the slide-design agent;
 they are not yours to apply.)*
 
@@ -219,7 +220,10 @@ agent decides form, layout, icons, and motion downstream. For each slide record:
   notes). **Budget it, don't feel it:** a *presented* slide targets **≤ ~40 words (≈ ≤ ~80 CJK
   characters) of on-slide reading load** — titles + points + captions together; past that, the
   audience reads instead of listening. Prose that matters but busts the budget goes to **speaker
-  notes**, or the slide splits. A *self-read* deck may carry ~2–3× that. (The render-time lint
+  notes**, or the slide splits. A *self-read* deck may carry ~2–3× that. The ≤~40-word presented
+  budget **yields to an interview-recorded text-heavy choice** (~2–3×, like self-read) — note the
+  choice in the plan, so the expected `TEXT WALL` warnings carry their one-clause exception. (The
+  render-time lint
   measures the actual load per slide and warns `TEXT WALL` — that warning means this budget was
   blown at the source, here.) **Write the copy like a sharp human in that field, not a content generator — kill the
   "AI taste":** concrete nouns + active verbs over abstract nouns; the specific number/name over a
@@ -284,8 +288,10 @@ fix the message before continuing.
 - The narrative **arc in one line** (which arc shape you chose and why — inform / decide / inspire).
 - The **emotional curve in one line** (purpose-relative beats mapped across the arc, per §3) and
   **what is deliberately staged** — the information held back so it lands on a later slide.
-- **Slide count vs. time budget**, with the **pace check** (one idea per slide; a longer deck means
-  more slides, not denser ones).
+- **Slide count vs. time budget** (spoken deck: the ~1/min pace check; one idea per slide — a longer
+  deck means more slides, not denser ones) **or vs. the user's chosen length band** (self-read:
+  short ~5–8 / medium ~9–15 / long 16+ — the band wins over completeness; cut consciously into
+  Open questions).
 - The **audience calibration** and the **delivery mode** (presented-live vs. self-read) that set
   how much copy each slide carries.
 

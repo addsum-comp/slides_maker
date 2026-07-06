@@ -8,19 +8,27 @@ silently replace it with a different deck that happens to cover the same topic. 
 with a diagnosis** and **agree on how much to change** before rebuilding anything.
 
 Read this when the user hands you an existing `.pptx`/Keynote/PDF to improve, redesign, clean
-up, or "tell me what's weak." The critic, rubrics, `deckkit`, and render loop are all the same
-as the build path — this just adds the front end.
+up, or "tell me what's weak" — for a pure critique (no rebuild requested), skip R0 and run only
+R1 steps 1–3 (render → extract → critic), deliver the diagnosis, and OFFER the rebuild; the
+interview + R0 fire only when they take it. The critic, rubrics, `deckkit`, and render loop are
+all the same as the build path — this just adds the front end.
 
-## Step R0 — Two extra interview answers (ask alongside the usual four)
-Beyond purpose/audience/source/style, a redesign hinges on two questions the build path
-doesn't ask. Fold them into the same interview turn, using the host's natural UI:
-structured choices when available, or one compact direct question in plain Codex chat.
+## Step R0 — Redesign interview: R0 REPLACES the template question (ask alongside purpose/audience/source/style)
+On the redesign path the keep/redesign answer IS the template decision — do not ask Q1's
+four-option template question up front. Beyond purpose/audience/source/style, a redesign
+hinges on two questions the build path doesn't ask. Fold them into the same interview turn,
+using the host's natural UI: structured choices when available, or one compact direct
+question in plain Codex chat.
 
 - **Keep the design, or redesign the look too?** Their deck may carry branding (a template,
   a colour scheme, a logo) they must keep, or it may be a blank-PowerPoint look they'd happily
-  replace. *Keep* → treat their deck as the template (`deckkit.open_template` preserves its
-  masters/layouts/brand; pull its palette) and improve *within* it. *Redesign* → you may
-  re-theme freely.
+  replace. *Keep* → their deck IS the template (`deckkit.open_template` preserves its
+  masters/layouts/brand; pull its palette) and improve *within* it; this counts as a *provided*
+  template, so per SKILL.md's gate carve do NOT offer the 3-direction gate. *Redesign the look*
+  → NOW ask Q1's four standard choices as the follow-up (registered / they provide one / design
+  a clean one / generate with an image tool): "design a clean one" opens the direction gate per
+  Q1's design-one branch; "generate with an image tool" runs `references/generated-template.md`
+  and skips the gate.
 - **How deep a change?** This governs everything downstream:
   - *Light cleanup* — keep their structure and slide order; fix the worst offenders (text
     walls, illegible figures, overflow, weak titles). The user is attached to the deck's shape.

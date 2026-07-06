@@ -1,15 +1,16 @@
 # Collaborative mode — opt-in, checkpoint-gated building
 
-**Default is auto** (interview → build → critic loop → show). Collaborative mode is
+**Default is the standard checkpoint flow** (interview → 🔴 checkpoints → build → critic loop →
+show). Collaborative mode is
 **opt-in**: run it when the user asks to "see options/directions first", "let me check
 before you build it all", wants to be involved, or for a brand-defining deck where the
-*direction* is theirs to choose. Auto mode may **offer** it in one line
+*direction* is theirs to choose. Standard mode may **offer** it in one line
 ("want me to show you 2–3 directions first?") — but don't force it.
 
 Why it's worth having: the critic loop optimizes toward *objectively good*, but it
 can't read **preference**. Fixing direction at a cheap gate costs ~100× less than
 after a finished deck. So collaborative mode front-loads the *subjective* calls behind
-cheap approvals, then hands the bulk to the same engine as auto mode.
+cheap approvals, then hands the bulk to the same engine as standard mode.
 
 Direction previews are an **HTML comparison page** — *one self-contained link* holding all
 2–3 directions, which the user opens in a browser to review side-by-side and pick from. It's
@@ -112,8 +113,13 @@ Build the **full** deck in the approved content + design plan — single-author 
   few archetype slides, not the whole deck.
 - **Critic at the gate:** previews shown to the user should already pass a quick
   critic — the human resolves *taste*, not bugs.
-- **Async fallback:** if the user goes quiet, proceed in auto mode with best judgment
-  and **flag every assumption** for later review — a gate should never hard-block.
+- **Async fallback:** Gate A (direction) should never hard-block — if the user goes quiet, pick
+  the best-fit direction yourself and **flag it**. Gates B and C ARE the Step-1/Step-2 🔴
+  checkpoints: silence does not waive a 🔴 stop (only an explicit per-deck "decide everything
+  yourself" directive does — SKILL.md, "The per-deck AUTO WAIVER"). At B/C, post the compact
+  checkpoint table (per the 🔴 CHECKPOINT convention), state in one line exactly what
+  confirmation you're waiting on, and stop — do all still-possible non-committal prep (asset
+  gathering) but build no slides past the gate.
 - **Compose, don't fork:** collaborative mode reuses everything — the interview,
   `design-by-purpose.md`, the style-module + section machinery, the critic panel,
-  `anim.py`. It only adds *approval gates*; the building engine is the same as auto.
+  `anim.py`. It only adds *approval gates*; the building engine is the same as standard mode.

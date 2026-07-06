@@ -74,8 +74,8 @@ Two time sinks compress well: ingesting material/assets, and the critic loop.
   quick deck; the larger multi-critic + arbiter, multi-round panel for high-stakes. The loop is
   non-negotiable; its *weight* is what you tune.
 
-**Two modes.** *Auto* (default): interview, then build and run the critic loop to a high
-bar yourself. *Collaborative* (opt-in — when the user wants to see options or approve as
+**Two modes.** *Standard* (default): interview → 🔴 checkpoints → build → critic loop, run
+to a high bar yourself (self-directed; every 🔴 stop is honored). *Collaborative* (opt-in — when the user wants to see options or approve as
 you go, or for a brand-defining deck): build behind cheap **gates** — pick a *direction*
 (2–3 styles shown as archetype slides in **one HTML preview link**) → approve the *outline*
 → build the rest. The critic captures *quality*; the gates capture *preference*. Offer it in
@@ -85,13 +85,21 @@ one line; never force it. See `references/collaborative-mode.md` (+ `scripts/arc
 proceed until the user confirms. Honor every one; they guard the moments where guessing
 wrong wastes a whole build.
 
-**Auto mode is PER-DECK, and never invisible.** A "decide everything yourself / just show me the
+**The per-deck AUTO WAIVER (distinct from Standard mode, which is the default — and never
+invisible).** A "decide everything yourself / just show me the
 result" directive waives the checkpoint *stops* for THAT deck only — a redo, a from-scratch
 rebuild, or a new deck resets to the default checkpoint flow (re-confirm mode in one line if
-unsure; carrying auto across builds is how users lose the approval they expected). And even in
-auto mode the checkpoints stay **visible — presented directly in chat, not as files**: the
+unsure; carrying auto across builds is how users lose the approval they expected). And even
+under the auto waiver the checkpoints stay **visible — presented directly in chat, not as files**: the
 checkpoint artifact is a **compact terminal-friendly markdown table** pasted into the
-conversation (approval stop in default mode, FYI in auto mode). Content checkpoint = the deck
+conversation (approval stop normally, FYI under the auto waiver). The waiver covers the
+preference/approval 🔴 stops — the content and design checkpoints, the Q1=d hero checkpoint,
+and the redesign diagnosis+scope check: under a full per-deck auto directive, post each in
+chat as the FYI (for the hero: the rendered hero + sample-content-slide image paths; for the
+redesign diagnosis: the 3–5 biggest levers + the chosen keep/rebuild scope in ≤10 lines) and
+proceed; the user reacts at hand-off. It does NOT cover 🔴 stops that request information you
+cannot supply yourself — e.g. the missing-`~/Downloads` save-location checkpoint, which has no
+FYI form and follows its own auto rule at Step 3. Content checkpoint = the deck
 memory sentence + emotional-curve line + pace check + ONE table (`# | 角色 | 记忆句(takeaway) |
 承载证据`); Design checkpoint = look/palette/type/motif in ~4 lines + the rhythm-map table +
 the three design musts + logo plan. Keep each under ~25 lines — the user reads it in the
@@ -211,7 +219,8 @@ in one line* ("I'll do a clean minimal look — say if you have a template") rat
 full prompt. Scaling ≠ skipping — never infer purpose or content. Some answers trigger a quick follow-up *after* the
 batch: *a conference talk* → ask which venue, then research it; *a new template* → they
 hand over the file; *"design a clean one" (no template)* → offer the **direction gate**
-(see Q1's design-one branch) — recommend showing **3** rendered style directions to pick
+(see Q1's design-one branch; unless Q4 is a Mode-A mimic example — then the example is the
+look; skip the gate) — recommend showing **3** rendered style directions to pick
 from before the full build; *"generate a template with an image tool"* → run the
 mini-interview + generation + feedback loop in `references/generated-template.md`, then **skip
 the direction gate** (the look is already decided). The four:
@@ -220,8 +229,12 @@ the direction gate** (the look is already decided). The four:
    host-appropriate registry (`~/.codex/slide-templates/` in Codex, `~/.claude/slide-templates/`
    in Claude Code; if only one exists, use it). Each subfolder is one template they've used before,
    with a `profile.md`).
-   **⚠️ The template question MUST present ALL FOUR standard choices every time — do not silently drop
-   one (especially the image-tool option, which is easy to forget):**
+   **⚠️ WHENEVER the template question is asked, it MUST present ALL FOUR standard choices — do not
+   silently drop one (especially the image-tool option, which is easy to forget). The question itself
+   may be skipped only per the named carves: the current request already answers Q1, or the tiny-ask
+   scale-down (default stated in one line) — and on the redesign path R0's keep/redesign answer
+   REPLACES this question (on "redesign the look" ask it as the follow-up — see
+   `references/redesign-existing-deck.md`):**
    **(a)** each *registered template* · **(b)** *"a new template (I'll provide one)"* · **(c)** *"design
    a clean one"* · **(d)** *"generate a template with an image tool"* (a bespoke generated visual
    identity). If you're using a structured-choice UI and run out of option slots, keep (c) and (d) and
@@ -272,7 +285,9 @@ the direction gate** (the look is already decided). The four:
      peer choices in the prompt — A / B / C (a shown style) · "describe your own / a reference" · and
      "Auto — let me pick the best-fit and just go" (an explicit option, not a fallback).** On Auto (or
      "you decide"), YOU select & name the best-fit and may SKIP the HTML gate, going straight to generate →
-     the 🔴 hero checkpoint (still the real gate — never a blind commit). Mock the candidates natively;
+     the 🔴 hero checkpoint (still the real gate in the default flow; a full per-deck "decide everything
+     yourself" directive downgrades it to a posted FYI like the other approval stops — "never a blind
+     commit" is met by posting the renders, not by waiting). Mock the candidates natively;
      generate only the chosen style's hero for real) →
      generate the text-free hero with a calm title zone (**no key** — native imagegen in Codex, else
      `generate_images_codex.py`; see `image-generation.md`) → **derive a matching `style.py`** (palette
@@ -357,6 +372,9 @@ the direction gate** (the look is already decided). The four:
      framing, Q&A norms, any companion poster). Venue norms vary widely — a clinical
      society ≠ an ML conference — so ground every choice in what you find, cite it
      back to the user, and fold it into the plan, the build, and the critic's rubric.
+     If the host exposes no web tool, apply the same fallback as Step 1's no-source
+     rule: ask the USER for the venue specs (slot length, aspect ratio, official
+     template, audience) instead of searching — never guess them.
      - *Poster, not a talk?* A conference **poster** is a different artifact — one large
        single-canvas layout, not a sequence of slides — so the deck arc and the per-slide
        rubric don't apply directly. `deckkit` can build a single large-canvas "slide"
@@ -379,7 +397,9 @@ the direction gate** (the look is already decided). The four:
      it rewards a different front end. **Follow `references/redesign-existing-deck.md`**:
      ask two extra answers in the same interview turn — *keep your
      design/branding, or redesign the look?* and *how deep — light cleanup keeping your
-     structure, or full re-author?* — and **diagnose their deck first** (render it,
+     structure, or full re-author?* — **these REPLACE the Q1 template question** (the R0 rule in
+     `references/redesign-existing-deck.md`): *keep* makes their deck the template; *redesign the
+     look* triggers Q1's four choices as a post-batch follow-up — and **diagnose their deck first** (render it,
      extract its content/figures with `scripts/extract_deck.py`, run the critic on it),
      then show the weakness list and confirm scope **before** rebuilding. Optimizing
      someone's existing deck rewards a diagnosis-led, scope-confirmed approach over a
@@ -431,8 +451,10 @@ the direction gate** (the look is already decided). The four:
      (collaborative mode Gate A, `references/collaborative-mode.md` + `scripts/archetypes_html.py`):
      **one HTML link** showing the archetype slides per direction, which the user opens and picks
      from before the full build. **Skippable,
-     never forced.** A *provided* template **or a generated template** (Q1's image-tool branch)
-     means the look is already decided — **don't offer the gate** in those cases.
+     never forced.** A *registered or provided* template, **a generated template** (Q1's image-tool
+     branch), **or a Mode-A mimic example** (Q4 "reproduce the look")
+     means the look is already decided — **don't offer the gate** in those cases. (A Mode-B mimic
+     stays eligible for the lighter case-(b) offer — its palette/mood is re-chosen for the topic.)
 
 **Language (decide it, then hold it).** A deck is written in **one language
 throughout** — default to the language the *user* writes in. **When the source
@@ -453,7 +475,8 @@ discover multi-agent tools with `tool_search` if needed), otherwise run the same
 brief inline yourself. It is the
 constructive counterpart to the critic/arbiter judges. Give it the interview answers
 (purpose/audience/time, **delivery context** & **primary goal**, style/language, template
-decision, venue if any), the source material (or "none"), and the content references
+decision, venue if any **plus the Step-0 venue-research findings — the planner builds on them
+(re-verify, don't re-research)**), the source material (or "none"), and the content references
 (`review-rubrics.md` — the content lens — and `multilingual.md`). *(The design references —
 `design-principles.md`, `design-by-purpose.md`, `form-selection.md`, `schematic-diagrams.md`,
 `animation.md`, `image-generation.md` — belong to the slide-design agent in Step 2, not here.)*
@@ -563,11 +586,12 @@ subagent tool when the host exposes one, otherwise run the same brief inline. Gi
 Content plan** (comprehension brief, claim ledger, narrative arc with its emotional curve, and the
 per-slide CONTENT table with each slide's *role · question · beat* and *visual source* cells), the
 interview answers that steer register
-(purpose/audience/time, delivery mode, style, template/brand decision, venue), and the craft
+(purpose/audience/time, delivery mode, style, template/brand decision, venue — plus, when the user
+gave a Q4 style example, the **written style brief + chosen mimic mode**), and the craft
 references it designs against (`form-selection.md`, `design-gallery.md`, `scripts/presets.py`,
 `design-by-purpose.md`, `design-principles.md`, `design-intelligence-addendum.md`, `semantic-color-contract.md`, `data-viz.md`,
 `schematic-diagrams.md`, `icons.md`, `animation.md`, `image-generation.md`,
-`east-asian-aesthetic.md`). It consumes the approved content — it does **not** reopen it — and
+`east-asian-aesthetic.md` — and, for a mimic deck, `style-analysis.md`). It consumes the approved content — it does **not** reopen it — and
 returns a **Design plan**: the deck's **Design language** (a *named* signature motif + a
 deliberately-chosen palette/type + the polish moves), the **deck rhythm**, a **per-slide design
 table** (form + the runner-up it beat · reasoning · layout · motion · image?), the
@@ -623,6 +647,11 @@ files around at the end). **Before the first save, confirm `~/Downloads` exists;
 it doesn't, ask the user where they'd like outputs** and use that location instead —
 don't silently dump into `/tmp`. You'll remind them to open it in step 6.
 > **🔴 CHECKPOINT** — if `~/Downloads` is missing, ask where to save before writing any file.
+> *(Per-deck auto: this checkpoint is a question, so it has no FYI form — do not stop. Default:
+> `mkdir -p ~/Downloads` when the home directory is writable (keeps the standard
+> `~/Downloads/<deck>/` layout every reference assumes); only if home is unwritable, use
+> `./<deck-name>/` in the working directory. Never `/tmp`. State the chosen location in chat the
+> moment you decide it — auto mode is never invisible — and repeat it in the hand-off.)*
 
 **Keep the per-deck build script (`build_<deck>.py`) in that same folder, beside the
 `.pptx`.** The build script — not the rendered file — is the *source of truth* for the
@@ -768,8 +797,11 @@ generate 2-3 candidate forms and choose with the tie-breaker in `references/form
   the accent (riso/brutalist/ink/luxury/museum), then `picture(fit="cover")`.
 
 If the user gave a **style example** (Q4),
-build to your **style brief** of it — match its palette/accents, density, title
-treatment, and figure/table/equation motifs (override the deckkit defaults to suit).
+build to your **style brief** of it *per the chosen mimic mode* (`references/style-analysis.md`) —
+**Mode A:** match its palette/accents, density, title treatment, and figure/table/equation motifs
+(override the deckkit defaults to suit); **Mode B:** recreate its structure, density, and the 2–4
+borrowed components + signature motif, but keep the topic-fit palette/type already locked in the
+Step-2 design plan — do NOT carry the example's colours.
 A few rules that matter (see `references/design-principles.md`):
 - **Use the source's own figures, WHOLE — integral is the default.** For *any* deck
   (research, work, exec, teaching): if the source — paper, report, doc, existing slide, or a
@@ -1150,7 +1182,7 @@ these are the rules that history shows get *silently* skipped when they live onl
 judgment calls the render-time lint cannot measure (lint already covers: word load, ink coverage,
 font drama, build presence, layout sameness, CJK ea-font, contrast, footer, overlaps — don't re-tick
 those here; read its report instead).
-1. **Speaker notes**: presented deck → every slide's spoken script is in its notes (`dk.speaker_notes`); self-read → prose is ON the slides instead.
+1. **Speaker notes**: presented deck (screen-shared = presented) → every slide's spoken script is in its notes (`dk.speaker_notes`); self-read → prose is ON the slides instead.
 2. **Builds start empty**: no animated slide pre-shows its first beat or a spoiling summary/legend in the static base.
 3. **Icons & motion match the plan**: the design plan's icon family and every `build:` line actually made it into the code (the classic inline-mode miss).
 4. **Charts native**: every chart is editable-native unless a matplotlib look was deliberately chosen; legends sit off the data.
@@ -1159,7 +1191,7 @@ those here; read its report instead).
 7. **Claims current**: every time-bound ledger row re-verified with as-of = TODAY; the deck carries its "as of" date.
 8. **Language & hygiene**: one language throughout; zero meta-annotations ("placeholder"/"TODO"/"AI-generated"); voice pass done on every line.
 9. **Eye path**: squint each slide — first look lands on the named hero, 3–4 hierarchy levels survive the blur.
-10. **Hand-off ready**: font/portability deps + per-slide click order noted for the hand-off; open questions carried, not dropped.
+10. **Hand-off ready**: font/portability deps + per-slide click order noted for the hand-off; open questions carried, not dropped; output dir resolved + announced (`~/Downloads/<deck>/` or the user's stated choice).
 
 **Gates never collapse.** A quick / low-stakes / inline run scales the *size* of each artifact
 (a 5-line content plan, a 10-line design plan), never the *existence* of the gates: interview →
@@ -1198,7 +1230,10 @@ two things invisible to every other check: **missing alt-text** on an informativ
 tofu** risk (an `equation_native` font not installed on the render host) — resolve them too.
 
 **It then prints a DECK STATS block — the measured form of the design targets. READ it, don't skim
-past it** (pass `--selfread` for a read-alone deck so the budgets scale). Per slide it measures:
+past it** (pass `--selfread` for a read-alone deck — it raises the TEXT WALL budget (~40→~90 words)
+and drops the presented-only SMALL TYPE / NO BUILDS warns; the other warns are mode-independent —
+`--surface` for a poster/single-canvas artifact, or `--textheavy` when the user explicitly chose
+text-heavy density for a presented deck, so the budgets fit the delivery mode). Per slide it measures:
 reading **load** (latin words + CJK chars/2) vs the ~40-word presented budget · **text% / ink%
 coverage** vs the ~50–70% whitespace target · **max font pt** · shape/picture/chart counts ·
 **build** presence · **sim↑** (layout-skeleton similarity vs the previous slide); deck-wide it
@@ -1331,7 +1366,8 @@ static slide, never a fix for a cluttered one.
 Then run the **actor-critic loop** — this is the quality engine, and the critic is a
 *demanding* judge (see `agents/critic.md`), not a rubber stamp:
 1. **Critique.** Dispatch an independent critic subagent through the host's available
-   multi-agent/subagent tool, pointed at `agents/critic.md`, giving it the rendered PNGs, the deck's **purpose + audience**,
+   multi-agent/subagent tool, pointed at `agents/critic.md`, giving it the rendered PNGs, the deck's **purpose + audience**
+   (plus the interview's recorded **delivery mode + density choice**, so the rubric's density carves can apply),
    `references/review-rubrics.md`, the **motion manifest** from step 4 (so it can judge the
    motion *design* it can't see in a static render), **and the source material** (so it can
    verify claims/figures/numbers, not just style). A *separate* agent matters: it judges the
@@ -1424,7 +1460,9 @@ result — a tight hand-off respects their time and reads as senior.
 that a wrong direction is expensive to unwind, render the first few finished slides (cover + a couple
 of content archetypes) and check in **before** completing the rest — "here's the look and the first 3
 slides; continuing in this direction unless you'd change something." Cheaper than discovering a
-palette/density/structure mismatch after all 20 are built. (Short decks: just build and run the critic.)
+palette/density/structure mismatch after all 20 are built. (A soft check-in, not a 🔴 stop: under a
+per-deck auto directive, post the early renders as an FYI and continue without waiting; in the
+default flow, wait briefly for a reaction before finishing. Short decks: just build and run the critic.)
 
 **If the deck has speaker notes, tell them how to use the notes.** They render nowhere on
 the slide, so the user may not know they exist: "the spoken script is in the notes — open
@@ -1478,7 +1516,7 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
 - **Never act as your own final critic** — an independent critic must consent; **never ship
   a partially-rendered or contested-blocker deck silently** (surface the disagreement).
 - **Never clobber the user's hand-edits** — reconcile before regenerating over their file.
-- **Never** ship a wall-of-text slide, a redrawn source figure where a real one exists, a
+- **Never** ship a wall-of-text slide the user didn't explicitly choose (Q4), a redrawn source figure where a real one exists, a
   cine GIF reduced to one frame, meaning carried by colour alone, or text below ~4.5:1 contrast.
 - **Never** put real slide text, labels, numbers, logos, citations, source figures, or
   evidence-bearing charts inside an AI-generated image; generated images are text-free

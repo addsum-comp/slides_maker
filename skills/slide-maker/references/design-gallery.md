@@ -54,7 +54,9 @@ Pick the preset to the purpose+mood, then **vary it** — these are starting lan
 - **Layered-card vocabulary (modern-SaaS polish):** `kpi_card` (hairline card = tinted `icon_chip`
   + label + DELTA pill top-right + big value + muted sub + optional `conclusion_strip`) ·
   `icon_chip` (accent-tinted squircle, accent icon) · `conclusion_strip` (the accent-tinted so-what
-  bar that closes a card) · `tint(color, frac)` (the pastel surface mixer behind all of these).
+  bar that closes a card) · `tint(color, frac)` (the pastel surface mixer behind all of these — pass `base=` to mix toward a
+  dark canvas instead of white). On an image-backed or dark page use the glass variants —
+  `kpi_card(fill="glass")` / seat on `glass_card` — the opaque white defaults are for light flat canvases.
   These add the micro-design layering that makes cards read *product-designed* — use them WITH the
   chrome budget (tints are content-surface, not chrome) and never as a same-height card wall.
   **Old-vs-new procedure:** `flow_compare` — parallel stage rows, highlighted bottleneck, result
