@@ -230,6 +230,11 @@ Score each dimension; cite specific slides.
    for named feedback that swung to the opposite extreme (muted → rainbow chrome, dense → bare, static
    → everything animated) instead of moving the criticised dial one deliberate step in the content
    layer (`references/handoff-and-iteration.md` "Move the dial");
+   **template-with-extra-steps (the taste tell)** — every choice on every slide traces to a stock
+   component at default settings or a preset default, with no visible choice a template wouldn't
+   have made (no bespoke composition, no adapted component, no content-born device, no deliberate
+   restraint); name the strongest counter-example if one exists — a deck can pass every
+   deterministic gate and still be this finding;
    **evenness** — a slide where every element shares one visual weight with no clear first-read **fails
    the squint test**, because nothing was chosen to win ("balanced" is not "even"); **missing
    semantic-colour ledger** — one accent hue used for everything, or colour that is decorative rather
@@ -251,7 +256,11 @@ Score each dimension; cite specific slides.
    its evidence (occupancy is judged against the ROLE bands — cover 25–35% · exec 45–60% ·
    technical 55–70% — not one number).
 10. **Factual fidelity** *(when source material exists — the check every system fails).*
-   Does every number, label, and headline claim trace back to the source? Does the deck
+   Does every number, label, and headline claim trace back to the source? **Fidelity includes
+   COVERAGE:** diff the deck against the source's own key points / contributions / headline
+   results — a key point *silently* missing from the deck is a **major** (completeness is part of
+   faithfulness; compression is editing, silent omission is misrepresentation); a consciously-cut
+   point must be visible in the plan's open questions / hand-off, not just absent. Does the deck
    represent the source's *actual emphasis* (e.g. a comparison table foregrounds the
    authors' comparison — baseline vs. the proposed thing — not a distracting one)? A
    caption that disagrees with its figure, a wrong number, or an over-claimed trend is a

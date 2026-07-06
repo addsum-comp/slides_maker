@@ -107,3 +107,10 @@ makes its verdict worth anything.
 - Output still lands in `~/Downloads/<deck>/` (the normal rule); the assembled `.pptx`
   is the deliverable, with a `render/` of the final PNGs.
 - If the deck is small, skip all of this — one build script is the right tool.
+
+**Final rhythm-normalization pass (required after assembly).** Section authors each see only their
+slice, so seams show at section boundaries: two dashboards butting together, the same skeleton three
+slides running, colour temperature jumping. After `assemble.py`, ONE mind (the coordinator) re-reads
+the assembled deck's rhythm map end-to-end — and the render-time lint's `sim↑` skeleton-similarity
+column + `LAYOUT SAMENESS` warning now measure exactly this across boundaries. Fix seams by reordering
+within a section or swapping one slide's skeleton, then re-render.

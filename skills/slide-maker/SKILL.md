@@ -25,6 +25,23 @@ a speaker*, not a document to be read — optimize for "understood in seconds." 
 `references/design-principles.md` for the craft, and treat the actor-critic loop
 (step 5) as non-negotiable: you are not the final judge of your own work.
 
+**THE TASTE PROTOCOL — rules are the floor, judgment is the ceiling.** This skill carries many
+rules, gates, components, and presets. They exist to prevent known failures — they are NOT the
+design. On every deck, at every decision:
+1. **Judge like a person, then check like a machine.** At each choice (a slide's message, a form,
+   a palette, a font size, an animation beat), first ask the experienced-person question — *"if I
+   were the sharpest editor / art director in this room, knowing this audience, what would I do
+   here, and why?"* — commit to that answer, THEN run the gates over it. Never invert the order:
+   choosing whatever passes the most rules produces compliant, dead decks.
+2. **Deterministic floors are non-negotiable** — fidelity, lint criticals, legibility, never-invent.
+   Taste never overrides a floor.
+3. **Defaults and catalogues are offers, not orders.** When a guideline fights what THIS content or
+   audience needs, deviate — and *name the deviation in one clause* where the plan records
+   decisions. An unexplained deviation is sloppiness; an explained one IS design.
+4. **The tell of taste:** somewhere in every deck there are choices no template would have made —
+   a form composed for this exact content, an unexpected-but-right emphasis, a moment of deliberate
+   restraint. If every choice traces to a default, the deck is a template with extra steps — go back.
+
 **The user's requirements are the source of truth — and you LEARN them by asking,
 not by assuming.** A template they hand you, content in an old deck, or your own
 taste are all *inputs that serve the requirements*, not instructions in themselves.
@@ -67,6 +84,20 @@ one line; never force it. See `references/collaborative-mode.md` (+ `scripts/arc
 **🔴 CHECKPOINT convention.** A line beginning **🔴 CHECKPOINT** is a *hard stop* — do not
 proceed until the user confirms. Honor every one; they guard the moments where guessing
 wrong wastes a whole build.
+
+**Auto mode is PER-DECK, and never invisible.** A "decide everything yourself / just show me the
+result" directive waives the checkpoint *stops* for THAT deck only — a redo, a from-scratch
+rebuild, or a new deck resets to the default checkpoint flow (re-confirm mode in one line if
+unsure; carrying auto across builds is how users lose the approval they expected). And even in
+auto mode the checkpoints stay **visible — presented directly in chat, not as files**: the
+checkpoint artifact is a **compact terminal-friendly markdown table** pasted into the
+conversation (approval stop in default mode, FYI in auto mode). Content checkpoint = the deck
+memory sentence + emotional-curve line + pace check + ONE table (`# | 角色 | 记忆句(takeaway) |
+承载证据`); Design checkpoint = look/palette/type/motif in ~4 lines + the rhythm-map table +
+the three design musts + logo plan. Keep each under ~25 lines — the user reads it in the
+terminal and answers in one click. Do **NOT** write `content-plan.md` / `design-plan.md` files
+into the deliverable folder (they clutter it; the conversation is the record) — unless the user
+explicitly asks for plan files.
 
 ## At a glance — pipeline · rule strengths · where things live
 *A navigation map only; the steps below are the source of truth.*
@@ -123,6 +154,13 @@ every **🔴 CHECKPOINT** is a hard stop.
 *(Full file/script inventory: see **Files** at the end.)*
 
 ## Step 0 — Interview the user first (always)
+
+> **Scope guard — the build interview fires for DECK-BUILDING asks only** (make/redesign/improve a
+> deck or slide). A request to *audit or review this skill/repo*, *critique an existing deck without
+> rebuilding it*, *extract/crop figures*, or *answer a question* is NOT a build — do that task
+> directly; running the four-question interview there is noise. When in doubt ("improve my deck"
+> could be either), one clarifying line beats a wrong assumption.
+
 **Run this interview every time, from scratch — do not skip it because earlier
 conversation, a previous deck, or context "obviously" implies an answer.** A terse
 request like *"make slides for MICCAI"* specifies only one thing (the venue);
@@ -1146,7 +1184,7 @@ sandbox even though `check_env.py` passes; in that case rerun only the render co
 unsandboxed execution, then continue the normal render -> lint -> critic loop. This is an environment
 permission issue, not evidence that the deck is malformed.
 
-**Then run the layout lint** — `python scripts/lint_deck.py <deck.pptx>`. The build-time
+**Then run the layout lint** — `python scripts/lint_deck.py <deck.pptx>` (add `--json out.json` for a structured copy of findings + the stats block — hand THAT to dispatched critics instead of re-parsing console text). The build-time
 `dk.lint_layout` (Step 4) already cleared the pure-geometry faults *before* this render; **lint_deck.py
 is its render-time complement** — it re-checks geometry on the FINAL file and adds the faults that only
 the rendered/parsed deck reveals (which `lint_layout` deliberately leaves to it). A cheap, deterministic

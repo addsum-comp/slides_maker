@@ -383,6 +383,8 @@ def _slide_stats(slide, bx, sw, sh):
     for s in bx:
         if s["full"] and not (s["t"] > footer_y and s["size"] <= 10.5):   # footers are chrome, not reading load
             load += _text_load(s["full"])
+    if load == 0:                                        # grouped-content decks: fall back to run-walk
+        load = sum(_text_load(r.text) for r in _walk_runs(slide.shapes) if r.text.strip())
     sizes = []                                                             # (pt, chars) for every explicit-size run
     for r in _walk_runs(slide.shapes):
         if r.text.strip() and r.font.size:
@@ -419,10 +421,15 @@ def _slide_stats(slide, bx, sw, sh):
 
 def _print_stats(rows, mode, sw, sh):
     if not rows:
-        return
+        return {}
     n = len(rows)
-    # deck-wide dominant body size = char-weighted median of run sizes ≤ 20pt
-    body = sorted((pt for r in rows for pt, ch in r["sizes"] if pt <= 20 for _ in range(ch)))
+    # deck-wide dominant BODY size = char-weighted median of body-class runs (10.5 < pt ≤ 20).
+    # Caption-class runs (≤10.5pt) are a legitimate smaller tier (annotations/footnotes) and must
+    # not drag the body median — but if a deck has NO body-class runs at all, fall back to the
+    # full ≤20pt sample so an all-tiny deck still trips the floor.
+    body = sorted((pt for r in rows for pt, ch in r["sizes"] if 10.5 < pt <= 20 for _ in range(ch)))
+    if not body:
+        body = sorted((pt for r in rows for pt, ch in r["sizes"] if pt <= 20 for _ in range(ch)))
     body_med = body[len(body) // 2] if body else 12.0
     print(f"\n  ── deck stats (mode: {mode}) — measured, advisory ──")
     print("     #  load  text%  ink%  maxpt  shp  pic  cht  build  sim↑")
@@ -501,9 +508,12 @@ def _print_stats(rows, mode, sw, sh):
                      f"no typographic hero; give at least the key number/statement real scale")
     for w in warns:
         print(f"  [stats] {w}")
+    return {"warns": warns, "body_median_pt": body_med, "type_drama": round(drama, 2),
+            "size_tokens": len(tokens), "builds": builds, "transitions": transd,
+            "avg_occupancy": round(avg_ink, 3)}
 
 
-def lint(path, mode="presented"):
+def lint(path, mode="presented", json_out=None):
     try:
         prs = Presentation(path)
     except Exception:
@@ -513,6 +523,7 @@ def lint(path, mode="presented"):
     total = 0
     warn_total = 0
     stats_rows = []
+    j_findings, j_warns = [], []
     for si, slide in enumerate(prs.slides):
         bx = _boxes(slide, sw, sh)
         try:
@@ -606,9 +617,16 @@ def lint(path, mode="presented"):
             if not others:
                 finds.append("EDITABILITY: slide is ~one whole-page image with no native text/objects "
                              "(build content as native shapes; images are plates/figures, not the whole slide)")
-        # 5) orphan / blank slide
+        # 5) orphan / blank slide — text hidden inside GROUPS counts as content (some generators
+        #    group everything); that gets an editability [warn], not a false EMPTY finding
         if not [s for s in bx if not s["bg"] and (s["text"] or s["solid"])]:
-            finds.append("EMPTY/ORPHAN slide: no native content (blank or background only)")
+            grouped_text = any(r.text.strip() for r in _walk_runs(slide.shapes))
+            if grouped_text:
+                warns.append("GROUPED-ONLY content: every text/object on this slide lives inside "
+                             "groups — it renders fine but is awkward to edit; prefer native "
+                             "ungrouped shapes")
+            else:
+                finds.append("EMPTY/ORPHAN slide: no native content (blank or background only)")
         # 6) INTERIOR PADDING / OVERFLOW: text inside a filled card must keep a minimum margin on every
         #    side, measured against its RENDERED extent — not merely "not overflow the card". Catches both
         #    text running PAST the card and text CRAMMED against an edge (the recurring "too close to the
@@ -728,19 +746,45 @@ def lint(path, mode="presented"):
                              f"render host — install it, or set deckkit.EQ_MATHFONT to a math font present here")
         for m in finds:
             print(f"  slide {si+1}: {m}")
+            j_findings.append({"slide": si + 1, "text": m})
         for m in warns:
             print(f"  slide {si+1}: [warn] {m}")
+            j_warns.append({"slide": si + 1, "text": m})
         total += len(finds)
         warn_total += len(warns)
-    _print_stats(stats_rows, mode, sw, sh)
+    deck_stats = _print_stats(stats_rows, mode, sw, sh)
     tail = ("" if total else "  ✓ clean (no hard findings)") + (f"  ·  {warn_total} warning(s)" if warn_total else "")
     print(f"\n{path}: {total} layout finding(s){tail}")
+    if json_out:
+        import json
+        per_slide = [{"slide": i + 1, "load": r["load"], "text_cov": round(r["text_cov"], 3),
+                      "ink_cov": round(r["ink_cov"], 3), "max_pt": r["max_pt"],
+                      "n_shapes": r["n_shapes"], "n_pic": r["n_pic"], "n_chart": r["n_chart"],
+                      "build": r["build"], "transition": r["trans"],
+                      "size_clusters": r["size_clusters"]} for i, r in enumerate(stats_rows)]
+        with open(json_out, "w", encoding="utf-8") as f:
+            json.dump({"file": str(path), "mode": mode, "findings": j_findings,
+                       "warnings": j_warns, "stats_warnings": deck_stats.get("warns", []),
+                       "deck": {k: v for k, v in deck_stats.items() if k != "warns"},
+                       "per_slide": per_slide,
+                       "counts": {"findings": total, "warnings": warn_total}}, f,
+                      ensure_ascii=False, indent=1)
+        print(f"  [json] wrote {json_out}")
     return total
 
 
 if __name__ == "__main__":
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    mode = "selfread" if any(a in ("--mode=selfread", "--selfread") for a in sys.argv[1:]) else "presented"
+    argv = sys.argv[1:]
+    args = [a for a in argv if not a.startswith("--")]
+    mode = "selfread" if any(a in ("--mode=selfread", "--selfread") for a in argv) else "presented"
+    json_out = None
+    for i, a in enumerate(argv):
+        if a == "--json" and i + 1 < len(argv):
+            json_out = argv[i + 1]
+            if json_out in args:
+                args.remove(json_out)
+        elif a.startswith("--json="):
+            json_out = a.split("=", 1)[1]
     if not args:
-        print("usage: python lint_deck.py <deck.pptx> [--selfread]"); sys.exit(2)
-    sys.exit(1 if lint(args[0], mode) > 0 else 0)
+        print("usage: python lint_deck.py <deck.pptx> [--selfread] [--json out.json]"); sys.exit(2)
+    sys.exit(1 if lint(args[0], mode, json_out) > 0 else 0)

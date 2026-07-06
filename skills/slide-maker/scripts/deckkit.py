@@ -3022,6 +3022,284 @@ def bilingual_lockup(slide, x, y, w, zh, en, *, zh_size=30, en_size=11, ink=None
     return yy + 0.3
 
 
+def _as_rgbc(c):
+    """Coerce hex-str / tuple / RGBColor to RGBColor."""
+    if isinstance(c, RGBColor):
+        return c
+    r, g, b = _as_rgb(c)
+    return RGBColor(r, g, b)
+
+
+def tint(color, frac=0.12, base=None):
+    """Mix `color` toward `base` (default white) — the pastel TINT behind icon chips, delta
+    pills, and conclusion strips (an accent at ~10-16% reads as a soft branded surface)."""
+    b = _as_rgb(base) if base is not None else (0xFF, 0xFF, 0xFF)
+    c = _as_rgb(color)
+    return RGBColor(int(c[0] * frac + b[0] * (1 - frac)),
+                    int(c[1] * frac + b[1] * (1 - frac)),
+                    int(c[2] * frac + b[2] * (1 - frac)))
+
+
+def icon_chip(slide, x, y, size, png, accent, *, frac=0.14):
+    """Tinted SQUIRCLE icon chip — accent-tinted soft square, accent-coloured icon centred
+    (recolor the PNG to `accent` via icons.py first). The modern-SaaS card marker; one per
+    card, identical size across siblings."""
+    return icon_tile(slide, x, y, size, png, shape="squircle", fill=tint(accent, frac))
+
+
+def conclusion_strip(slide, x, y, w, text_str, accent, *, h=0.36, size=11, font=None):
+    """Tinted CONCLUSION STRIP — the rounded accent-tinted bar that closes a card with its
+    one-line so-what. Accent text on accent tint; place INSIDE the card with padding above
+    the card's bottom edge. Returns bottom y."""
+    box(slide, x, y, w, h, fill=tint(accent, 0.12), round=True, r=0.07)
+    text(slide, x + 0.16, y, w - 0.32, h, [[(text_str, size, _as_rgbc(accent), True, False, font)]],
+         anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+    return y + h
+
+
+def kpi_card(slide, x, y, w, h, label, value, *, unit="", delta=None, delta_color=None,
+             sub=None, icon=None, accent=None, fill=None, line=None, ink=None, mute=None,
+             value_size=30, label_size=11, font=None, value_font=None, strip=None):
+    """LAYERED KPI RESULT CARD — hairline card with an optional tinted icon-chip + label row,
+    an optional DELTA CHIP top-right (the change IS the story: '+51%' / '-72%' / '+19pt';
+    pass delta_color its semantic hue), the big value+unit, a muted sub, and an optional
+    accent-tinted conclusion `strip` at the bottom. One call = the modern result-card
+    pattern; grid several for a KPI dashboard — or prefer `dumbbell_board` when the
+    before->after MAGNITUDE should be shown spatially. Returns bottom y."""
+    ic_ = ink if ink is not None else DEEP
+    mc = mute if mute is not None else MUTE
+    acc = _as_rgbc(accent) if accent is not None else BLUE
+    box(slide, x, y, w, h, fill=fill if fill is not None else WHITE,
+        line=line if line is not None else RGBColor(0xE3, 0xE8, 0xEE), line_w=1.0, round=True, r=0.09)
+    tx = x + 0.22
+    if icon:
+        icon_chip(slide, x + 0.2, y + 0.18, 0.38, icon, acc)
+        tx = x + 0.72
+    text(slide, tx, y + 0.2, w - (tx - x) - 0.98, 0.34,
+         [[(label, label_size, ic_, True, False, font)]], anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+    if delta:
+        dc = _as_rgbc(delta_color) if delta_color is not None else acc
+        dw = max(0.6, 0.18 + 0.082 * len(str(delta)))
+        box(slide, x + w - dw - 0.16, y + 0.21, dw, 0.3, fill=tint(dc, 0.12), round=True, r=0.15)
+        text(slide, x + w - dw - 0.16, y + 0.21, dw, 0.3,
+             [[(str(delta), 10, dc, True, False, font)]],
+             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+    vparts = [(str(value), value_size, acc, True, False, value_font or font)]
+    if unit:
+        vparts.append((" " + unit, int(value_size * 0.5), acc, True, False, value_font or font))
+    text(slide, x + 0.2, y + 0.5, w - 0.4, value_size / 72.0 + 0.2, [vparts],
+         anchor=MSO_ANCHOR.BOTTOM, space_after=0)
+    sub_y = y + 0.62 + value_size / 72.0 + 0.14
+    strip_top = (y + h - 0.52) if strip else None
+    if sub:
+        if strip_top is not None and sub_y + 0.3 > strip_top:
+            print(f"kpi_card: '{label}' — sub dropped: card too short for value+sub+strip "
+                  f"(need h ≥ ~{sub_y + 0.3 + 0.56 - y:.2f}, got {h}). Grow h or drop one layer.")
+        else:
+            text(slide, x + 0.2, sub_y, w - 0.4, 0.26,
+                 [[(sub, 10, mc, False, False, font)]], space_after=0)
+    if strip:
+        conclusion_strip(slide, x + 0.14, y + h - 0.52, w - 0.28, strip, acc)
+    return y + h
+
+
+def flow_compare(slide, x, y, w, old_stages, new_stages, *, old_label="旧流程", new_label="新流程",
+                 old_sub="", new_sub="", old_result="", new_result="", old_accent=None,
+                 new_accent=None, highlight_old=None, highlight_new=None, note=None,
+                 transition_label="", ink=None, mute=None, font=None, row_gap=1.32):
+    """OLD-vs-NEW PROCESS COMPARISON — two parallel rows of stage chips with arrows, one stage
+    per row optionally HIGHLIGHTED (the bottleneck / the redefinition), a result chip at each
+    row's right edge (27 天 vs 7.5 天), an optional red `note` under the old row's highlight,
+    and a transition marker between the rows. THE form for a process-REBUILD story (交付重构 /
+    redefined pipeline / migration): before/after of a *procedure*, where `dumbbell_board` is
+    before/after of *metrics*. Keep stages <=5 and stage text <=6 CJK glyphs. Returns bottom y."""
+    oc = _as_rgbc(old_accent) if old_accent is not None else RGBColor(0xC8, 0x8A, 0x2B)
+    nc = _as_rgbc(new_accent) if new_accent is not None else RGBColor(0x1B, 0x7F, 0x5C)
+    ic_ = ink if ink is not None else DEEP
+    mc = mute if mute is not None else MUTE
+    lab_w, res_w = 1.05, 1.6
+    span = w - lab_w - res_w - 0.3
+    rows = [(old_stages, old_label, old_sub, old_result, oc, highlight_old, True),
+            (new_stages, new_label, new_sub, new_result, nc, highlight_new, False)]
+    for r, (stages, lab, sub, result, acc, hi, is_old) in enumerate(rows):
+        ry = y + r * row_gap
+        text(slide, x, ry + 0.03, lab_w, 0.3, [[(lab, 13, acc, True, False, font)]], space_after=0)
+        if sub:
+            text(slide, x, ry + 0.34, lab_w, 0.24, [[(sub, 9.5, mc, False, False, font)]], space_after=0)
+        n = max(1, len(stages))
+        cw = (span - (n - 1) * 0.3) / n
+        for i, st in enumerate(stages):
+            sx = x + lab_w + i * (cw + 0.3)
+            hi_this = (hi == i)
+            box(slide, sx, ry, cw, 0.5, fill=tint(acc, 0.14) if hi_this else None,
+                line=acc, line_w=1.3, round=True, r=0.08)
+            text(slide, sx, ry, cw, 0.5, [[(st, 12, acc if hi_this else ic_, hi_this, False, font)]],
+                 align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+            if i < n - 1:
+                arrow(slide, sx + cw + 0.075, ry + 0.2, 0.15, 0.1, color=acc, direction="right")
+            if hi_this and is_old and note:
+                text(slide, sx - 0.3, ry + 0.56, cw + 0.6, 0.24,
+                     [[(note, 9.5, RGBColor(0xC2, 0x40, 0x2A), True, False, font)]],
+                     align=PP_ALIGN.CENTER, space_after=0)
+        if result:
+            box(slide, x + lab_w + span + 0.3, ry - 0.05, res_w, 0.6, fill=tint(acc, 0.12), round=True, r=0.08)
+            text(slide, x + lab_w + span + 0.3, ry - 0.05, res_w, 0.6,
+                 [[(result, 15, acc, True, False, font)]],
+                 align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+    if transition_label:
+        text(slide, x + lab_w, y + row_gap - 0.44, span, 0.24,
+             [[("▼  " + transition_label, 9.5, nc, True, False, font)]], space_after=0)
+    return y + row_gap + 0.62
+
+
+
+def cycle_diagram(slide, cx, cy, nodes, *, rx=1.5, ry=1.0, node_size=0.42, ring_c=None,
+                  arrow_c=None, node_fill=None, node_line=None, icons=None, ink=None, sub_c=None,
+                  center=None, center_c=None, feedback=None, feedback_label=None, feedback_c=None,
+                  label_w=1.95, label_size=14, sub_size=10, start_deg=-45.0, font=None):
+    """A CYCLE / LOOP / FLYWHEEL diagram — 3–6 nodes on an ellipse, arrows between consecutive
+    nodes, labels placed COLLISION-FREE (the geometry that repeatedly needed hand-debugging:
+    top/bottom labels colliding with nodes, side labels running off-canvas, subs dipping into the
+    footer). Use for any circular process: lifecycle, feedback system, operating rhythm, flywheel.
+
+    nodes = [(label, sub_or_""), ...] · `icons` = optional parallel list of icon-PNG paths (or None
+    per node) drawn centred in each node disc · `center` = optional hub label · `feedback` =
+    optional (from_idx, to_idx) drawn as a DASHED elbow routed OVER the top of the ring (the
+    "reinforcing loop" arrow), with `feedback_label` above it.
+
+    Layout rule: `start_deg=-45` (default) places 4 nodes DIAGONALLY so every label sits BESIDE its
+    node (the safest layout — prefer it). Angles with |cos|≥0.5 get side labels (left/right,
+    right-aligned on the left side); near-vertical nodes stack label+sub fully above (top) or below
+    (bottom) the disc. Keep cy-ry ≥ ~1.6 and cy+ry ≤ ~4.2 on a 5.625in canvas so stacked labels
+    clear the title and footer. Returns the list of node-centre (x, y) points."""
+    rc = ring_c if ring_c is not None else RGBColor(0xD9, 0xCD, 0xB4)
+    ac = arrow_c if arrow_c is not None else MUTE
+    nf = node_fill if node_fill is not None else WHITE
+    nl = node_line if node_line is not None else GOLD
+    ic_ = ink if ink is not None else DEEP
+    sc = sub_c if sub_c is not None else MUTE
+    n = len(nodes)
+    o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - rx), Inches(cy - ry),
+                               Inches(2 * rx), Inches(2 * ry))
+    o.fill.background(); o.line.color.rgb = rc; o.line.width = Pt(2.0); o.shadow.inherit = False
+    import math as _m
+    pts = []
+    for i in range(n):
+        ang = _m.radians(start_deg + i * 360.0 / n)
+        pts.append((cx + rx * _m.cos(ang), cy + ry * _m.sin(ang), _m.cos(ang), _m.sin(ang)))
+    for i in range(n):                                   # arrows between consecutive nodes
+        p0, p1 = pts[i], pts[(i + 1) % n]
+        connector(slide, (p0[0] + (p1[0] - p0[0]) * 0.30, p0[1] + (p1[1] - p0[1]) * 0.30),
+                  (p0[0] + (p1[0] - p0[0]) * 0.72, p0[1] + (p1[1] - p0[1]) * 0.72),
+                  color=ac, width=1.5, arrow=True)
+    hs = node_size / 2.0
+    for i, ((px, py, c, s_), (lb, sub)) in enumerate(zip(pts, nodes)):
+        box(slide, px - hs, py - hs, node_size, node_size, fill=nf, line=nl, line_w=1.4,
+            round=True, r=hs)
+        if icons and i < len(icons) and icons[i]:
+            icon(slide, icons[i], px - hs * 0.62, py - hs * 0.62, node_size * 0.62)
+        if abs(c) >= 0.5:                                # side label (the safe default)
+            if c > 0:
+                text(slide, px + hs + 0.11, py - 0.26, label_w, 0.3,
+                     [[(lb, label_size, ic_, True, False, font)]], space_after=0)
+                if sub:
+                    text(slide, px + hs + 0.11, py + 0.04, label_w, 0.26,
+                         [[(sub, sub_size, sc, False, False, font)]], space_after=0)
+            else:
+                text(slide, px - hs - 0.11 - label_w, py - 0.26, label_w, 0.3,
+                     [[(lb, label_size, ic_, True, False, font)]], align=PP_ALIGN.RIGHT, space_after=0)
+                if sub:
+                    text(slide, px - hs - 0.11 - label_w, py + 0.04, label_w, 0.26,
+                         [[(sub, sub_size, sc, False, False, font)]], align=PP_ALIGN.RIGHT, space_after=0)
+        else:                                            # stacked above (top) / below (bottom)
+            if s_ < 0:
+                yy = py - hs - 0.14 - (0.26 if sub else 0) - 0.30
+                text(slide, px - label_w / 2, yy, label_w, 0.3,
+                     [[(lb, label_size, ic_, True, False, font)]], align=PP_ALIGN.CENTER, space_after=0)
+                if sub:
+                    text(slide, px - label_w / 2, yy + 0.30, label_w, 0.26,
+                         [[(sub, sub_size, sc, False, False, font)]], align=PP_ALIGN.CENTER, space_after=0)
+            else:
+                yy = py + hs + 0.12
+                text(slide, px - label_w / 2, yy, label_w, 0.3,
+                     [[(lb, label_size, ic_, True, False, font)]], align=PP_ALIGN.CENTER, space_after=0)
+                if sub:
+                    text(slide, px - label_w / 2, yy + 0.30, label_w, 0.26,
+                         [[(sub, sub_size, sc, False, False, font)]], align=PP_ALIGN.CENTER, space_after=0)
+    if center:
+        text(slide, cx - 0.75, cy - 0.19, 1.5, 0.38,
+             [[(center, label_size, center_c if center_c is not None else ic_, True, False,
+                EADISPLAY or font)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+    if feedback:
+        fi, ti = feedback
+        fc = feedback_c if feedback_c is not None else RGBColor(0x2E, 0x7D, 0x57)
+        fx_, fy_ = pts[fi][0], pts[fi][1]; tx_, ty_ = pts[ti][0], pts[ti][1]
+        top_y = cy - ry - hs - 0.34
+        elbow_connector(slide, [(fx_, fy_ - hs - 0.05), (fx_, top_y), (tx_, top_y),
+                                (tx_, ty_ - hs - 0.05)], style="dashed", color=fc, width=1.6, arrow=True)
+        if feedback_label:
+            text(slide, cx - 0.9, top_y - 0.28, 1.8, 0.24,
+                 [[(feedback_label, sub_size, fc, True, False, font)]],
+                 align=PP_ALIGN.CENTER, space_after=0)
+    return [(p[0], p[1]) for p in pts]
+
+
+def dumbbell_board(slide, x, y, w, rows, *, row_h=0.52, label_w=None, accent=None, before_c=None,
+                   track_c=None, ink=None, mute=None, hero=None, hero_c=None, threshold=None,
+                   value_font=None, label_size=14, sub_size=10, value_size=14, before_size=10,
+                   font=None):
+    """A BEFORE→AFTER evidence board — one dumbbell row per metric, each on ITS OWN scale, with
+    the collision-free geometry that otherwise needs hand-debugging (value labels above the dots,
+    single-line name+sub so proximity reads correctly, per-row lo/hi so direction is honest and
+    magnitude is never faked across incompatible units). The strongest form for a results /
+    scoreboard slide: the GAP is the message (`form-selection.md`).
+
+    rows = [(name, sub_or_"", v_before, v_after, scale_lo, scale_hi, unit), ...] — set lo/hi per
+    row (pad ~10%); improvements where lower-is-better simply have v_after left of v_before.
+    `hero` = row index to emphasise (left accent bar + bold name) · `threshold` = optional
+    (row_idx, value, tick_label) drawing a vertical reference tick on that row (e.g. the 100%
+    line NRR must cross). Budget ~0.52in/row + margins; keep w ≥ ~8 so value labels clear.
+    Returns the bottom y."""
+    acc = accent if accent is not None else RGBColor(0x4C, 0xC3, 0x8A)
+    bc = before_c if before_c is not None else MUTE
+    tc = track_c if track_c is not None else RGBColor(0xE3, 0xE6, 0xEC)
+    ic_ = ink if ink is not None else DEEP
+    mc = mute if mute is not None else MUTE
+    lw = label_w if label_w is not None else 0.42 * w
+    bx0, bx1 = x + lw + 0.15, x + w - 1.02
+    for i, (name, sub, v0, v1, lo, hi, unit) in enumerate(rows):
+        ry = y + i * row_h
+        is_hero = (hero == i)
+        if is_hero:
+            box(slide, x - 0.22, ry - 0.06, 0.06, 0.52,
+                fill=hero_c if hero_c is not None else acc, round=True, r=0.03)
+        parts = [(name, label_size, ic_, is_hero, False, font)]
+        if sub:
+            parts.append(("   " + sub, sub_size, mc, False, False, font))
+        text(slide, x, ry - 0.02, lw + 0.1, 0.4, [parts], anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+        box(slide, bx0, ry + 0.14, bx1 - bx0, 0.018, fill=tc)
+        span = float(hi - lo) or 1.0
+        X = lambda v: bx0 + (v - lo) / span * (bx1 - bx0)
+        x0, x1 = X(v0), X(v1)
+        if threshold and threshold[0] == i:
+            xk = X(threshold[1])
+            box(slide, xk, ry - 0.10, 0.014, 0.5, fill=RGBColor(0x9A, 0xA5, 0x96))
+            if len(threshold) > 2 and threshold[2]:
+                text(slide, xk + 0.06, ry + 0.20, 0.7, 0.22,
+                     [[(str(threshold[2]), sub_size, mc, False, False, font)]], space_after=0)
+        connector(slide, (x0, ry + 0.15), (x1, ry + 0.15), color=acc, width=2.2, arrow=True)
+        box(slide, x0 - 0.05, ry + 0.10, 0.10, 0.10, fill=bc, round=True, r=0.05)
+        box(slide, x1 - 0.06, ry + 0.09, 0.12, 0.12, fill=acc, round=True, r=0.06)
+        fmt = lambda v: f"{v:g}"
+        text(slide, x0 - 0.62, ry - 0.185, 0.6, 0.24,
+             [[(fmt(v0), before_size, mc, False, False, value_font or font)]],
+             align=PP_ALIGN.RIGHT, space_after=0)
+        text(slide, x1 + 0.10, ry - 0.21, 0.98, 0.28,
+             [[(fmt(v1) + (" " + unit if unit else ""), value_size, acc, True, False,
+                value_font or font)]], space_after=0)
+    return y + len(rows) * row_h
+
+
 def concept_equation(slide, x, y, w, h, terms, *, op="=", accent=None, ink=None, highlight_idx=None,
                      term_size=30, op_size=34, font=None, term_colors=None):
     """A word-EQUATION headline device (not LaTeX math): big display terms joined by oversized

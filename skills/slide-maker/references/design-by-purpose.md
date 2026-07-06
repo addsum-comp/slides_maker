@@ -236,3 +236,13 @@ tabs. Like a conference talk but built for a *shared-screen* medium, not a proje
   pacing genuinely helps a remote audience you can't read (by design sense, not a quota — see
   `references/animation.md`); explicit "ask in the chat" prompts; a visible agenda so late
   joiners orient. If it's recorded, ensure every slide reads as a still frame.
+
+## Preset fit by purpose — a fast sanity map (fit is a default, avoid is a flag, both overridable with a stated reason)
+| Purpose | Natural fits | Flag before using |
+|---|---|---|
+| Thesis defense · committee | `swiss` · `editorial_paper` · clean custom | `memphis` · `risograph` · `luxury_dark` (playful/fashion registers read unserious to a committee) |
+| Exec / board readout | `consulting` · `editorial_report` (dark data) · `swiss` | `risograph` · `blueprint` (zine/schematic registers undercut authority) |
+| Conference talk | `swiss` · `editorial_paper` · `dark_tech` (AI/systems) | heavy `glassmorphism` (projector contrast risk) |
+| Product pitch / launch | `glassmorphism` · `dark_tech` · `memphis` (consumer/playful) | `brutalist` · `museum_memorial` |
+| Teaching / lecture | `editorial_paper` · `swiss` · warm custom | `luxury_dark` · `consulting` (cold for a classroom) |
+| Culture / heritage / CN-brand | `ink_wash` · `eastern_traditional` · `museum_memorial` | `dark_tech` (register clash) — and the reverse: don't reach for ink/seal on a technical/clinical deck without a content reason (`east-asian-aesthetic.md`) |

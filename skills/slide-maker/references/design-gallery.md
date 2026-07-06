@@ -51,6 +51,21 @@ Pick the preset to the purpose+mood, then **vary it** — these are starting lan
   dashed=optional · dotted=feedback/inferred); promote exactly ONE node to `hub=True`. On a dark deck
   host the diagram in a bright `diagram_island` ("Figure N"). `concentric_rings` for nested frameworks
   (CMT 色彩·材质·纹理); `hub_spoke`/`quadrant`/`timeline` for those specific shapes.
+- **Layered-card vocabulary (modern-SaaS polish):** `kpi_card` (hairline card = tinted `icon_chip`
+  + label + DELTA pill top-right + big value + muted sub + optional `conclusion_strip`) ·
+  `icon_chip` (accent-tinted squircle, accent icon) · `conclusion_strip` (the accent-tinted so-what
+  bar that closes a card) · `tint(color, frac)` (the pastel surface mixer behind all of these).
+  These add the micro-design layering that makes cards read *product-designed* — use them WITH the
+  chrome budget (tints are content-surface, not chrome) and never as a same-height card wall.
+  **Old-vs-new procedure:** `flow_compare` — parallel stage rows, highlighted bottleneck, result
+  chips, transition marker. **Exec/board cover pattern:** a compact 3-KPI strip (value + one-word
+  label ×3) above the fold gives a readout cover its hook — build from `kpi_card`-lite or `stat_row`.
+- **Cycle / loop / flywheel:** `cycle_diagram` — 3–6 nodes on an ellipse with collision-free labels
+  (diagonal `start_deg=-45` is the safest 4-node layout), optional icons, hub label, and a dashed
+  reinforcing-loop arrow routed over the top. **Before→after scoreboard:** `dumbbell_board` — one
+  dumbbell row per metric on its own honest scale, single-line name+sub, hero-row accent, optional
+  threshold tick (the "crosses 100%" moment). Both encode geometry that previously needed
+  per-deck debugging — reach for the component before hand-composing.
 - **Process / steps:** `step_list` (vertical numbered spine OR horizontal connected pills with an
   accented terminal step), numeral_style arabic/pad2(01)/cjk.
 - **Consulting furniture:** `insight_banner` (so-what bar), `cta_button`/`cta_pair`, `status_stamp`

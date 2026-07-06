@@ -132,6 +132,23 @@ raises("dual_axis rejects empty", lambda: dc.dual_axis(os.path.join(TMP, "_x.png
 raises("wireframe_grid rejects cols=0", lambda: dk.wireframe_grid(S(), 0, 0, 5, 4, [], cols=0))
 raises("picture rejects missing file", lambda: dk.picture(S(), "/no/such/img.png", 0, 0, 3, 2))
 
+ok("cycle_diagram (4 nodes + feedback + center)", lambda: dk.cycle_diagram(
+    S(), 6.5, 3.6, [("获客", "3 行业"), ("见效", "7 天"), ("使用", "3 指标"), ("续费", "达标增购")],
+    rx=1.4, ry=1.0, center="飞轮", feedback=(3, 0), feedback_label="回流"))
+ok("dumbbell_board (hero + threshold)", lambda: dk.dumbbell_board(
+    S(), 0.8, 1.6, 11.0, [("ARR", "+51%", 4980, 6350, 4300, 6800, "万"),
+                          ("NRR", "首次>100%", 92, 108, 85, 118, "%")],
+    hero=1, threshold=(1, 100, "100%")))
+
+ok("tint mixes toward white", lambda: dk.tint("1B7F5C", 0.14))
+ok("kpi_card (delta + strip, tall enough)", lambda: dk.kpi_card(
+    S(), 0.8, 0.8, 3.4, 2.3, "净收入留存 NRR", "108", unit="%", delta="+16pt",
+    delta_color=dk.RGBColor(0x1B, 0x7F, 0x5C), sub="从 92%", strip="首次超过流失"))
+ok("flow_compare (old/new + highlight + note)", lambda: dk.flow_compare(
+    S(), 0.8, 1.4, 11.5, ["签约", "排期", "对接", "上线"], ["达标签约", "复用模板", "首次转化"],
+    old_result="27 天", new_result="7.5 天", highlight_old=2, highlight_new=2,
+    note="40% 卡在此", transition_label="模板化"))
+
 prs.save(os.path.join(TMP, "_smoke_deck.pptx"))
 print(f"\nsmoke_deckkit: {len(fails)} failure(s)" + ("" if not fails else " — " + "; ".join(n for n, _ in fails)))
 sys.exit(1 if fails else 0)

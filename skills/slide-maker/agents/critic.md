@@ -153,6 +153,10 @@ Do not just skim for the first few obvious issues. Run these passes:
        "随着…的发展" openers, 破折号成瘾. The test: *would a sharp person in this field actually say this line
        aloud?* If a line reads like a press release / textbook abstract / translation when it shouldn't,
        flag it with a concrete human rewrite (see `references/multilingual.md` "Write like a human").
+     - **Coverage probe (fidelity includes completeness):** when the source is provided, list its
+       key points / contributions / headline results and tick each against the deck — a key point
+       silently absent is a MAJOR finding (rubric §10); a consciously-cut one must be visible in
+       the plan's open questions.
      - **Owns these named-flaw checks (below):** factual fidelity; source-figure faithfulness;
        generated-image factual correctness + topical relevance; **science-schematic domain-accuracy**
        (a labelled force/ray/circuit/apparatus/reaction/geometry diagram is *physically correct* —
@@ -187,7 +191,10 @@ Do not just skim for the first few obvious issues. Run these passes:
        `references/design-intelligence-addendum.md` (surfaced in `review-rubrics.md` item 9), so you score
        the same things the art director planned against: a *clean-but-even* deck (one grid repeated, one
        accent hue used decoratively, no clear first-read, a WOW that's merely big) is a finding even when
-       every individual slide looks tidy.
+       every individual slide looks tidy. And apply the TASTE TELL (rubric §9
+       "template-with-extra-steps"): ask "which choice here would a template NOT have made?" — if no
+       slide answers, the deck is compliant but dead, and that is a deck-level finding with the
+       missing counter-example as its evidence.
        **Does the look fit the purpose?** crisp/corporate status vs sober defense vs bold pitch vs warm
        lecture (`design-by-purpose.md`) — a mismatch is a real finding. **If a style example was given, judge
        fidelity to it PER THE CHOSEN MIMIC MODE** (the plan records it; `style-analysis.md`): **Mode A
@@ -728,7 +735,8 @@ consumes it as-is.
       "dimension": "<rubric dimension, e.g. 'results legibility'>",
       "issue": "<what's wrong, concretely, referencing what's on the slide>",
       "why": "<why it hurts for THIS purpose/audience>",
-      "fix": "<a specific, buildable change — not 'improve this'>"
+      "fix": "<a specific, buildable change — not 'improve this'>",
+      "fix_risk": "<optional: low | medium | high — how likely the fix is to disturb surrounding layout; the actor sequences high-risk fixes last and re-lints after them>"
     }
   ]
 }
@@ -747,4 +755,6 @@ that is wrong → must fix. **major** = clearly hurts comprehension or impact. *
 slide, the element, and the exact change ("crop the results figure to its top row,
 enlarge to full width, draw a magenta box on the region that differs"), never
 "make it clearer". Praise only what is genuinely strong, and keep it short — the
-findings are the point.
+findings are the point. **Order `findings` by leverage** — the highest-impact item first (the
+summary's "biggest lever" should be finding #1), so an actor that fixes top-down spends its
+effort where it matters; never bury a blocker under minors.

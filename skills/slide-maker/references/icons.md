@@ -43,6 +43,11 @@ recolor a customer/partner logo to the deck accent (a wrong-colour look-alike is
 **SVG Repo** has **mixed per-icon licenses** — prefer the curated sets above; if you must use it,
 check that icon's license and attribute when the license requires it.
 
+**Icons are not diagrams.** When the content is a *domain mechanism* (a model architecture, a
+k-space trajectory, a force diagram, a data path), a generic library icon is a downgrade, not a
+visual: draw the schematic (`schematic-diagrams.md`). Icons mark categories, wayfinding, and
+repeated entities — they never *stand in for* the mechanism the slide exists to explain.
+
 ## Mechanism — fetch → recolor → rasterize → place
 python-pptx can't reliably embed SVG, so rasterize to a **transparent high-DPI PNG** (renders
 identically in PowerPoint / Keynote / the LibreOffice render / the critic) and recolor to the deck

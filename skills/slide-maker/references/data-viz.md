@@ -22,6 +22,20 @@ is for when the relationship is richer.)
 
 The recipes render a themed PNG → place with `deckkit.picture(out, ..., fit="contain")`.
 
+## Chart anti-patterns (each one has shipped an ugly or misleading chart — check by name)
+- **Dual-axis abuse** — two unrelated series forced onto twin axes to fake correlation; use it only
+  for one genuinely paired ↑/↓ story, and colour-key each axis to its series.
+- **Too many series** — >4 lines/bars per chart turns evidence into spaghetti; split, or grey all
+  but the ONE series the takeaway is about (single-highlight rule).
+- **Composition without meaning** — a donut/stacked bar for parts that don't sum to a meaningful
+  whole; if the audience won't ask "share of what?", use a bar.
+- **Cropped-axis drama** — a bar chart whose y-axis starts above 0 inflates a small delta; bars
+  start at 0 (lines may zoom, but then say so on the axis).
+- **Chart with no takeaway** — a plot dropped on the slide with no assertion title / takeaway rail
+  is data, not an argument; every chart answers a named question.
+- **Rainbow categorical palette** — hues with no semantic binding read as decoration; bind each hue
+  (semantic-color-contract.md) or stay monochrome + one accent.
+
 ## The four rules every designed plot follows
 1. **Single highlight (one-accent discipline).** Recolor only the ONE series/wedge/row that
    carries the point in the accent; drop everything else to a neutral grey. The recipes take a

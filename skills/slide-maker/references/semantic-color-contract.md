@@ -37,6 +37,11 @@ auto-cycle a fixed ink set (blue→pink→ochre→black) per section. Same princ
 
 ## Pitfalls
 - Don't overload one hue with two meanings (gold = "brand" AND "warning" reads as confusion).
+- **When a BRAND colour collides with a semantic assignment** (the client's brand red vs red=risk):
+  the brand keeps the *chrome* (logo, title accents, cover), the semantic contract keeps the *data*
+  (charts, deltas, status) — and the contested hue gets ONE owner; shift the other meaning to a
+  neighbouring hue (risk → burnt orange) rather than letting the same red mean "us" on one slide
+  and "danger" on the next.
 - Keep it to ≤5 bound concepts; beyond that colour stops being legible as meaning.
 - Verify every bound colour clears ≥4.5:1 on its background (`contrast_ratio`), and never encode meaning
   by colour ALONE — pair it with a label/icon/shape (accessibility + projection).

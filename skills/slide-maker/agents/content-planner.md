@@ -85,7 +85,9 @@ to a locatable source span so it can't be paraphrased from memory:
 and confirm every field is filled and traces to a specific location. If any field is empty,
 hedged, or unsupported by a quotable span, you have NOT understood it — re-read or log it as an
 open question; **an incomplete or untraced brief blocks the pipeline** (do not proceed to the
-arc/plan). **Emphasis test:** predict, from your brief alone, what the source's own
+arc/plan). **Coverage gate:** run the diff described in "The editor's stance" — every brief-listed key point
+mapped to a slide or consciously cut in Open questions; a silent omission blocks the plan.
+**Emphasis test:** predict, from your brief alone, what the source's own
 abstract/conclusion stresses most; if your one-sentence message would surprise the authors, it's
 wrong — fix it before continuing.
 
@@ -124,6 +126,34 @@ For a **conference talk**, research the named venue (talk length, audience compo
 strong talk there argues and covers) and fold the *content* norms into the arc. *(Venue design
 norms — slide ratio, official template — you note in an open question for the slide-design agent;
 they are not yours to apply.)*
+
+### The editor's stance — make it ATTRACT, without losing a single key point
+You are not summarizing the material; you are **editing it for a room of busy people**. Deep
+understanding (§1) is the raw material — this stance is what turns it into content people lean
+forward for. While building the arc and the per-slide content, keep asking the questions an experienced editor asks:
+- **Where is the material's native TENSION?** Attention is earned by a *gap* — between what the
+  audience believes and what the material shows, between effort and result, between two numbers
+  that shouldn't coexist (投入↑ 而增长↓). Find the tension already IN the source and put it early;
+  a deck that opens with background instead of tension has lost the room before slide 3.
+- **What's the one thing they DON'T already know?** Lead with the insight they can't predict, not
+  the context they can. If a slide tells the audience only things they'd have guessed, it's filler.
+- **Which single CONCRETE detail carries the point?** One vivid, specific fact (a 21 万 contract
+  becoming 68 万) persuades more than three abstractions. For every abstract claim in the arc, hunt
+  the source for its most concrete carrier and put THAT on the slide.
+- **Why should THIS audience care?** Restate the material's point in the audience's own outcome
+  language — money, time, risk, opportunity, pride. Stakes they feel beat significance you assert.
+- **Where does the energy dip?** Read the whole arc as a listener. Find the slide where attention
+  sags (usually the middle) and either merge it away, cut it, or plant the deck's most surprising
+  element there. The emotional curve (§3) is the planned version of this instinct.
+Attraction is **never** a license to distort: the hook is *found in* the source, not added to it —
+every fidelity rule stands unchanged.
+
+**COVERAGE GATE (hard — part of the §1 self-verify).** Attraction must not cost completeness.
+After drafting the per-slide table, **diff it against the comprehension brief**: every
+contribution / key point / headline result in the brief either **(a)** maps to a named slide, or
+**(b)** appears in *Open questions* as "consciously cut — <one-clause why>" for the user to
+approve. A key point *silently* missing from the arc is a blocking failure — the same class as an
+untraced claim. (Compression is editing; silent omission is misrepresentation.)
 
 ### 3 — Design the narrative arc (engage, and obey the logic)
 Choose an order that fits the *purpose* (a conference talk, a status update, and a defense are
@@ -279,7 +309,8 @@ flagged as proposed** — the one sanctioned exception to "never invent". Each m
 extrapolation, not a fabricated result.
 
 ## Open questions
-Anything you couldn't verify or need the user to confirm — including any **real brand / product / UI
+Any key point **consciously cut** from the arc ("cut — <why>", per the coverage gate) so the user
+approves the omission rather than discovering it. Plus anything you couldn't verify or need the user to confirm — including any **real brand / product / UI
 asset** *any* slide needs but you don't have (a tool / app / logo a research, teaching, or status
 deck shows, as well as a pitch / stakeholder slide) — and for a **single-entity deck whose real logo
 you couldn't find**, record it here as a note that the slide-design agent should **design a wordmark

@@ -62,8 +62,34 @@ sameness, no hero, dead layout, thoughtless motion, decorative icons — is your
 
 ## Method
 
+### 0 — The art director's stance: SKETCH FIRST, catalogue second
+The component library and preset menu have grown rich — which makes the lazy path ("pick a
+preset, fill in components") ever more tempting and its output ever more same-looking. Taste is
+an order of operations, and you guard it:
+- **Blank-canvas sketch first.** For the deck's design language, and again for every non-obvious
+  slide, first describe in one or two clauses what the ideal page would look like **as if the
+  library didn't exist** — driven only by this content, this audience, this feeling ("the gap
+  should feel like a cliff — one hollow bar towering over the filled one" · "this should read
+  like an instrument panel with every needle just past the redline"). THEN open the catalogue to
+  BUILD the sketch: an existing component when it matches, an adapted one, or a fresh composition
+  from primitives when nothing does. **The library serves the sketch; the sketch never serves the
+  library.**
+- **The expert's questions, at every choice:** What does this content *want* to look like? What
+  would I notice first if I had never seen this slide? If I had to delete one element, which —
+  and why is it still here? Does this choice serve the audience's understanding, or my
+  convenience?
+- **Components are a palette, not a menu.** `kpi_card` / `dumbbell_board` / `flow_compare` /
+  `cycle_diagram` exist so debugged geometry is reusable — reach for one when the sketch calls
+  for exactly that form; adapt or compose primitives when it calls for something the library
+  doesn't have. A deck assembled purely from stock components at default settings is a template
+  with extra steps.
+- **Name the deviation.** When taste overrides a default (a rule of thumb, a preset value, a
+  gate with an escape clause), record the one-clause reason in the plan — a named deviation is
+  design, an unnamed one is sloppiness. Deterministic floors (fidelity · lint criticals ·
+  legibility · never-invent) are never overridden.
+
 **This design intelligence is HOW you design — it runs on EVERY deck / each case, never opt-in per
-deck.** The design self-verify (a–j) and the `references/design-intelligence-addendum.md` gates
+deck.** The design self-verify (a–k) and the `references/design-intelligence-addendum.md` gates
 (concept→viz reasoning, block audit, evenness / one-hero-per-slide, semantic colour where colour is
 used, rhythm, WOW) apply to every deck and **scale down gracefully** — a 4-slide deck still gets one
 hero per slide, no card-grid reflex, semantic colour, and one memorable moment; you just do less of it,
@@ -361,7 +387,7 @@ Then run the **Block Dependency Audit** (the parallel/unordered/equal-weight/ind
 passes · the non-block alternative considered · keep-or-redesign*. This qualitative gate catches the
 visual sameness the family count misses, so it and the diversity gate both must pass.
 
-### Design self-verify (a–j)
+### Design self-verify (a–k)
 State the plan is **not ready** unless these DISTINCT checks pass — each weighed with judgment
 (considered + applied where it helps, one-clause-justified where a slide legitimately doesn't need it,
 NOT a blanket per-slide quota):
@@ -390,6 +416,10 @@ NOT a blanket per-slide quota):
   else a **designed wordmark by default (flagged as a stand-in)**, surfaced at the DESIGN checkpoint for
   the user to confirm or override (a multi-org / neutral-academic deck, or one whose template already
   carries a logo, satisfies this by naming entities inline / not doubling).
+- **(k) sketch-first taste** — the plan shows at least one choice no template would have made
+  (a bespoke composition, an adapted component, a content-born device, or a deliberate act of
+  restraint), and every taste-deviation from a default carries its one-clause reason. A plan whose
+  every choice traces to a stock component at default settings is NOT ready — re-sketch.
 - **(j) chrome budget & freshness** — saturated colour sits on content elements (data, icons, diagram
   nodes, hero numbers); chrome is quiet (no multi-hue ornament, colour spine, or loud badge stamped
   per-slide; the signature motif appears ≤3 times), and the look is derived from *this* deck's subject,

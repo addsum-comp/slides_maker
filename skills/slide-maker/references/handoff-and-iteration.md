@@ -8,6 +8,12 @@ and both are avoidable:
    scratch and the two never merged. (This has happened to a real user; it is the most
    damaging post-delivery failure.)
 
+## What the deliverable folder contains
+The deck + `render/` PNGs (+ PDF), the build script (source of truth), the speaker-notes source,
+and the final lint/stats snapshot — a tidy, buildable bundle. The content/design PLANS are **not**
+files here: they are presented directly in chat as compact tables at the two checkpoints (that
+conversation is the record); write plan `.md` files only if the user explicitly asks.
+
 ## The core model: the script is the source of truth
 A per-deck build (`build_<deck>.py`) **regenerates** the entire `.pptx` every run. So:
 - The **script** is the source of truth; the **`.pptx` is a build artifact**.
