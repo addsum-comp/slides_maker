@@ -208,10 +208,37 @@ def set_font(run, size, color, bold=False, italic=False, font=None, ea=None):
         _apply_ea(run, eaf)
 
 
+CJK_LS = 1.12             # default line_spacing (OOXML spcPct — a multiple of SINGLE spacing,
+                          # which renders at ≈1.2× font size) for CJK-bearing paragraphs when the
+                          # caller doesn't force one. 1.12 × 1.2 ≈ **1.34× font size** — inside the
+                          # professional CJK slide band (≈1.3–1.45× font size; mixed EN/中文 ≈1.35×).
+                          # ⚠ UNITS: python-pptx line_spacing floats are spcPct, NOT em-multiples —
+                          # "1.35 line height" in design terms is line_spacing ≈ 1.12, not 1.35.
+                          # Latin-only paragraphs keep 1.0 (single). Pass an explicit line_spacing
+                          # to override either way (tuned layouts are untouched).
+
+_CJK_ORD = ((0x1100, 0x11FF),   # Hangul Jamo (NFD-decomposed Korean)
+            (0x2E80, 0x9FFF),   # radicals · kana · CJK punctuation · Han
+            (0xAC00, 0xD7AF),   # Hangul syllables
+            (0xF900, 0xFAFF),   # CJK compatibility ideographs
+            (0xFF00, 0xFFEF),   # full-width forms + half-width katakana
+            (0x20000, 0x3134F)) # supplementary ideographic planes (e.g. 𠮷)
+
+
+def _has_cjk(s):
+    """True if the string contains any CJK-context glyph (the leading/EA-font classifier)."""
+    return any(a <= ord(ch) <= b for ch in s for a, b in _CJK_ORD)
+
+
 def text(slide, x, y, w, h, runs, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
-         space_after=6, line_spacing=1.0):
+         space_after=6, line_spacing=None):
     """runs = list of paragraphs; each paragraph = list of run tuples
     (txt, size, color, bold, italic[, font]).
+
+    line_spacing=None (default) resolves PER PARAGRAPH: Latin-only → 1.0, CJK-bearing →
+    ``CJK_LS`` (renders ≈1.34× font size) — the script-aware leading a bilingual deck needs
+    (CJK glyphs fill the em-box, so single spacing reads denser than the same setting in
+    Latin). Pass a number to force one value for every paragraph, exactly as before.
 
     Vertical centring: to centre text inside a filled box/card, pass anchor=MSO_ANCHOR.MIDDLE
     AND give this textbox the SAME (x, y, w, h) as the box. A y-offset (e.g. y+0.07) combined
@@ -228,7 +255,10 @@ def text(slide, x, y, w, h, runs, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
         p.alignment = align
         p.space_after = Pt(space_after)
         p.space_before = Pt(0)
-        p.line_spacing = line_spacing
+        if line_spacing is not None:
+            p.line_spacing = line_spacing
+        else:
+            p.line_spacing = CJK_LS if any(_has_cjk(t) for (t, *_rest) in para) else 1.0
         for (txt, size, color, bold, italic, *rest) in para:
             r = p.add_run(); r.text = txt
             set_font(r, size, color, bold, italic, rest[0] if rest else None)
@@ -420,7 +450,11 @@ def editorial_header(slide, eyebrow, title, *, x=0.6, y=0.55, w=None, accent=MAG
         sw, _ = _slide_size(slide); w = sw - 2 * x
     disp = serif if serif is not None else (DISPLAY or FONT)
     text(slide, x, y, w, 0.3, [[(eyebrow.upper(), 12, accent, True, False)]], space_after=0)
-    tb = text(slide, x, y + 0.34, w, 0.8, [[(title, size, ink, True, False, disp)]], space_after=0)
+    # line_spacing pinned to 1.0: the rule position below is single-spacing math, and a
+    # one-line display headline needs no body leading (the CJK default would push the
+    # glyphs down onto the rule — LibreOffice adds the extra leading ABOVE the line).
+    tb = text(slide, x, y + 0.34, w, 0.8, [[(title, size, ink, True, False, disp)]],
+              space_after=0, line_spacing=1.0)
     if EADISPLAY:
         for p in tb.text_frame.paragraphs:
             for r in p.runs:
@@ -1564,9 +1598,14 @@ def measure_bullets(items, w, size=17, gap=0.26):
 
 def measure_text(runs, w, size, *, line_h_factor=1.12, pad=0.0):
     """Height (inches) a plain :func:`text` block of ``runs`` = [(text, bold), ...] needs at
-    ``size`` within width ``w``. ``pad`` adds top+bottom slack."""
+    ``size`` within width ``w``. ``pad`` adds top+bottom slack. CJK-aware: when the runs carry
+    CJK, the per-line factor rises to ``1.2 × CJK_LS`` (the pitch text()'s script-aware default
+    actually renders), so measure-then-place callers reserve enough height."""
     nlines = _measure_lines(runs, size, w)
-    return nlines * (size / 72.0 * line_h_factor) + pad
+    factor = line_h_factor
+    if any(_has_cjk(t) for (t, *_r) in runs):
+        factor = max(factor, 1.2 * CJK_LS)
+    return nlines * (size / 72.0 * factor) + pad
 
 
 def bullet(slide, x, y, w, items, size=17, gap=0.26, marker=BLUE, lead_c=DEEP, body_c=SLATE):
@@ -2965,7 +3004,10 @@ def bilingual_lockup(slide, x, y, w, zh, en, *, zh_size=30, en_size=11, ink=None
     rule between. Returns bottom y."""
     ic = ink if ink is not None else DEEP
     acc = accent if accent is not None else MAGENTA
-    tb = text(slide, x, y, w, 0.7, [[(zh, zh_size, ic, True, False, zh_font or EADISPLAY or DISPLAY or FONT)]], space_after=0)
+    # line_spacing pinned to 1.0: the rule offset below (zh_size/72 + 0.12) is single-spacing
+    # math — the CJK default would drop the headline onto its own accent rule.
+    tb = text(slide, x, y, w, 0.7, [[(zh, zh_size, ic, True, False, zh_font or EADISPLAY or DISPLAY or FONT)]],
+              space_after=0, line_spacing=1.0)
     eaface = zh_font or EADISPLAY      # CJK glyphs render from <a:ea> — set the DISPLAY face there too
     if eaface:
         for p in tb.text_frame.paragraphs:
@@ -3317,6 +3359,7 @@ def _ink_rect(sh, bb):
     inner_w = max(0.1, bb[2]-ml-mr); inner_h = max(0.05, bb[3]-mt-mb)
     wrap = tf.word_wrap if tf.word_wrap is not None else True
     lines_total, ink_w, max_sz = 0, 0.0, 0.0
+    ink_h_acc = 0.0
     align = None; subbed = False
     for p in tf.paragraphs:
         runs, sz, fn = [], 0.0, None
@@ -3341,10 +3384,19 @@ def _ink_rect(sh, bb):
             nl = 1
             ink_w = max(ink_w, nat)                     # may exceed inner_w → horizontal overflow
         lines_total += nl
+        # spacing-aware: _LINT_LINE_H models the SINGLE-spacing render (~1.2×em); a paragraph's
+        # spcPct multiplies it (text()'s CJK default writes 1.12 → true pitch ≈1.34×em). Floor
+        # at 1.0 so sub-single tuned helpers keep the conservative old model.
+        try:
+            _ls = p.line_spacing
+        except Exception:
+            _ls = None
+        _lsf = _ls if isinstance(_ls, float) and _ls > 1.0 else 1.0
+        ink_h_acc += nl * (sz / 72.0) * _LINT_LINE_H * _lsf
     if max_sz <= 0:
         return None
     line_h = max_sz/72.0 * _LINT_LINE_H
-    ink_h = lines_total * line_h
+    ink_h = ink_h_acc if ink_h_acc > 0 else lines_total * line_h
     ink_w = min(ink_w, inner_w) if wrap else ink_w
     # vertical placement by anchor
     try: anc = str(tf.vertical_anchor)
@@ -3597,8 +3649,12 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
 def fit_text_size(runs, w, h, start_size, *, font=None, min_size=9.0, line_h=_LINT_LINE_H, pad=0.0):
     """Largest point size ≤ `start_size` at which `runs` = [(text, bold), ...] fits a `w`×`h`in box
     — so 'if it doesn't fit, shrink the font' is one call, not a guess. Measures with the real font
-    metrics; returns `min_size` if even that overflows (then shorten the text or grow the box)."""
+    metrics; returns `min_size` if even that overflows (then shorten the text or grow the box).
+    CJK-aware: CJK runs are measured at the pitch text()'s script-aware default renders
+    (``1.2 × CJK_LS``), so the returned size actually fits."""
     aw, ah = max(0.2, w-pad), max(0.1, h-pad)
+    if any(_has_cjk(t) for (t, *_r) in runs):
+        line_h = max(line_h, 1.2 * CJK_LS)
     s = start_size
     while s > min_size:
         if _measure_lines(runs, s, aw, font=font) * (s/72.0*line_h) <= ah:

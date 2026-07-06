@@ -1172,7 +1172,9 @@ subtract or split, don't shrink), **`LAYOUT SAMENESS`**
 (no typographic hero → the type-scale drama rule failed), **`SMALL TYPE`** (body-median under the
 canvas-relative ≈18pt-equivalent floor → fewer words, bigger type), **`SIZE SPRAWL`** (>3–4 font sizes
 on one slide → use the declared type-scale tokens), **`NO BUILDS`** (presented deck with no
-appear-builds → the motion manifest failed). Treat each `[stats]` warning as the NAMED design rule
+appear-builds → the motion manifest failed), and on CJK decks **`CJK TIGHT LEADING`** (multi-line
+CJK at ≤ single spacing → use the script-aware default) and **`CJK-LATIN SPACING`** (both 盘古之白
+conventions mixed → pick one deck-wide). Treat each `[stats]` warning as the NAMED design rule
 having failed measurably: fix it or write one clause of why this deck is the exception, and **paste
 the stats block into the critic's input** so the judges score numbers, not impressions. It's a safety
 net for the no-overlap / fits-its-box / density / rhythm rules, **not** a

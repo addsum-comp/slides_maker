@@ -39,6 +39,7 @@ Checks (tuned for low false-positives):
   informative image (accessibility; invisible to every other check), and MATH-FONT TOFU (an
   equation_native math font not installed on the render host → equations render as boxes).
 """
+import re
 import sys
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
@@ -313,6 +314,69 @@ def _size_clusters(bx, sh):
     return [c[0] for c in clusters]
 
 
+def _walk_tf_shapes(shapes):
+    """Yield every shape with a text_frame (recursing into groups; tables handled separately)."""
+    for s in shapes:
+        try:
+            if s.shape_type == MSO_SHAPE_TYPE.GROUP:
+                yield from _walk_tf_shapes(s.shapes); continue
+            if s.has_text_frame:
+                yield s
+        except Exception:
+            continue
+
+
+_CJK_RE_RANGES = "\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uac00-\ud7af\uf900-\ufaff"
+# lookahead counting so 'sandwich' boundaries (速度3倍 = 2 boundaries) both count;
+# the spaced/unspaced patterns are disjoint (space vs no space between the pair).
+_SPACED = re.compile(f"(?=[{_CJK_RE_RANGES}] [A-Za-z0-9%])|(?=[A-Za-z0-9%] [{_CJK_RE_RANGES}])")
+_UNSPACED = re.compile(f"(?=[{_CJK_RE_RANGES}][A-Za-z0-9%])|(?=[A-Za-z0-9%][{_CJK_RE_RANGES}])")
+
+
+def _cjk_count(s):
+    return sum(1 for ch in s if any(a <= ord(ch) <= b for a, b in _CJK_RANGES))
+
+
+def _cjk_typography(slide):
+    """(tight_blocks, spaced_boundaries, unspaced_boundaries) for the bilingual-typography warns.
+    TIGHT: a paragraph that ITSELF carries enough CJK to wrap (>=14 chars) set at <= SINGLE
+    spacing (spcPct <=1.0, i.e. <=~1.2x font size — the 'single spacing is cramped in CJK'
+    failure; the target band is spcPct ~1.08-1.21 = ~1.3-1.45x font size). Latin-only sibling
+    paragraphs at 1.0 are fine and NOT counted; placeholder shapes are skipped (their spacing
+    may inherit generous leading from the template master, unreadable here).
+    SPACING: 盘古之白 consistency — one CJK<->Latin boundary convention deck-wide, not both;
+    table cells count toward the spacing tally (real content) but not toward leading."""
+    tight = spaced = unspaced = 0
+    for sh in _walk_tf_shapes(slide.shapes):
+        tf = sh.text_frame
+        txt = tf.text
+        try:
+            is_ph = sh.is_placeholder
+        except Exception:
+            is_ph = False
+        if not is_ph and _cjk_count(txt) >= 24:           # frame-level fast path
+            for p in tf.paragraphs:
+                if _cjk_count(p.text) < 14:               # only CJK-bearing, wrap-capable paragraphs
+                    continue
+                ls = p.line_spacing
+                if ls is None or (isinstance(ls, float) and ls <= 1.0):
+                    tight += 1
+                    break
+        spaced += len(_SPACED.findall(txt))
+        unspaced += len(_UNSPACED.findall(txt))
+    for s in slide.shapes:                                # table cells: spacing tally only
+        try:
+            if getattr(s, "has_table", False):
+                for row in s.table.rows:
+                    for cell in row.cells:
+                        spaced += len(_SPACED.findall(cell.text_frame.text))
+                        unspaced += len(_UNSPACED.findall(cell.text_frame.text))
+        except Exception:
+            continue
+    return tight, spaced, unspaced
+
+
+
 def _slide_stats(slide, bx, sw, sh):
     footer_y = sh - 0.6
     load = 0
@@ -334,8 +398,10 @@ def _slide_stats(slide, bx, sw, sh):
                 pingfang += 1
         except Exception:
             pass
+    tight, sp_y, sp_n = _cjk_typography(slide)
     return {
         "pingfang": pingfang,
+        "cjk_tight": tight, "sp_spaced": sp_y, "sp_unspaced": sp_n,
         "size_clusters": _size_clusters(bx, sh),
         "load": load,
         "text_cov": _coverage([s for s in bx if s["text"] and not s["bg"]], sw, sh),
@@ -418,6 +484,18 @@ def _print_stats(rows, mode, sw, sh):
         warns.append(f"PINGFANG ON MACOS: {pingfang} run(s) carry 'PingFang SC' as the EA font — the "
                      f"macOS LibreOffice render loop substitutes a handwriting face for it; use "
                      f"'Hiragino Sans GB' (see deckkit.EAFONT; presets now default to it)")
+    tight_slides = [str(i + 1) for i, r in enumerate(rows) if r.get("cjk_tight")]
+    if tight_slides:
+        warns.append(f"CJK TIGHT LEADING: slide(s) {', '.join(tight_slides)} have multi-line CJK "
+                     f"paragraphs at ≤ single line spacing (≈≤1.2× font size) — CJK body wants "
+                     f"~1.3-1.45× font size, i.e. line_spacing ≈1.08-1.21; leave deckkit text()'s "
+                     f"line_spacing unset to get the script-aware default (CJK_LS=1.12 ≈ 1.34×)")
+    sp_y = sum(r.get("sp_spaced", 0) for r in rows)
+    sp_n = sum(r.get("sp_unspaced", 0) for r in rows)
+    if min(sp_y, sp_n) >= 3:
+        warns.append(f"CJK-LATIN SPACING: both '中文 Latin' spaced ({sp_y}×) and '中文Latin' unspaced "
+                     f"({sp_n}×) boundaries appear — pick ONE convention deck-wide (recommend the "
+                     f"space: 全年 ARR 增长 51%)")
     if drama and drama < 2.0 and n > 3:
         warns.append(f"FLAT TYPE: no run anywhere reaches 2× the body size ({drama:.1f}×) — the deck has "
                      f"no typographic hero; give at least the key number/statement real scale")

@@ -246,8 +246,8 @@ Score each dimension; cite specific slides.
    STATS block* from `scripts/lint_deck.py` (the builder pastes it into your input; ask for it if
    missing) — measured reading load, text/ink coverage, font histogram + type-drama ratio, build
    presence, and skeleton-similarity per slide. Score the numbers, not impressions: a `TEXT WALL` /
-   `CROWDED` / `LAYOUT SAMENESS` / `FLAT TYPE` / `SMALL TYPE` / `SIZE SPRAWL` / `NO BUILDS` stats
-   warning left unaddressed (no one-clause exception recorded) is a finding with the measurement as
+   `CROWDED` / `LAYOUT SAMENESS` / `FLAT TYPE` / `SMALL TYPE` / `SIZE SPRAWL` / `CJK TIGHT LEADING` /
+   `CJK-LATIN SPACING` / `NO BUILDS` stats warning left unaddressed (no one-clause exception recorded) is a finding with the measurement as
    its evidence (occupancy is judged against the ROLE bands — cover 25–35% · exec 45–60% ·
    technical 55–70% — not one number).
 10. **Factual fidelity** *(when source material exists — the check every system fails).*

@@ -272,8 +272,8 @@ Do not just skim for the first few obvious issues. Run these passes:
      it still can't see every case. It also prints a **DECK STATS block** (per-slide reading load,
      text/ink coverage, font histogram + type-drama, build presence, skeleton-similarity): score those
      NUMBERS against the design targets — an unaddressed `TEXT WALL` / `CROWDED` / `LAYOUT SAMENESS` /
-     `FLAT TYPE` / `SMALL TYPE` / `SIZE SPRAWL` / `NO BUILDS` stats warning is a finding with the
-     measurement as evidence (occupancy judged against role bands, not one number), and the
+     `FLAT TYPE` / `SMALL TYPE` / `SIZE SPRAWL` / `CJK TIGHT LEADING` / `CJK-LATIN SPACING` /
+     `NO BUILDS` stats warning is a finding with the measurement as evidence (occupancy judged against role bands, not one number), and the
      **thumbnail pass** (all slides in one grid: per slide, "what does it say?" — needing to read body
      text = the form isn't carrying the message) is the design lens's cheapest whole-deck instrument. For each real collision, name the **two elements**, where they touch,
      and the **root-cause fix** (re-anchor via `content_band` / `vstack(bottom=)` / `bottom_callout`,

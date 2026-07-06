@@ -77,6 +77,41 @@ body)** — the Latin and mono faces are functional roles, not extra style fonts
 every slide. *(Avoid setting everything to "Arial" — it has no CJK glyphs, so the whole deck rides
 an uncontrolled single fallback, the flat one-font look to fix.)*
 
+### Bilingual (EN + 中文) typography system — one visual language, not two
+When Latin and CJK share a deck (any 中文 deck with English terms/numbers, or a true bilingual deck),
+design the **system** first and pick fonts second — the two scripts must read as one voice with
+similar visual weight and spacing:
+- **Pairing menu** (matched-proportion sans + sans — ONE Latin family + ONE CJK family, which
+  together form the deck's text pairing; the CJK/EA and mono faces are *functional* roles under
+  the ≤2-text-families rule, `font-guidance.md`; weights ≤3):
+  *cross-platform / safest* → **Noto Sans + Noto Sans CJK SC** (or Source Han Sans); *macOS build
+  loop* → **Helvetica Neue (or Inter, if installed) + Hiragino Sans GB** (PingFang SC only for the
+  final deck, per the render-loop trap above); *Windows/Office* → **Aptos/Segoe UI + Microsoft
+  YaHei or DengXian**; *technical* → **IBM Plex Sans + Source Han Sans**. Serif-Latin + sans-CJK is
+  a deliberate *editorial* move only — never an accident.
+- **Optical balance (the compensations no font pair does for you):** CJK glyphs fill the em-box, so
+  at equal pt they read *larger and heavier* than Latin — in a mixed lockup, drop the CJK ~0.5–1pt
+  or bump the Latin, and remember **CJK bold is visually heavier than Latin bold** (a CJK title at
+  semibold often matches a Latin title at bold; reduce the CJK weight before reaching for a smaller
+  size).
+- **Leading ladder (script-aware) — mind the UNITS:** targets are in **× font size** (the design
+  convention): Latin ~1.15–1.3× · CJK multi-line body ~**1.3–1.45×** · mixed EN/中文 ~**1.35×**.
+  PowerPoint's `line_spacing` *multiple* is a % of SINGLE spacing, which itself renders at ≈1.2×
+  font size — so those targets correspond to `line_spacing` ≈ **1.08–1.21**, not 1.3–1.45.
+  Single spacing that looks fine in Latin is cramped in CJK. `deckkit.text()` resolves this
+  automatically when `line_spacing` is left unset (CJK-bearing paragraphs get `CJK_LS`=1.12
+  ≈ 1.34× font size; Latin-only paragraphs stay at single — bump explicitly for an airy
+  editorial look). Composite helpers (`bullet`/`callout`/`step_list`…) keep their tuned compact
+  leading (≈1.22–1.30× font size) — for long CJK body text prefer a direct `text()` block. The
+  render lint warns **`CJK TIGHT LEADING`** when a multi-line CJK paragraph ships at ≤ single
+  spacing.
+- **CJK↔Latin boundary spacing (盘古之白): pick ONE convention deck-wide.** Recommended: a normal
+  space around inline Latin terms/digits — `全年 ARR 增长 51%` — applied everywhere; consistently
+  none is acceptable, but *mixing* the two reads sloppy. The render lint warns **`CJK-LATIN
+  SPACING`** when both conventions appear (≥3 boundaries of each, deck-wide). (Full-width punctuation still takes no flanking spaces.)
+- **Hierarchy by weight before colour** for bilingual text (colour renders differently across the
+  two scripts' stroke densities); highlight only keywords and numbers.
+
 ### Portability caveat (say this in step 6)
 PowerPoint can embed fonts, but python-pptx can't, so the recipient's machine needs the
 CJK font installed — or PowerPoint substitutes. Prefer a widely-installed font (PingFang
@@ -92,8 +127,9 @@ and tell the user which font the deck expects.
   left-of-centre within its advance and won't optically centre. Full-width is for *running*
   CJK text, not a centred single glyph.
 - **Line-breaking (断句).** CJK wraps at any character (no spaces needed) — fine, but give text
-  boxes a little more room and consider `line_spacing` ~1.1–1.2; dense CJK at tight
-  leading is hard to read. Because it breaks anywhere, **check a wrapped title/term doesn't split
+  boxes a little more room and use the script-aware leading (CJK body ~1.3–1.45× font size =
+  `line_spacing` ≈1.08–1.21; deckkit's `text()` default handles it when `line_spacing` is unset);
+  dense CJK at tight leading is hard to read. Because it breaks anywhere, **check a wrapped title/term doesn't split
   at a meaningless point** (mid-term, or between a number and its unit) — widen the box or rebreak.
 - **No 叠字 (overlapping glyphs).** If glyphs visibly collide/overlap, the box is too narrow or the
   tracking is off — widen the box or fix spacing; never squeeze CJK to fit.
@@ -111,7 +147,7 @@ and tell the user which font the deck expects.
   "." wrap to its own line.
 - **Density.** A CJK character carries more meaning per glyph, so for a **presented** deck terse
   points matter even more — resist filling the line just because it fits. *(A read-alone / reference
-  CJK deck may run denser like any read-alone deck — then lean on `line_spacing` 1.1–1.2 and the
+  CJK deck may run denser like any read-alone deck — then keep the script-aware leading (never below ~1.25× font size — `line_spacing` ≈1.04 — for CJK body) and the
   kinsoku guidance above; see `design-principles.md` "Delivery mode".)*
 - **Numbers / Latin terms** inside CJK text render in `FONT` (the latin font) — choose a
   Latin font that pairs cleanly with the CJK one (Calibri/Arial with most sans CJK).

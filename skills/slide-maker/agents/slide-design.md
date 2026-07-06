@@ -110,9 +110,17 @@ feel art-directed rather than defaulted, and it's yours to set once and hold. Pi
   it physically cannot land anywhere else); **(3) a canvas-relative BODY FLOOR** — presented-deck body
   text ≥ ~18–22pt *on a standard 13.3in-wide slide*, scaled to the actual canvas (≈ **13.5–16.5pt on
   the 10in deckkit default**) — smaller body means too many words, not a smaller font; **(4) economy**
-  — **≤3–4 sizes on any one slide, 4–5 tokens deck-wide**; every size on every slide is one of the
-  declared tokens. The render-time lint measures all four (`FLAT TYPE`, `SMALL TYPE`, `SIZE SPRAWL`,
-  plus the histogram/token count) — each warning is this rule failing measurably.
+  — **≤3–4 sizes on any one slide, 4–5 tokens deck-wide, ≤3 weights**; every size on every slide is
+  one of the declared tokens. On a CJK / bilingual deck the contract also fixes the **leading ladder**
+  (Latin ~1.15–1.3× · CJK body ~1.3–1.45× · mixed ~1.35× — deckkit's script-aware default handles it
+  when `line_spacing` is left unset) and the **optical compensations** (CJK reads larger/heavier at
+  equal pt — trim the CJK ~0.5–1pt in mixed lockups, drop CJK bold a weight; the pairing menu and
+  盘古之白 spacing convention live in `multilingual.md` "Bilingual (EN + 中文) typography system").
+  Mind the units: the leading ladder's numbers are × font size — in PowerPoint line_spacing terms
+  that's ≈1.08–1.21, and deckkit's unset-default `CJK_LS`=1.12 lands inside. The render-time lint
+  measures it all (`FLAT TYPE`, `SMALL TYPE`, `SIZE SPRAWL`, the histogram/token count — and on
+  CJK decks `CJK TIGHT LEADING` / `CJK-LATIN SPACING`) — each warning is this rule failing
+  measurably.
 - **Declare the SPACING SCALE as the type scale's twin — proportional, never uniform.** Whitespace has
   hierarchy exactly like type: fix ~4 gap tokens on a ~1.6× ladder — *line* < *element* < *group* <
   *section* (on the default 10×5.625in canvas ≈ `0.06 · 0.12–0.2 · 0.3 · 0.5in`; scale to the canvas)
