@@ -1166,9 +1166,12 @@ coverage** vs the ~50–70% whitespace target · **max font pt** · shape/pictur
 **build** presence · **sim↑** (layout-skeleton similarity vs the previous slide); deck-wide it
 prints the **font histogram + type-drama ratio** and **builds/transitions n/N**. Its `[stats]`
 warnings name the rule they measure — **`TEXT WALL`** (word budget blown → cut copy to notes or
-split), **`CROWDED`** (whitespace target missed → subtract, don't shrink), **`LAYOUT SAMENESS`**
+split), **`CROWDED`** (occupancy past ~70% — role bands: cover 25–35 · exec 45–60 · technical 55–70 →
+subtract or split, don't shrink), **`LAYOUT SAMENESS`**
 (3 consecutive slides share one skeleton → the §1.2 skeleton-rotation rule failed), **`FLAT TYPE`**
-(no typographic hero → the type-scale drama rule failed), **`NO BUILDS`** (presented deck with no
+(no typographic hero → the type-scale drama rule failed), **`SMALL TYPE`** (body-median under the
+canvas-relative ≈18pt-equivalent floor → fewer words, bigger type), **`SIZE SPRAWL`** (>3–4 font sizes
+on one slide → use the declared type-scale tokens), **`NO BUILDS`** (presented deck with no
 appear-builds → the motion manifest failed). Treat each `[stats]` warning as the NAMED design rule
 having failed measurably: fix it or write one clause of why this deck is the exception, and **paste
 the stats block into the critic's input** so the judges score numbers, not impressions. It's a safety

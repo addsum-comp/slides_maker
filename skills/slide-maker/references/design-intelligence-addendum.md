@@ -147,6 +147,23 @@ Target band is ~50–70% whitespace (the operational figure here for `design-pri
 justified; the first two moves are **strengthen the hero** and **split the slide** (never shrink to
 illegible).
 
+**Refinement — optimise CONTROLLED DENSITY, not maximum whitespace.** "Subtract, don't add" guards
+against filler; it is not a licence for bare pages. The real dial is measured **occupancy** (the
+render-time lint's ink-coverage number), banded by the slide's *role*:
+
+| Slide role | Occupancy band |
+|---|---|
+| cover / statement / divider | ~25–35% |
+| executive / summary / narrative | ~45–60% |
+| technical / dashboard / evidence | ~55–70% |
+| any slide past ~70–75% | crowded — subtract or split (`CROWDED` warn) |
+
+Every empty area must have a **nameable job** — separation, emphasis, framing, or guiding the eye; air
+with no job is under-design just as filler is over-design. The best slides sit in deliberate **visual
+tension**: neither crowded nor empty, and heavy elements (a large dark block, a full-bleed plate) are
+balanced by air or lighter elements on the other side of the composition — balance visual *weight*,
+not object count.
+
 ### 1.4 Visual Surprise — name *why* the WOW is memorable
 
 The failure mode: the deck schedules a WOW slide every ~6–8 slides but makes it merely a *large element*,

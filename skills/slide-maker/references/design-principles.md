@@ -282,6 +282,13 @@ design a slide and when you critique one. Each maps onto rules this skill alread
 - **Proximity — group related items; separate unrelated ones with space.** What belongs together sits
   together; the gap *between* groups is clearly larger than the gap *within* one, so the eye parses the
   structure without lines or boxes. (See "Group by proximity — inter-group gap ≥ ~1.5–2× intra-group".)
+  Operationally this is a **SPACING SCALE** — ~4 gap tokens on a ~1.6× ladder, *line < element < group <
+  section* (≈ `0.06 · 0.12–0.2 · 0.3 · 0.5in` on the default 10×5.625in canvas; scale to the canvas),
+  declared once in the design language and reused everywhere. Identical gaps everywhere is the tell of an
+  undesigned page: when every distance is the same, proximity carries no structure and the eye must read
+  boxes and rules instead. Whitespace earns its place by *job* — separation, emphasis, framing, or
+  guiding the eye — and heavy elements (a big dark block, a full-bleed image) are balanced by air or
+  lighter elements across the composition: balance visual **weight**, not object count.
 A slide that satisfies all four — one element pops (C), it uses the deck's repeated system (R),
 everything aligns to a grid (A), and related things are grouped (P) — is almost always well-laid-out;
 a slide that feels "off" usually violates one of them, so name *which* when diagnosing.

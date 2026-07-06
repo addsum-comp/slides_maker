@@ -296,6 +296,23 @@ def _skeleton(bx):
                      for s in bx if not s["bg"])
 
 
+def _size_clusters(bx, sh):
+    """Distinct font sizes on the slide's CONTENT (footer chrome excluded), clustered within
+    0.75pt so 10.3/10.5 counts once. The doc target: ≤3-4 sizes per slide, from the deck's
+    declared type-scale tokens — ad-hoc size sprawl is what makes type feel unconsidered."""
+    footer_y = sh - 0.6
+    raw = sorted({round(sz * 2) / 2.0
+                  for s in bx if not (s["t"] > footer_y and s["size"] <= 10.5)
+                  for para in s["paras"] for (t, sz) in para if t.strip()})
+    clusters = []
+    for sz in raw:
+        if clusters and sz - clusters[-1][-1] <= 0.75:
+            clusters[-1].append(sz)
+        else:
+            clusters.append([sz])
+    return [c[0] for c in clusters]
+
+
 def _slide_stats(slide, bx, sw, sh):
     footer_y = sh - 0.6
     load = 0
@@ -319,6 +336,7 @@ def _slide_stats(slide, bx, sw, sh):
             pass
     return {
         "pingfang": pingfang,
+        "size_clusters": _size_clusters(bx, sh),
         "load": load,
         "text_cov": _coverage([s for s in bx if s["text"] and not s["bg"]], sw, sh),
         "ink_cov": _coverage([s for s in bx if not s["bg"]], sw, sh),
@@ -363,15 +381,34 @@ def _print_stats(rows, mode, sw, sh):
             warns.append(f"TEXT WALL: slide {i+1} carries a reading load of ~{r['load']} words "
                          f"({mode} budget ≈{'40' if mode=='presented' else '90'}, warn >{budget}) — move prose "
                          f"to speaker notes or split the slide")
-        if r["ink_cov"] > 0.65:
-            warns.append(f"CROWDED: slide {i+1} ink coverage {r['ink_cov']*100:.0f}% (whitespace "
-                         f"{100-r['ink_cov']*100:.0f}% < the ~50-70% ‘air’ target) — subtract, don't shrink")
+        if r["ink_cov"] > 0.70:
+            warns.append(f"CROWDED: slide {i+1} occupancy {r['ink_cov']*100:.0f}% — role bands: cover "
+                         f"25-35 · exec/summary 45-60 · technical/dense 55-70; past ~70% the slide reads "
+                         f"crowded — subtract or split, don't shrink")
+        if len(r["size_clusters"]) > 4:
+            warns.append(f"SIZE SPRAWL: slide {i+1} uses {len(r['size_clusters'])} distinct font sizes "
+                         f"({', '.join(f'{s:g}' for s in r['size_clusters'])}) — target ≤3-4 per slide, drawn "
+                         f"from the deck's declared type-scale tokens")
     builds = sum(1 for r in rows if r["build"])
     transd = sum(1 for r in rows if r["trans"])
     drama = (max((r["max_pt"] for r in rows), default=0.0) / body_med) if body_med else 0.0
     avg_ink = sum(r["ink_cov"] for r in rows) / n
+    # deck-wide size tokens: union of per-slide clusters, re-clustered
+    tok = sorted({s for r in rows for s in r["size_clusters"]})
+    tokens = []
+    for sz in tok:
+        if tokens and sz - tokens[-1] <= 0.75:
+            continue
+        tokens.append(sz)
     print(f"     fonts: body-median {body_med:.0f}pt · deck max {max((r['max_pt'] for r in rows), default=0):.0f}pt "
-          f"· type drama {drama:.1f}× | builds {builds}/{n} · transitions {transd}/{n} · avg ink {avg_ink*100:.0f}%")
+          f"· type drama {drama:.1f}× · size tokens in use {len(tokens)} (target 4-5 deck-wide) | "
+          f"builds {builds}/{n} · transitions {transd}/{n} · avg occupancy {avg_ink*100:.0f}%")
+    # canvas-relative body floor: ≈18pt on a standard 13.33in-wide slide, scaled to THIS canvas
+    floor = 18.0 * (sw / 13.333)
+    if mode == "presented" and body_med and body_med < floor * 0.92 and n > 2:
+        warns.append(f"SMALL TYPE: body-median {body_med:.0f}pt is under the ~{floor:.0f}pt floor for this "
+                     f"{sw:.1f}in-wide canvas (≈18-22pt on a standard 13.3in slide) — a presented deck's body "
+                     f"text must read from the back of the room; fewer words, bigger type")
     if mode == "presented" and builds == 0 and n > 2:
         warns.append("NO BUILDS: a presented deck with zero appear-builds — the motion manifest "
                      "should name build:/static:+reason per slide (anim.py Build)")

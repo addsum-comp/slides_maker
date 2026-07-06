@@ -99,16 +99,29 @@ feel art-directed rather than defaulted, and it's yours to set once and hold. Pi
   For a returning user, recall the previous deck's look and deliberately vary at least one foundation
   (canvas value, header furniture, signature device, type pairing) — converging on one house template
   *across decks* is the same failure as one template *across slides*.
-- **Declare the TYPE SCALE as a contract — with real drama.** Fix the deck's modular scale once, as
-  named tokens the builder must use (e.g. `display 54 · title 24 · body 12 · caption 9`), instead of
-  improvising sizes per slide (the 9.6/10.3/10.5 drift that makes a deck feel unconsidered). Two
-  requirements: **(1) hierarchy** — clear steps (~1.4–1.8× between adjacent levels); **(2) drama** —
-  the display level exists and gets USED: at least the deck's key numbers / hero statements reach
-  ≥2.5–4× body size. A deck whose largest run is ~1.5–2× body reads timid and text-like — big scale
-  on the few things that matter is what makes a slide feel designed and *directed* (the eye lands on
-  the hero first because it physically cannot land anywhere else). The render-time lint prints the
-  measured font histogram + a `type drama` ratio and warns `FLAT TYPE` below 2× — treat that warning
-  as this rule failing.
+- **Declare the TYPE SCALE as a contract — with real drama and a real floor.** Fix the deck's modular
+  scale once, as named tokens the builder must use (e.g. on the default 10×5.625in canvas:
+  `display 40 · title 22 · body 14 · caption 9.5`), instead of improvising sizes per slide (the
+  9.6/10.3/10.5 drift that makes a deck feel unconsidered). Four requirements: **(1) hierarchy** —
+  clear steps (~1.4–1.8× between adjacent levels; harmonious ratios like 36/22/14); **(2) drama** —
+  the display level exists and gets USED: the deck's key numbers / hero statements reach ≥2.5–4× body
+  size (a deck whose largest run is ~1.5–2× body reads timid and text-like — big scale on the few
+  things that matter is what makes a slide feel *directed*: the eye lands on the hero first because
+  it physically cannot land anywhere else); **(3) a canvas-relative BODY FLOOR** — presented-deck body
+  text ≥ ~18–22pt *on a standard 13.3in-wide slide*, scaled to the actual canvas (≈ **13.5–16.5pt on
+  the 10in deckkit default**) — smaller body means too many words, not a smaller font; **(4) economy**
+  — **≤3–4 sizes on any one slide, 4–5 tokens deck-wide**; every size on every slide is one of the
+  declared tokens. The render-time lint measures all four (`FLAT TYPE`, `SMALL TYPE`, `SIZE SPRAWL`,
+  plus the histogram/token count) — each warning is this rule failing measurably.
+- **Declare the SPACING SCALE as the type scale's twin — proportional, never uniform.** Whitespace has
+  hierarchy exactly like type: fix ~4 gap tokens on a ~1.6× ladder — *line* < *element* < *group* <
+  *section* (on the default 10×5.625in canvas ≈ `0.06 · 0.12–0.2 · 0.3 · 0.5in`; scale to the canvas)
+  — and derive every gap from a token, so relatedness is *visible*: tight inside a unit, wider between
+  units, widest between zones. Identical gaps everywhere is the tell of an undesigned page (proximity
+  stops carrying structure). Margins are part of the contract: outer L/R ≈ 6–8% of width, T/B ≈ 5–7%
+  of height, interior card padding comfortable at ~0.18–0.3in (the lint's 0.12in is a hard floor, not
+  the target). Every empty area must have a nameable job — separation, emphasis, framing, or guiding
+  the eye — which is what "whitespace is active" means in practice.
 - **Then pick the cross-cutting "atmosphere / polish" moves that fit the register** (taste, NOT a
   checklist — match the move to the look; `design-gallery.md`) and apply them consistently: a **semantic
   colour contract** (bind one hue per concept — navy=structure, green=good, red=risk — reused on
