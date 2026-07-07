@@ -1490,11 +1490,19 @@ Then run the **actor-critic loop** — this is the quality engine, and the criti
      takeaway / role / question / beat table**, the **claim ledger**, the **per-figure
      carrying-element rows**, and the Design plan's **declared contracts** — the skeleton rhythm
      map, the WOW slide(s), the money slide (the slide the deck exists for), the semantic-colour
-     ledger, the type tokens, and the motion manifest. Like the motion manifest it extends, the
+     ledger, the type tokens, the motion manifest, and — **when a Q4 style example is in play** —
+     the **chosen mimic mode (A/B) + style-brief pointer** (so the design lens judges style against
+     the right bar: a Mode-B restyle's deliberately-different palette is correct, not a fidelity
+     miss). Like the motion manifest it extends, the
      card carries **intent the pixels can't show**: the judges verify the RENDER honors what the
      deck DECLARES — they never re-litigate the approved declarations themselves, and pixels
      always win over a kept-but-bad promise. Fidelity stays **source-first**: a ledger row is
-     corroboration for a number, never a substitute for its source location. For an external
+     corroboration for a number, never a substitute for its source location.
+     **On any post-first round driven by user feedback**, also fold in that round's **`user-dials:`
+     line(s)** — a neutral record of *dimension → direction, layer — "the user's verbatim words"*
+     (NOT prior-critic output, so the fresh-critic-unanchored rule below is untouched); it is the
+     evidence the pendulum-overshoot check cites (`review-rubrics.md` §9), so the critic judges an
+     overshoot against the user's actual words, not a reconstruction. For an external
      deck under review/redesign or a direction preview (no Step-1 plan exists), state
      "none-declared" explicitly in the dispatch instead.
    - **Consume the previous round's `strengths` as a do-not-harm ledger.** On every fix round,

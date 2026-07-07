@@ -41,7 +41,8 @@ coordinator applies the rule.
   message + emotional-curve line, the per-slide takeaway/role/question/beat table, the
   **claim ledger** (`claim | type | source | verbatim value | verified? | as-of | tense`), the
   **per-figure carrying-element rows**, and the Design plan's declared contracts (rhythm map ·
-  WOW/money slide · semantic-colour ledger · type tokens · motion manifest) — the cross-check
+  WOW/money slide · semantic-colour ledger · type tokens · motion manifest · the chosen mimic
+  mode A/B when a Q4 style example was given) — the cross-check
   targets for the fidelity class and for confirming/refuting any contract-break finding. **The
   source stays ground truth: check slide vs ledger row AND ledger row vs source — a slide that
   matches a wrong ledger row is still wrong.** On an external deck with no plans, the dispatch

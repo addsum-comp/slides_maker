@@ -88,7 +88,9 @@ something.
   contracts — the deck memory sentence + emotional-curve line (peak marked), the per-slide
   takeaway/role/question/beat table, the claim ledger, the per-figure carrying-element rows, and
   the Design plan's declared contracts (skeleton rhythm map · WOW slide(s) · money slide ·
-  semantic-colour ledger · type tokens · motion manifest). Like the motion manifest it extends,
+  semantic-colour ledger · type tokens · motion manifest · the chosen mimic mode A/B + style-brief
+  pointer when a Q4 style example was given · on a user-feedback round, that round's `user-dials:`
+  line). Like the motion manifest it extends,
   it carries intent the pixels can't show. Two guard lines: **a promise is a commitment to audit,
   never an excuse — pixels win**; and **the audit is ADDITIVE** — plan conformance never caps or
   substitutes for the rubric (a kept promise that reads badly is still a finding; you audit
