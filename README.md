@@ -13,7 +13,18 @@
 
 <p align="center"><sub>Free and open source, built by <a href="https://addsum.top/en/"><strong>Addsum</strong></a></sub></p>
 
-> Chat with it in Codex or Claude Code. A small team of specialized agents **reads your material, or researches the web when you have none**, then plans the deck, builds it, and has an independent critic review it before you see it. You get a real PowerPoint: every text box, shape, and chart is click-to-edit, the script lives in speaker notes, and bullet reveals are native click builds.
+> **The AI deck-maker that reads your actual work, never invents a number, ships fully-editable native PowerPoint — and won't hand it over until an independent critic signs off.**
+
+Chat with it in Codex or Claude Code. It isn't one prompt guessing at slides: a small team of specialized agents reads your paper / repo / doc (or researches the topic when you have none), plans the story, designs each slide around it, builds a real `.pptx`, and puts it through an independent review before you ever see it.
+
+Most AI-PPT tools race to look pretty in seconds. slide-maker optimizes for the four things that actually matter when the deck is *yours to defend*:
+
+- 🔍 **Reads your source — doesn't invent it.** Every number and figure traces back to your material; it won't make up a statistic to fill a slide. (The failure mode of every "expand a topic" tool — one popular assistant printed *43% growth* where the real figure was *12%*.)
+- ✏️ **A real PowerPoint, not a screenshot.** Every text box, shape, native chart and equation is a click-to-edit object — *nothing* flattened to an image. (Many "export to PPTX" tools quietly turn a third of your slides into uneditable pictures.)
+- 🧑‍⚖️ **Reviewed before you see it.** A non-negotiable actor–critic loop: a *separate* critic tries to break the deck — cramped layout, weak contrast, a number that doesn't match the source — and sends fixes back. Not the author model grading its own homework.
+- 🎨 **Designed around your content, in any language.** Composed slide by slide — matching your template or designing a clean one — for a research talk, a thesis defense, or a product pitch. Not your text poured into a stock layout.
+
+<sub>Native-editable PPTX is now table stakes (several tools do it). What's rare is *editable **and** source-traced **and** critic-reviewed **and** bespoke* — together, in one file you own. Honest limits: no zero-setup cloud, no share links, no animated web backgrounds — it makes a **file**, run locally, that opens and edits cleanly in real PowerPoint/Keynote. See [what's different](#what-makes-slide-maker-different).</sub>
 
 <p align="center">
   <a href="https://slides.addsum.top/"><strong>Intro video</strong></a> ·
@@ -128,6 +139,8 @@ AI presentation tools roughly fall into four categories. slide-maker only does t
 | Image-based | One big picture per slide, packed into PPTX | No, each slide is a picture |
 | HTML presentation | Slides in a browser | Not a PPTX |
 | **Native editable (slide-maker)** | **Real text boxes, shapes, native charts** | **Yes, click anything and edit** |
+
+That table is about the *format*. A handful of newer tools now also emit native-editable PPTX — so "editable" alone no longer sets anything apart. What sets slide-maker apart is **what it does with that format**: it reads your real material and refuses to invent, it puts the deck through an independent review before you see it, and it composes each slide to your content instead of pouring text into a template. The rest of this section is those three, in order.
 
 ### A small team of agents: separate jobs, separate incentives
 
