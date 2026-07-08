@@ -328,7 +328,7 @@ def _pangu_para(para):
 
 
 def text(slide, x, y, w, h, runs, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
-         space_after=6, line_spacing=None):
+         space_after=6, line_spacing=None, wrap=True):
     """runs = list of paragraphs; each paragraph = list of run tuples
     (txt, size, color, bold, italic[, font]).
 
@@ -337,13 +337,19 @@ def text(slide, x, y, w, h, runs, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
     (CJK glyphs fill the em-box, so single spacing reads denser than the same setting in
     Latin). Pass a number to force one value for every paragraph, exactly as before.
 
+    wrap=True (default) word-wraps to the box width. Pass **wrap=False for a single HERO
+    NUMERAL / integral number / one-word display** that must stay on ONE line — a big "2026"
+    or "€15亿" must never break into "202"/"6". With wrap off the run overflows the box
+    instead of wrapping (size the box wide enough, or let a ghost bleed off-canvas); the
+    build-time lint still flags a real off-canvas overflow.
+
     Vertical centring: to centre text inside a filled box/card, pass anchor=MSO_ANCHOR.MIDDLE
     AND give this textbox the SAME (x, y, w, h) as the box. A y-offset (e.g. y+0.07) combined
     with the box's full height pushes the centre below the box's true middle — text then reads
     "a bit low". Want top padding? Use margin_top, not a y-offset with unchanged height."""
     tb = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
     tf = tb.text_frame
-    tf.word_wrap = True
+    tf.word_wrap = bool(wrap)
     tf.vertical_anchor = anchor
     tf.margin_left = tf.margin_right = Pt(2)
     tf.margin_top = tf.margin_bottom = Pt(2)
@@ -2190,7 +2196,7 @@ def series_from_csv(path, x_col, y_cols, *, delimiter=None, encoding="utf-8"):
 
 def native_chart(slide, x, y, w, h, categories, series, *, kind="line_markers",
                  palette=None, dark=False, font=None, highlight=None, legend=True,
-                 value_fmt=None, smooth=True):
+                 value_fmt=None, smooth=True, zero_base=True):
     """An **EDITABLE native PowerPoint chart** (a real chart object: click to edit data/labels in
     PowerPoint, and **any non-Latin labels — CJK · Cyrillic · Greek · …** — render via PowerPoint's own
     fonts, **no tofu**, unlike the rasterised designed_charts recipes). Prefer this whenever editability
@@ -2200,7 +2206,15 @@ def native_chart(slide, x, y, w, h, categories, series, *, kind="line_markers",
     `series` = [(name, [v, v, ...]), ...]; `categories` = the x labels. Themed to the deck (palette,
     dark). `kind`: 'line' | 'line_markers' | 'column' | 'bar'. `highlight` = index of the one series
     to keep in the accent (others dropped to grey). For a two-scale 'A↑ vs B↓' chart use
-    `native_dual_axis` instead."""
+    `native_dual_axis` instead.
+
+    **`zero_base=True` (default) forces a ZERO value-axis baseline for column/bar charts** so bar
+    LENGTH encodes the value itself, not ``value − auto_min``. Without it PowerPoint auto-crops the
+    axis on clustered-high data (scores 85/88/92, revenue 210/220/230) and a bar reading ~3× taller
+    is only 1.09× larger — the classic 'cropped-axis drama' that MISREPRESENTS magnitude. It fires
+    only for column/bar with all-non-negative data; line/line_markers keep auto-scale (a trend line
+    legitimately wants a cropped axis). Pass ``zero_base=False`` only for a *deliberate* zoomed
+    magnitude axis, and say why."""
     from pptx.chart.data import CategoryChartData
     from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
     KIND = {"line": XL_CHART_TYPE.LINE, "line_markers": XL_CHART_TYPE.LINE_MARKERS,
@@ -2214,6 +2228,15 @@ def native_chart(slide, x, y, w, h, categories, series, *, kind="line_markers",
     ch = gf.chart
     _theme_chart(ch, series, palette=palette, dark=dark, font=font, highlight=highlight,
                  legend=legend, value_fmt=value_fmt, smooth=smooth, kind=kind)
+    # honest magnitude: a column/bar's LENGTH must encode value, so pin the axis to 0 (a non-zero
+    # auto-min makes a bar encode value−min — the 'cropped-axis drama' that misreads magnitude).
+    if zero_base and kind in ("column", "bar"):
+        try:
+            allv = [float(v) for _, vals in series for v in vals]
+            if allv and min(allv) >= 0:
+                ch.value_axis.minimum_scale = 0
+        except Exception:
+            pass
     return ch
 
 
@@ -2379,6 +2402,12 @@ def native_pareto(slide, x, y, w, h, items, *, palette=None, dark=False, font=No
     _theme_chart(ch, [("数量", 1), ("累计 %", 1)], palette=pal, dark=dark, font=font,
                  highlight=0, legend=True, value_fmt=None, smooth=False, kind="column")
     _chart_to_secondary(ch, dark=dark, font=font)
+    # count bars sit on the primary axis — pin it to 0 so bar length reads as count, not count−min
+    if all(v >= 0 for v in vals):
+        try:
+            ch.value_axis.minimum_scale = 0
+        except Exception:
+            pass
     return ch
 
 
@@ -4359,9 +4388,12 @@ def tier_stack(slide, x, y, w, h, tiers, *, mode="pyramid", direction=None, acce
     narrow one (default follows ``mode``). Each band gets a colour from a semantic RAMP — tints of one
     accent, light at the top → full accent at the base — or the explicit per-tier ``accents`` list.
     ``values`` (optional, aligned to ``tiers``) is DISPLAYED (conversion %/counts); when numeric it
-    ALSO drives band width value-proportionally, so a real funnel's drop-off is honest geometry rather
-    than a fixed taper. ``labels='inside'`` sets the label (auto-fit) ON the band, contrast-aware;
-    ``labels='side'`` draws the tiers in the left ~half and calls each label out to the RIGHT with a
+    ALSO drives band width value-proportionally — width tracks ``value/max`` with only a hairline
+    floor, so a real funnel's deep drop-off is HONEST geometry (a 5%-of-max tier is drawn at 5%
+    width, not clamped up to a fixed minimum that would contradict its own label). ``labels='inside'``
+    sets the label (auto-fit) ON the band, contrast-aware — but a band too thin to hold its label
+    (a value-mode sliver) auto-routes to a RIGHT-side leader so honest geometry stays legible;
+    ``labels='side'`` draws every tier in the left ~half and calls each label out to the RIGHT with a
     thin leader. ``ink`` is the side-label colour (default DEEP). Returns the bottom y.
 
     Ship ``pyramid(...)`` / ``funnel(...)`` as the two obvious entry points over this core."""
@@ -4384,10 +4416,14 @@ def tier_stack(slide, x, y, w, h, tiers, *, mode="pyramid", direction=None, acce
             numeric_vals = [float(v) for v in values]
         except (TypeError, ValueError):
             numeric_vals = None
-    MINF = 0.20
+    MINF = 0.20            # decorative-taper floor ONLY (no values) — keeps the narrow end visible
+    SLIVER = 0.02          # value-mode floor: a near-zero tier shows as a hairline, NOT inflated
     if numeric_vals is not None and max(abs(v) for v in numeric_vals) > 0:
+        # value-proportional: width MUST track value/max honestly (a funnel's deep drop-off is the
+        # story). Only a hairline SLIVER floor so a sub-1% tier stays visible — never the 0.20 floor,
+        # which would draw a 5%-of-max tier at 20% width and contradict its own label.
         mx = max(abs(v) for v in numeric_vals)
-        fracs = [max(MINF, abs(v) / mx) for v in numeric_vals]
+        fracs = [max(SLIVER, abs(v) / mx) for v in numeric_vals]
     else:
         fracs = []
         for i in range(n):
@@ -4411,7 +4447,11 @@ def tier_stack(slide, x, y, w, h, tiers, *, mode="pyramid", direction=None, acce
             v = values[i]
             val_str = f"{v:g}" if isinstance(v, (int, float)) and not isinstance(v, bool) else str(v)
         band_cy = cy + band_h / 2.0
-        if labels == "inside":
+        # a value-proportional band can now be a thin sliver — too narrow to hold a label INSIDE.
+        # auto-route those to a side leader so the honest geometry stays legible (never inflate the
+        # band just to fit its text).
+        too_thin = labels == "inside" and band_w < 0.85
+        if labels == "inside" and not too_thin:
             tc = WHITE if contrast_ratio(WHITE, cols[i]) >= contrast_ratio(DEEP, cols[i]) else DEEP
             lsize = fit_text_size([(str(lab), True)], max(0.4, band_w - 0.24), band_h - 0.06, 14,
                                   font=font, min_size=8)
@@ -4420,6 +4460,15 @@ def tier_stack(slide, x, y, w, h, tiers, *, mode="pyramid", direction=None, acce
                 runs.append([(val_str, max(8.0, lsize - 2), tc, False, False, font)])
             text(slide, bx, cy, band_w, band_h, runs, align=PP_ALIGN.CENTER,
                  anchor=MSO_ANCHOR.MIDDLE, space_after=0, line_spacing=0.98)
+        elif too_thin:
+            lx = bx + band_w + 0.16
+            connector(slide, (bx + band_w, band_cy), (lx - 0.04, band_cy),
+                      color=MUTE, width=1.0, arrow=False)
+            runs = [(str(lab), 11.5, ic, True, False, font)]
+            if val_str:
+                runs.append(("   " + val_str, 11.5, MUTE, False, False, font))
+            text(slide, lx, cy, max(0.6, x + w - lx), band_h, [runs],
+                 anchor=MSO_ANCHOR.MIDDLE, space_after=0)
         else:
             lx = x + w_area + 0.22
             connector(slide, (bx + band_w, band_cy), (lx - 0.06, band_cy),
@@ -4661,14 +4710,24 @@ def eval_matrix(slide, x, y, w, options, criteria, cells, *, mark="ball", recomm
     return bottom
 
 
-def _heat_color(v, vmin, vmax, scale, accent):
+def _heat_color(v, vmin, vmax, scale, accent, *, div_zero=False):
     """Map a value to a cell fill for :func:`heat_matrix`. ``scale='seq'`` light→accent · ``'div'``
-    blue↔red through a neutral midpoint · ``'risk'`` green→amber→red (a risk grid)."""
+    blue↔red through a neutral midpoint · ``'risk'`` green→amber→red (a risk grid). ``div_zero`` pins
+    the diverging neutral at the VALUE 0 (two-slope: 0→neutral, using full contrast on each sign)
+    so a signed delta reads its sign correctly — set by heat_matrix when no explicit range is given."""
     span = (vmax - vmin) or 1.0
     t = max(0.0, min(1.0, (float(v) - vmin) / span))
     acc = _as_rgbc(accent) if accent is not None else BLUE
     if scale == "div":
         cool, mid, warm = RGBColor(0x2C, 0x6F, 0xBB), RGBColor(0xF2, 0xF3, 0xF5), RGBColor(0xC6, 0x3A, 0x33)
+        if div_zero:
+            # anchor neutral at 0, not the range midpoint — a true 0 must read neutral, positives warm,
+            # negatives cool. Two-slope keeps full contrast on each sign for asymmetric ranges.
+            hi_pos = vmax if vmax > 0 else 1.0
+            lo_neg = vmin if vmin < 0 else -1.0
+            fv = float(v)
+            t = 0.5 + 0.5 * (fv / hi_pos) if fv >= 0 else 0.5 - 0.5 * (fv / lo_neg)
+            t = max(0.0, min(1.0, t))
         return _blend(cool, mid, t / 0.5) if t < 0.5 else _blend(mid, warm, (t - 0.5) / 0.5)
     if scale == "risk":
         green, amber, red = RGBColor(0x2E, 0x8B, 0x57), RGBColor(0xE0, 0xA3, 0x2E), RGBColor(0xC6, 0x3A, 0x33)
@@ -4681,7 +4740,9 @@ def heat_matrix(slide, x, y, w, h, values, row_labels, col_labels, *, scale="seq
     """A category×category HEAT MATRIX — solid-filled cells coloured by value, with two-edge axis
     labels (``col_labels`` across the top, ``row_labels`` down the left). ``values`` is a 2-D list
     ``values[row][col]``. The value→colour mapper is ``scale='seq'`` (light→accent), ``'div'``
-    (blue↔red through neutral — signed deltas), or ``'risk'`` (green→amber→red — a 5×5 risk grid);
+    (blue↔red through neutral — signed deltas: the neutral is pinned at the VALUE 0, so a 0 reads
+    neutral, positives warm, negatives cool; pass an explicit ``vmin``/``vmax`` to instead fix the
+    range and its midpoint), or ``'risk'`` (green→amber→red — a 5×5 risk grid);
     ``vmin``/``vmax`` fix the range (default data min/max). ``cell_labels`` prints values in the cells
     — pass ``True`` to show the numbers, or a 2-D list of strings — in a CONTRAST-AWARE colour
     (``contrast_ratio`` picks dark-on-light / light-on-dark). ``legend=True`` adds a colour-bar strip
@@ -4692,6 +4753,8 @@ def heat_matrix(slide, x, y, w, h, values, row_labels, col_labels, *, scale="seq
     flat = [float(v) for row in values for v in row]
     lo = vmin if vmin is not None else min(flat)
     hi = vmax if vmax is not None else max(flat)
+    # diverging + no caller range → anchor neutral at 0 so signed deltas read their sign correctly
+    div_zero = (scale == "div" and vmin is None and vmax is None)
     rlab_w = min(2.2, max(1.0, w * 0.2))
     clab_h = 0.3
     leg_h = 0.5 if legend else 0.0
@@ -4705,7 +4768,7 @@ def heat_matrix(slide, x, y, w, h, values, row_labels, col_labels, *, scale="seq
         text(slide, x, gy + r * ch, rlab_w - 0.1, ch, [[(str(row_labels[r]), 10.5, DEEP, True, False, font)]],
              align=PP_ALIGN.RIGHT, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
         for c in range(nc):
-            col = _heat_color(values[r][c], lo, hi, scale, accent)
+            col = _heat_color(values[r][c], lo, hi, scale, accent, div_zero=div_zero)
             box(slide, gx + c * cw, gy + r * ch, cw, ch, fill=col)
             lbl = None
             if cell_labels is True:
@@ -4724,7 +4787,7 @@ def heat_matrix(slide, x, y, w, h, values, row_labels, col_labels, *, scale="seq
         for i in range(nseg):
             vv = lo + (i / (nseg - 1)) * (hi - lo)
             box(slide, gx + i * bar_w / nseg, lgy, bar_w / nseg + 0.006, 0.14,
-                fill=_heat_color(vv, lo, hi, scale, accent))
+                fill=_heat_color(vv, lo, hi, scale, accent, div_zero=div_zero))
         text(slide, gx, lgy + 0.16, 1.2, 0.2, [[(f"{lo:g}", 9, MUTE, False, False, font)]],
              align=PP_ALIGN.LEFT, space_after=0)
         text(slide, gx + bar_w - 1.2, lgy + 0.16, 1.2, 0.2, [[(f"{hi:g}", 9, MUTE, False, False, font)]],

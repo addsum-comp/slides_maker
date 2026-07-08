@@ -138,6 +138,41 @@ rank change → slope; A↑/B↓ tradeoff → dual-axis; vital few → Pareto), 
 **highlight the one series that matters** (everything else neutral grey), and give it a "so-what"
 rail. Full roster + ready recipes in `references/data-viz.md` (`scripts/designed_charts.py`); KPI
 tiles via `deckkit.scorecard`. For a single obvious number use a hero stat, not a chart.
+- **The axis / baseline must span EVERY element it measures.** A bar/waterfall/dot chart's baseline
+  or value axis has to run under (or across) *all* its bars — a baseline that stops short of the last
+  bar reads as a rendering bug. Derive its length from the bars (`last_bar_x_end − axis_x`), never a
+  hand-picked width that happens to miss the final element.
+- **A cumulative / waterfall must not DOUBLE-COUNT.** Show the increments as floating bars *or* their
+  running total as a full bar — never both an increment set AND its sum as peer bars (a "+8 / +8.3 /
+  +16.3" trio reads as three additions when 16.3 = 8 + 8.3). Use dashed connectors to carry the running
+  total between floats, end on ONE total/subtotal bar, and keep *different kinds* of quantity apart
+  (e.g. employee take-home extras vs employer-paid pension are two stacks, not one 135% total — show
+  the second as a separate labelled note, not stacked into the first). `deckkit.waterfall` /
+  `designed_charts` render this correctly; prefer them over hand-rolling floating boxes.
+- **The geometry must MATCH the number — three ways an encoding silently lies.** A picture that
+  misrepresents its own data is worse than a broken layout; before shipping any value-driven chart,
+  read one bar/cell's *geometry* against its *printed value*. (1) **Zero baseline for magnitude** —
+  a column/bar's length must encode the value, so the axis starts at 0; on clustered-high data
+  (85/88/92) an auto-cropped axis makes a 1.09× gap look ~3×. (2) **Proportional means proportional**
+  — a funnel band / bubble area / any size-encoding must track `value/max` with at most a hairline
+  floor; a min-size clamp that widens a 5%-of-max tier to 20% makes the shape contradict its label
+  (route a too-thin label to a side leader instead of inflating the shape). (3) **Signed scales
+  anchor neutral at 0** — a diverging blue↔red must put its neutral at the *value* 0, not the data
+  midpoint, or a true 0 reads as negative. deckkit's components now default to all three (zero-base
+  column/bar, hairline funnel sliver, zero-centred `div` heat); a matplotlib or hand-rolled chart
+  gets none for free — set `ylim(bottom=0)`, keep sizes proportional, use `TwoSlopeNorm(vcenter=0)`.
+
+## Big numbers — the hero numeral must read clean
+- **An integral number never wraps.** A hero/ghost numeral or a single figure ("2026", "€15亿",
+  "+16.3%") must stay on **one line** — never break into "202" / "6". Size it to fit its box, or pass
+  **`deckkit.text(..., wrap=False)`** (a ghost may then bleed off-canvas, which is fine; the build-time
+  lint still catches a real overflow).
+- **Numerals need LINING figures.** Set big numbers in a **lining-figure** face (uniform-height,
+  baseline-aligned digits) — Helvetica Neue / Arial / Verdana, or Cambria / Times New Roman for serif.
+  A big number in an **old-style-figure** face (Georgia, Baskerville, Palatino, Constantia) shows
+  digits at different heights ("some smaller / higher / lower") and misaligns with adjacent CJK/Latin
+  on the line. Full rule + face list in `references/font-guidance.md`. Verify digit alignment in the
+  render — beside CJK (`中文 15亿`) and on pure-Latin lines.
 
 ## Layout patterns — reach for the right one (apply dynamically, not always)
 Beyond columns/rows, `deckkit` has purpose-fit patterns; use the one that fits the *content*, and

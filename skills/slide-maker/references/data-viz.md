@@ -38,7 +38,34 @@ The recipes render a themed PNG → place with `deckkit.picture(out, ..., fit="c
 - **Composition without meaning** — a donut/stacked bar for parts that don't sum to a meaningful
   whole; if the audience won't ask "share of what?", use a bar.
 - **Cropped-axis drama** — a bar chart whose y-axis starts above 0 inflates a small delta; bars
-  start at 0 (lines may zoom, but then say so on the axis).
+  start at 0 (lines may zoom, but then say so on the axis). This bites hardest on **clustered-high
+  data** (scores 85/88/92, revenue 210/220/230): the renderer *auto-crops* the axis to ~200 and a
+  bar reading ~3× taller is only 1.09× larger. `deckkit.native_chart`/`native_pareto` now force a
+  zero baseline for column/bar with non-negative data (`zero_base=True` default) — don't pass
+  `zero_base=False` unless a zoomed magnitude axis is deliberate *and* labelled; a **matplotlib /
+  hand-rolled** bar chart has no such guard, so set `ax.set_ylim(bottom=0)` yourself.
+- **Inflating floor on a proportional encoding** — a min-visible-size clamp that lifts small values
+  to a fixed floor so a `10`-out-of-`200` tier is DRAWN at 20% width while its label reads 5%: the
+  geometry now contradicts its own number, and the floor fires exactly where a funnel's story lives
+  (the deep drop-off). A proportional encoding (funnel/pyramid band width, bubble area, bar length)
+  must track `value/max` with at most a *hairline* floor; when a band gets too thin to hold its
+  label, route the label OUT to a side leader — never widen the band. `deckkit.tier_stack` does this
+  now; a hand-rolled proportional shape must too.
+- **Off-zero neutral on a signed scale** — a diverging blue↔red (or +/−) encoding whose neutral is
+  anchored at the DATA midpoint, not the value 0, so a true `0` renders blue ("negative") and
+  all-positive deltas straddle neutral — the sign reading is simply wrong. Anchor neutral at the
+  semantic zero. `deckkit.heat_matrix(scale='div')` zero-centres by default (pass explicit
+  `vmin`/`vmax` only to fix a deliberate asymmetric range); a matplotlib diverging map needs
+  `TwoSlopeNorm(vcenter=0)` (or a symmetric `vmin=-M, vmax=+M`).
+- **Axis that misses a bar** — a baseline / value axis drawn to a hand-picked width that stops short of
+  the last bar reads as a rendering bug; derive its extent from the data (`last_bar_x_end − axis_x`).
+- **Waterfall that double-counts** — showing increments AND their sum as peer bars ("+8 / +8.3 / +16.3"
+  where 16.3 = 8+8.3), or stacking two *different* quantity kinds into one total (take-home extras +
+  employer pension = a "135%" bar). Show increments *or* the running total, use `deckkit.waterfall`
+  (correct running-total + connectors), and keep distinct quantities in separate stacks / a side note.
+- **Hand-rolled where a component exists** — building `waterfall`/`gantt`/`dumbbell_board`/a chart from
+  raw boxes re-introduces the geometry & grammar bugs the component already fixed; reach for the
+  component, hand-roll only a form the library genuinely lacks.
 - **Chart with no takeaway** — a plot dropped on the slide with no assertion title / takeaway rail
   is data, not an argument; every chart answers a named question.
 - **Rainbow categorical palette** — hues with no semantic binding read as decoration; bind each hue

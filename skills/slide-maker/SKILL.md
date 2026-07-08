@@ -829,7 +829,19 @@ rhythm, per-slide design, colour, logo) as the source of truth — the slide-des
 each slide's visual FORM and the user approved it at the DESIGN checkpoint, so **don't re-derive an
 approved form.** *Fallback only where the plan left something open:* pick that slide's form deliberately —
 generate 2-3 candidate forms and choose with the tie-breaker in `references/form-selection.md`;
-**don't default every multi-item slide to a card grid.** The helper set, by job:
+**don't default every multi-item slide to a card grid.**
+> **🔴 When a COMPONENT exists for the form, BUILD that component — do NOT hand-roll a substitute from
+> raw `box`/`connector` primitives.** Reaching for a plotted form (`waterfall`, `gantt`,
+> `dumbbell_board`, `dot_strip`, `tier_stack`, `native_chart`, `eval_matrix`, `heat_matrix`, `meter_bar`,
+> `timeline` …) and then hand-drawing it with boxes **re-introduces the exact geometry & grammar bugs the
+> component already fixed** — a baseline width hardcoded to a number that stops short of the last bar
+> (the component derives its axis from the data), a waterfall that double-counts (+8 / +8.3 / +16.3 as
+> peer bars) or conflates two quantity kinds (take-home vs employer cost in one 135% stack). This is the
+> #1 source of "the chart looks messy / wrong" defects. Adapt a component's params or compose from
+> primitives ONLY for a form the library genuinely lacks — and *then* the burden is on you: **derive
+> every axis / baseline / track extent from the data** (`last_bar_x_end − axis_x`, never a hand-picked
+> width), and don't double-count (`references/design-principles.md` "Designed plots" + "Big numbers").
+The helper set, by job:
 - **Chrome:** `title_bar`/`content_slide`, `footer`, `editorial_header` (caps eyebrow + title +
   hairline), `part_eyebrow`/`page_marker` (mono eyebrow + page marker), `logo` (persistent
   brand/institution/product mark in a fixed corner on every page — see the brand-logo rule below).
@@ -1428,6 +1440,22 @@ critic round — full rationale in `references/design-principles.md`):
   the slide title (clear step between levels, ~1.4–1.8×); no body, formula, or chip label set as large
   as (or larger than) the title. The only thing that may exceed body size is a deliberate **hero**
   element (the one big numeral or the slide-defining equation) — and even it stays below the title.
+- **Hero numerals read clean** — an **integral number stays on ONE line** (no "2026" broken into
+  "202"/"6" — use `wrap=False` or a wide-enough box); digits are **uniform-height & baseline-aligned**
+  (a lining-figure face — Helvetica Neue / Arial / Cambria — NOT an old-style-figure face like Georgia,
+  whose digits sit at different heights); and a numeral run **aligns** with adjacent CJK/Latin on its
+  line (`design-principles.md` "Big numbers", `font-guidance.md`).
+- **Chart axis spans every bar; a cumulative doesn't double-count** — a bar/waterfall/dot chart's
+  baseline/value-axis runs under **all** its bars (not stopping short of the last one), and a
+  cumulative/waterfall shows increments *or* their total, never both as peer bars (a "+8 / +8.3 /
+  +16.3" trio is a double-count); keep different quantity kinds in separate stacks. Prefer
+  `deckkit.waterfall` over hand-rolled floating boxes (`design-principles.md` "Designed plots").
+- **Geometry matches the number** — read one bar/band/cell's *size or colour* against its *printed
+  value*: a magnitude column/bar starts at **0** (a cropped axis makes 210/220/230 read as a ~3×
+  cliff); a proportional shape (funnel band, bubble) is sized to `value/max`, not clamped up by a
+  min-size floor that contradicts its label; a diverging/signed scale reads its **sign** (a true 0
+  is neutral, not blue). deckkit defaults handle all three — flag any hand-rolled/matplotlib chart
+  that doesn't (`data-viz.md` "Chart anti-patterns", `design-principles.md` "Designed plots").
 - **Formula sized to content** — every equation's glyphs read at ≈ **body size** (not blown up to fill
   the slide width, not illegibly shrunk), and **consistent across slides** (same placed height); any
   inline variable/symbol is in **math format** (italic, real sub/superscript), never plain body letters

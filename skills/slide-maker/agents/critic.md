@@ -240,9 +240,20 @@ Do not just skim for the first few obvious issues. Run these passes:
      - **Owns these named-flaw checks (below):** OVERLAP (collision vs layering); layout/balance/footer/
        margins; **large empty region / oversized filler block**; diagram arrow-direction & even spacing;
        the full typography set (too-small, **font hierarchy: content < title**, box-alignment, mixed-size
-       baseline, operator spacing, widow, corner-rounding, lone-glyph centring, type-pairing); **formula
-       sizing-to-content + variables in math format**; colour/contrast/one-accent; charts & computed-plot
-       correctness + legibility (tofu, aliasing, legend placement, single-highlight, so-what); image
+       baseline, operator spacing, widow, corner-rounding, lone-glyph centring, type-pairing, **hero-numeral
+       hygiene: an integral number wrapped across lines ("202"/"6") + old-style-figure digits at uneven
+       heights (Georgia-class) where a lining face is needed + a numeral misaligned with adjacent CJK/Latin**);
+       **formula sizing-to-content + variables in math format**; colour/contrast/one-accent; charts &
+       computed-plot correctness + legibility (tofu, aliasing, legend placement, single-highlight, so-what,
+       **a value axis/baseline that doesn't span every bar, a cumulative/waterfall that DOUBLE-COUNTS
+       (increments + their sum as peer bars) or conflates two quantity kinds, and a chart HAND-ROLLED from
+       boxes where a component (`waterfall`/`gantt`/`dumbbell_board`/…) would have been correct**;
+       **VALUE-ENCODING FIDELITY — does the geometry match the number? a magnitude bar/column on a
+       cropped (non-zero) axis so a 1.09× difference reads ~3× (clustered-high data is the trap); a
+       proportional shape (funnel/pyramid band, bubble area) whose small value is inflated by a
+       min-size floor so the band contradicts its own label; a signed/diverging scale whose neutral
+       sits at the data midpoint not 0, so a true 0 reads as negative — spot-check one cell/bar's
+       geometry against its printed value**); image
        crop/placement; AI-slop visual tells; stacked-group proximity; deck rhythm; motion/build design;
        **Poster test (bookends)** — judge the cover and the TRUE closing slide (you know which slide
        closes the argument — not a trailing sources/backup page) at thumbnail scale (the provided
