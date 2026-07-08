@@ -275,6 +275,14 @@ Do not just skim for the first few obvious issues. Run these passes:
      would land better**: quantitative data with no chart; 3-6 metrics not shown as `scorecard`
      tiles; a sequence not drawn as a `timeline`/pipeline; a core-and-peers idea not a `hub_spoke`;
      a two-axis classification not a `quadrant`; a before→after not a `dumbbell`/`before_after`;
+     **options scored against criteria written as prose or a plain table where an `eval_matrix`**
+     (Harvey-ball / ✓◐✕ scoring grid) would let the reader compare at a glance; **a dated plan with
+     durations / parallel workstreams as a bullet list where a `gantt`/swimlane** would show the overlap;
+     **a narrowing pipeline or drop-off, or stacked tiers, flattened into text where a `tier_stack`**
+     (funnel / pyramid) fits; **a risk / prioritization / value grid as a plain table where a
+     `heat_matrix`** would encode the pattern in colour; **a variance walk / revenue bridge as endpoints
+     only where a `waterfall`** shows how the total builds; **a product/UI screenshot floating as a bare
+     rectangle where a `device_frame`** (browser / phone chrome) would read as the product;
      **a method's procedure / training loop written as prose where an `algorithm_block`** (numbered
      pseudocode) would be exact and skimmable — *and* the reverse: an `algorithm_block` so **dense or
      long** it's an unreadable wall at slide scale (trim to the steps that carry the contribution, push

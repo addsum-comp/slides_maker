@@ -95,7 +95,12 @@ an order of operations, and you guard it:
   and why is it still here? Does this choice serve the audience's understanding, or my
   convenience?
 - **Components are a palette, not a menu.** `kpi_card` / `dumbbell_board` / `flow_compare` /
-  `cycle_diagram` exist so debugged geometry is reusable — reach for one when the sketch calls
+  `cycle_diagram` / `tier_stack` (funnel·pyramid) / `gantt` (dated plan·swimlanes) / `eval_matrix`
+  (options×criteria scoring, Harvey balls) / `heat_matrix` (risk·value grid) / `waterfall` (a total's
+  walk) / `device_frame` (a UI screenshot in browser·phone chrome) exist so debugged geometry is
+  reusable — **know the full roster (`form-selection.md`'s decision map routes every content-shape to
+  its component, `design-gallery.md` catalogues them) so a real form isn't missed and hand-rolled** —
+  reach for one when the sketch calls
   for exactly that form; adapt or compose primitives when it calls for something the library
   doesn't have. A deck assembled purely from stock components at default settings is a template
   with extra steps.
