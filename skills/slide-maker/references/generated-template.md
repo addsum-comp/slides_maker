@@ -34,11 +34,15 @@ layers**, and the split is what keeps it editable *and* on-brand:
     the same style (placed `picture(fit="cover")`), or the hero re-placed full-bleed under a heavy
     `scrim_overlay` so a soft but **still-visible** ghost of it remains (a ghost you genuinely can't see is the same failure as no plate — see the visibility floor in the legibility guardrails).
   **🔴 MUST for the image-tool template — the interior shallow background is itself a GENERATED image
-  plate, not a flat / merely-native fill.** Since the user chose a *generated visual identity*, every
-  interior page carries a **dedicated low-contrast, text-free background image generated in the same
-  style** (the subtle imagery plate above), so the body reads as *designed* as the cover; a flat — or a
+  plate, not a flat / merely-native fill — and it is TOPICAL.** The chosen style is the **whole deck's**
+  identity, not cover decoration: every
+  interior/main-content page carries a **dedicated low-contrast, text-free background image generated in
+  the same style AND related to the deck's topic/content** (the subtle imagery plate above — a faint
+  circuit-and-node field for an AI deck, faint botanicals for a garden brand, never a generic mesh or
+  abstract filler that could sit under any deck), so the body reads as *designed* as the cover; a flat — or a
   merely-native, gradient-only — interior under a lush generated cover is the failure to avoid. Apply the
-  **SAME plate on every content slide** so they read as one system; only the cover and dividers get the
+  **SAME plate on every content slide** so they read as one system (a second topical plate variant is
+  fine for a long deck's section change); only the cover and dividers get the
   full, vivid imagery. **The plate is a faint DERIVATIVE of the hero itself** — the hero's own signature motif and palette, softened, evenly-toned, low-saturation — **not a generic or unrelated texture** (a stock triangulated mesh, random grain): a plate whose motif differs from the hero reads as a second, unrelated design and quietly breaks the one-system illusion, so 'a plate on every page' is met on paper while the deck stops feeling like one identity. *Carves (audit-scoped) — the MUST yields to:* **(1)** a deliberately **minimal /
   flat** generated style (Swiss · Scandinavian · Brutalist) whose aesthetic *is* near-flat; **(2)** the
   **user explicitly asking for clean / flat / minimal interiors**, or a **brand identity that is itself a
@@ -90,29 +94,33 @@ layers**, and the split is what keeps it editable *and* on-brand:
 Run a short extra interview *now* — only what the *look* needs (purpose/audience/source come
 later in the normal interview):
 - **Scenario / topic** — what the deck is for (e.g. "summer music festival annual handbook").
-- **Show the candidate styles as a VISUAL HTML preview, not just a text list — a "style gate"
-  (recommended).** Don't make the user choose a style from words alone. Pick the **3–4 best-fit named
-  styles** for this scenario from the **Style library** at the end of this file (e.g. **Memphis** from
-  the Sugar Rush sample, or Swiss, Art Deco, Vaporwave, Editorial, Risograph, Glassmorphism, Blueprint…),
-  **tailor each to the topic + brand colours**, turn each into a **token-set** (palette + portable fonts +
-  motif/accent — pull from `presets.py` when the style is a named preset, else author it), and render all
-  of them into **ONE self-contained HTML** with **`scripts/archetypes_html.py styles.json out.html
-  "Deck Title"`** — each style shown across a few representative pages (cover · content · diagram · data).
-  **Hand the user the single `file://…` link** to open in a browser and *see what each style is actually
-  like* — then pick (each card has a **Pick** button that copies a paste-back line). This mirrors the
-  **direction gate** (`collaborative-mode.md`) but for the generated-template look.
-  - The HTML mockups are **native token-set previews** — they convey each style's **palette / type / mood**
-    (the *direction*); the style's **motifs and the actual generated imagery** are NOT in the mockup —
-    those land **only for the chosen style** at the 🔴 hero checkpoint below. **Don't generate 3–4 real
-    hero images just for the picker** —
-    that's slow and wasteful; mock them natively in the HTML, generate only the winner for real.
+- **Show the candidate styles as a VISUAL HTML preview of REAL generated images — a "style gate"
+  (recommended).** Don't make the user choose a style from words alone — and don't frame this gate
+  around *colour* (colour variations of one look belong to the flat/clean **direction gate** in
+  `collaborative-mode.md`; palette here is a *derived detail*, tailored after the style is chosen).
+  This gate is about **STYLE, chosen for the TOPIC + CONTENT**: pick the **3 best-fit named styles for
+  what this deck is actually about** from the **Style library** at the end of this file, and make them
+  **deliberately DIVERSE** — three different visual *languages* (e.g. Swiss vs Manga vs Glassmorphism;
+  Ink-wash vs Blueprint vs Claymorphism), never three moods of one language. For each candidate,
+  **GENERATE 1 real template image (2 for the front-runner) in that style, on this topic** — a
+  text-free hero/cover-grade plate with a calm title zone, exactly what the winner's cover will be —
+  then compose **ONE self-contained HTML gallery** (the images beside the file, one `<img>` card per
+  style with its name, a one-line "why it fits this topic", and a **Pick** line) and **hand the user
+  the single `file://…` link**. The user judges the *actual generated look*, not a native mock of it —
+  for an image-driven template, palette-token mockups under-sell every image-native style (manga,
+  clay, watercolour, collage) and the choice is only real when they see the imagery. Cost is bounded:
+  3–4 images total, and the winner's gate image **is reused as the deck's hero** (no regeneration).
+  - *Fallback:* if image generation is unavailable (no tool, no key) or the user wants the fastest
+    path, fall back to native token-set mockups via `scripts/archetypes_html.py` — say plainly that
+    they show palette/type direction only, and the real imagery lands at the 🔴 hero checkpoint.
   - **The choice prompt MUST offer these as FIRST-CLASS, peer options — not just fallbacks** (present
     them as selectable choices, e.g. via the host's option UI; some users want to *delegate* the look
     and shouldn't have to engage with the picker to do it):
     - **A / B / C — pick one of the shown styles** (the common path: they *see* the candidates and choose).
     - **"Auto — you pick the best-fit and just go"** — an explicit, up-front peer option (NOT only a
       "liked none" escape). When the user takes it (or says "you decide / design it for me"), YOU select
-      the best-fit library style from **scenario + brand colours** and **name it back** ("for a summer
+      the best-fit library style from **the topic + content + audience** (brand colours fold in at the
+      tailoring step) and **name it back** ("for a summer
       festival I'll go Memphis/pop"), or, for a distinctive scenario, give a richer **mood-led** prompt
       (scenario + energy + palette + "design a cohesive visual identity") instead of a named style — then
       generate and let them react at the hero checkpoint. **If they pick Auto up front, you may SKIP the
@@ -144,7 +152,9 @@ language, not a straitjacket*: customise its palette/motifs to fit, and blending
 preset + a reference) is fine — just name what you're combining so the choice is legible to the user.
 
 ### 2 — Generate the template image(s)
-Generate a **full-bleed, text-free** hero/divider illustration in the chosen style:
+Generate a **full-bleed, text-free** hero/divider illustration in the chosen style. *(Came through
+the real-image style gate? The winner's gate image IS the hero — don't regenerate it; this step then
+only adds the divider variant, if wanted, and the 🔴 interior plate below.)*
 - **Tooling — auto-detect the source, no API key needed** (build the prompt with
   `scripts/image_prompts.py`; full guidance in `references/image-generation.md`). Use what's present,
   in order: **(1)** native imagegen when the host has it (inside Codex — use the agent tool call
@@ -165,9 +175,13 @@ Generate a **full-bleed, text-free** hero/divider illustration in the chosen sty
 - Generate **1–2 plates**: a **hero** (cover) and, if the look differs, a **divider** variant.
 - **Generate the interior shallow-background plate too — 🔴 MUST (see the construction model).**
   Alongside the hero, generate **one extra low-contrast background plate**: a **text-free, faint,
-  evenly-toned** version of the style (calm, low-saturation, no strong focal point, generous negative
-  space) made to sit *behind* content on **every interior page**. Prompt it explicitly for low contrast
-  and even tone ("soft, faded, low-contrast background texture, lots of calm negative space in the
+  evenly-toned, TOPIC-RELATED** version of the style (calm, low-saturation, no strong focal point,
+  generous negative
+  space) made to sit *behind* content on **every interior page**. Name the deck's own subject motifs
+  in the prompt — the topical requirement from the construction model, not a generic texture — while
+  prompting explicitly for low contrast
+  and even tone ("soft, faded, low-contrast background of scattered faint <topic motifs — e.g.
+  circuit nodes / botanical leaves / musical staves>, lots of calm negative space in the
   centre, no focal subject, no text") so dark text stays readable on top with only a **light scrim**.
   *Carve:* a deliberately **minimal / flat** generated style (Swiss · Scandinavian · Brutalist) may skip
   the plate and use a faint native texture instead — its aesthetic is near-flat by design.
@@ -286,7 +300,8 @@ them, and show both. The content slide is essential: it proves the blocks actual
 - [ ] A style **chosen and tailored** to the scenario — a picked library style, an auto-picked one
       (named back to the user), or a fresh look from a reference — palette/motifs customised, not raw.
 - [ ] Hero (and divider) generated **text-free**, in-style, with a **calm zone** for the title — **plus
-      the 🔴 MUST interior shallow-background plate** (low-contrast, even-toned; skipped only for a
+      the 🔴 MUST interior shallow-background plate** (low-contrast, even-toned, **topic-related** — the
+      deck's own subject motifs, never generic texture; skipped only for a
       deliberately minimal/flat style).
 - [ ] `style.py` derived: palette **extracted from the image**, motif helpers, component helpers,
       fonts/chrome, a **`content_bg(slide)`** for the shallow interior background, and a
@@ -303,7 +318,8 @@ them, and show both. The content slide is essential: it proves the blocks actual
 - [ ] Template **saved to the registry** for reuse.
 
 ## Style library — well-known starting styles (seed, then tailor)
-Proven visual languages to seed the generation from — pick the **3–4 best-fit for the scenario**,
+Proven visual languages to seed the generation from — pick the **3 best-fit for the TOPIC + CONTENT,
+deliberately diverse** (three different visual languages, never three moods of one),
 offer them as options (+ "describe your own" / "I'll provide a reference"), then **tailor** the
 pick (palette, energy, brand colours) before generating. Each entry gives the *palette* /
 *motifs* / *type* you'll both put in the image prompt **and** encode in the native `style.py`
@@ -360,7 +376,75 @@ pick (palette, energy, brand colours) before generating. Each entry gives the *p
 **Clean & corporate**
 - **Corporate-bold / modern brand** — confident, premium. *Palette:* one strong brand hue + dark +
   white. *Motifs:* big type, bold shapes, hero numbers, subtle gradient. *Type:* strong geometric sans.
+- **Luxury dark** — hushed, premium, gallery-like. *Palette:* near-black + gold/champagne + one deep
+  jewel tone. *Motifs:* thin gold rules, serif numerals, generous dark space. *Type:* high-contrast serif.
+- **Dark tech / engineering** — command-deck confidence. *Palette:* near-black navy + 1–2 neon accents.
+  *Motifs:* glowing nodes, thin connectors, grid ghosts, diagram islands. *Type:* heavy sans + mono chrome.
 
-> These are *starting points*, not a closed list. The user's own reference, brand, or a described
+**Illustration & character** *(image-native — these only read in real generated imagery, never in a token mock)*
+- **Manga / anime** — kinetic, expressive, story-driven. *Palette:* cel-shaded brights or B/W screentone.
+  *Motifs:* speed lines, halftone screentone, panel frames, expressive skies. *Type:* bold condensed +
+  a hand-lettered accent. Great for youth/community/launch energy.
+- **Ukiyo-e / woodblock** — timeless, crafted, Japanese. *Palette:* indigo, vermilion, cream, seafoam.
+  *Motifs:* flat colour planes, bold keylines, stylised waves/clouds, washi grain. *Type:* serif/brush accent.
+- **Ink wash / 水墨** — contemplative, literati. *Palette:* ink blacks on paper + one vermilion seal-red.
+  *Motifs:* brush strokes, mist gradients, negative space. *Type:* see `east-asian-aesthetic.md` (`ink_wash`).
+- **Flat vector illustration** — friendly product/explainer. *Palette:* 4–6 cheerful mids on white.
+  *Motifs:* geometric characters/scenes, simple shadows, spot illustrations. *Type:* rounded geometric sans.
+- **Claymorphism / clay 3D** — tactile, warm, playful. *Palette:* soft pastels, cream bg. *Motifs:*
+  squishy rounded 3D forms, soft double shadows, plasticine texture. *Type:* chunky rounded sans.
+- **Isometric / low-poly 3D** — systems made charming. *Palette:* 2–3 hues + tints on light/dark.
+  *Motifs:* isometric mini-worlds, faceted geometry, exploded diagrams. *Type:* clean sans/mono.
+- **3D render / hyper-surreal** — glossy C4D-style hero objects, impossible-but-photoreal scenes.
+  *Palette:* vivid on studio gradients. *Motifs:* floating objects, soft studio light, depth of field.
+  *Type:* minimal sans (the image is the drama).
+
+**Photo & layout-led**
+- **Cinematic photographic** — full-bleed atmospheric photography/imagery + scrim + minimal type; the
+  classic big-keynote look. *Palette:* drawn from the imagery + one accent. *Motifs:* edge-to-edge
+  plates, gradient scrims, one bold line per slide. *Type:* large clean sans. (Duotone-treat photos
+  via `image_fx.py` to keep them on-palette.)
+- **Bento grid** — modular tile mosaic (the Apple-keynote / bentoslides look). *Palette:* one bg +
+  2–3 tile tints. *Motifs:* rounded tiles of mixed spans, one stat/visual per tile, generous gaps.
+  *Type:* bold geometric sans. Great for feature/summary/dashboard-flavoured decks.
+- **Neo-brutalism** — the web-native, friendlier brutalism. *Palette:* off-white + 1–2 loud accents
+  (neon yellow/pink). *Motifs:* thick black borders, hard offset shadows, raw chunky buttons/chips,
+  stark grids. *Type:* heavy grotesque + mono.
+- **Neumorphism / soft UI** — quiet, tactile monochrome. *Palette:* one soft grey/tinted bg.
+  *Motifs:* extruded soft-shadow cards, pillowy depth, minimal colour. *Type:* light rounded sans.
+
+**Collage & nostalgia**
+- **Collage / scrapbook** — eclectic, human, zine-energy. *Palette:* paper neutrals + punchy accents.
+  *Motifs:* photo cutouts, torn edges, tape, polaroids, handwritten notes, mixed ephemera. *Type:*
+  serif clippings + hand-written accent.
+- **Papercut / paper craft** — layered, dimensional, warm. *Palette:* 3–5 saturated paper tones.
+  *Motifs:* layered cut-paper depth, soft drop shadows between layers. *Type:* rounded sans.
+- **Retro-futurism / Space Age** — optimistic mid-century tomorrow. *Palette:* atomic orange/teal/cream.
+  *Motifs:* starbursts, ringed planets, streamlined forms, boomerang shapes. *Type:* retro geometric sans.
+- **Art Nouveau** — organic, ornamental, whiplash curves. *Palette:* muted golds/greens/creams.
+  *Motifs:* flowing botanical frames, stylised figures, decorative borders. *Type:* flowing display serif.
+- **Pixel art / 8-bit** — playful dev/gaming nostalgia. *Palette:* limited console palette. *Motifs:*
+  pixel sprites, dithering, scanline CRT hints. *Type:* pixel/mono.
+- **70s groovy / psychedelic** — warm, wavy, optimistic. *Palette:* mustard/burnt-orange/olive/cream.
+  *Motifs:* wavy stripes, arches, suns, bubbly curves. *Type:* bubbly rounded display serif.
+- **Modern heritage / vintage print** — old-world credibility, new restraint. *Palette:* cream/ink +
+  oxblood or forest. *Motifs:* crests, engraving-style linework, ornamental rules, letterpress grain.
+  *Type:* classic serif + small caps.
+- **Organic modern / mid-century** — warm, crafted, architectural. *Palette:* terracotta/sage/bone/
+  walnut. *Motifs:* arches, rounded blobs, linen/paper grain, simple botanical or furniture linework.
+  *Type:* humanist serif + sans. (Studio credentials, architecture/interior, craft brands.)
+- **Chalkboard / blackboard** — the teaching register. *Palette:* deep slate/green board + chalk
+  white + one pastel chalk accent. *Motifs:* hand-chalked rules/arrows/diagrams, dust texture.
+  *Type:* chalk hand + clean sans. (Lectures, workshops, explainers.)
+- **Maximalist pattern-clash** — loud, dense, fashion-editorial. *Palette:* many saturated hues,
+  clashing on purpose. *Motifs:* layered patterns, oversized type over imagery, stickers/badges.
+  *Type:* mixed display weights. (Use with discipline — legibility guardrails below apply doubly.)
+- **Line art / monoline** — elegant single-weight economy. *Palette:* ink on paper + one accent.
+  *Motifs:* continuous-line illustrations, thin geometric frames, tiny filled accents. *Type:* light
+  sans with generous tracking.
+
+> These are *starting points*, not a closed list — and the gate's job is matching a style to the
+> TOPIC, so range across families (a fintech readout, a children's charity, and a robotics lab talk
+> should surface completely different candidate sets). The user's own reference, brand, or a described
 > look always outranks a preset; a preset just gives the image tool and the native build a strong,
 > coherent target instead of a cold start.

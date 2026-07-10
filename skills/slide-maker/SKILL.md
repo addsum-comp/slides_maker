@@ -348,17 +348,19 @@ the direction gate** (the look is already decided). The four:
    - *Generate a template with an image tool* → **a bespoke visual identity** — a styled, **text-free**
      hero/divider illustration, then reproduced natively so every content block fits it — for a vivid,
      designed deck (launch, event, brand, playful pitch) where a clean default isn't enough. **Follow
-     `references/generated-template.md`**: a mini-interview *now* (scenario + brand colours; **seed from
-     its Style library**, and **show the 3–4 best-fit styles as a VISUAL HTML preview — a "style gate"**
-     (`archetypes_html.py`, one `file://` link, each style across a few representative pages) so the user
-     *sees* the candidate looks before any image is generated, then picks. **Offer these as first-class,
-     peer choices in the prompt — A / B / C (a shown style) · "describe your own / a reference" · and
-     "Auto — let me pick the best-fit and just go" (an explicit option, not a fallback).** On Auto (or
-     "you decide"), YOU select & name the best-fit and may SKIP the HTML gate, going straight to generate →
-     the 🔴 hero checkpoint (still the real gate in the default flow; a full per-deck "decide everything
-     yourself" directive downgrades it to a posted FYI like the other approval stops — "never a blind
-     commit" is met by posting the renders, not by waiting). Mock the candidates natively;
-     generate only the chosen style's hero for real) →
+     `references/generated-template.md`**: a mini-interview *now* (scenario/topic first — brand colours
+     fold into tailoring; **pick the 3 best-fit, deliberately DIVERSE styles for the TOPIC + CONTENT
+     from its Style library** (different visual languages — e.g. Swiss vs Manga vs Glassmorphism — never
+     colour-variations of one look), **GENERATE 1 real template image per candidate style (2 for the
+     front-runner) on this topic, and show them in ONE HTML gallery — the "style gate"** (one `file://`
+     link; the winner's image is reused as the deck's hero, so the cost is ~3–4 images; native
+     `archetypes_html.py` mockups are only the no-image-tool fallback), then the user picks. **Offer
+     these as first-class, peer choices in the prompt — A / B / C (a shown style) · "describe your own /
+     a reference" · and "Auto — let me pick the best-fit and just go" (an explicit option, not a
+     fallback).** On Auto (or "you decide"), YOU select & name the topic-best-fit style and may SKIP the
+     HTML gate, going straight to generate → the 🔴 hero checkpoint (still the real gate in the default
+     flow; a full per-deck "decide everything yourself" directive downgrades it to a posted FYI like the
+     other approval stops — "never a blind commit" is met by posting the renders, not by waiting)) →
      generate the text-free hero with a calm title zone (**no key** — native imagegen in Codex, else
      `generate_images_codex.py`; see `image-generation.md`) → **derive a matching `style.py`** (palette
      via `deckkit.palette_from_image`, motif + component helpers, so native blocks match) → render the
@@ -370,7 +372,8 @@ the direction gate** (the look is already decided). The four:
      Then **the look is decided — SKIP the 3-direction gate**, finish the interview normally, and build
      (image cover/dividers with native title on top; content built natively in `style.py`. **🔴 MUST
      (this generated/image-tool template branch ONLY — not provided-template or "design a clean one" decks),
-     not a default: also GENERATE a faint interior-background PLATE and place it (lightly scrimmed) on
+     not a default: also GENERATE a faint, TOPIC-RELATED interior-background PLATE (same style, the
+     deck's own subject-matter motifs — never generic texture) and place it (lightly scrimmed) on
      every interior page — the shallow background is itself a generated image, not a flat/native fill —
      AND make content blocks FROSTED / semi-transparent (~30–45% see-through, α≈0.55–0.72), never flat
      opaque panels. Only the end pages — the cover, the section dividers, AND a closing/ending page that bookends the cover — carry full-strength imagery; interior
