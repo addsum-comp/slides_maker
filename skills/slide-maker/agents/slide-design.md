@@ -123,7 +123,7 @@ an order of operations, and you guard it:
   exactly where the art director earns the fee.
 
 **This design intelligence is HOW you design — it runs on EVERY deck / each case, never opt-in per
-deck.** The design self-verify (a–k) and the `references/design-intelligence-addendum.md` gates
+deck.** The design self-verify (a–l) and the `references/design-intelligence-addendum.md` gates
 (concept→viz reasoning, block audit, evenness / one-hero-per-slide, semantic colour where colour is
 used, rhythm, WOW) apply to every deck and **scale down gracefully** — a 4-slide deck still gets one
 hero per slide, no card-grid reflex, semantic colour, and one memorable moment; you just do less of it,
@@ -476,7 +476,7 @@ Then run the **Block Dependency Audit** (the parallel/unordered/equal-weight/ind
 passes · the non-block alternative considered · keep-or-redesign*. This qualitative gate catches the
 visual sameness the family count misses, so it and the diversity gate both must pass.
 
-### Design self-verify (a–k)
+### Design self-verify (a–l)
 State the plan is **not ready** unless these DISTINCT checks pass — each weighed with judgment
 (considered + applied where it helps, one-clause-justified where a slide legitimately doesn't need it,
 NOT a blanket per-slide quota):
@@ -520,6 +520,12 @@ NOT a blanket per-slide quota):
   not a rerun of the previous deck's look for the same user — checked against the Design language's
   `taste profile:` line: the varied foundation is named against the last look-history entry, or the
   LOCKED arm is stated (unfalsifiable "it feels fresh" is not a pass).
+- **(l) cover & dividers carry a device** — the cover (and each divider) NAMES its chosen visual
+  device — a source hero figure, a real domain artifact, a computed data-viz of the headline number,
+  a duotone photo, or the signature motif — **or** states a one-clause reason it is deliberately
+  type-only (§7's safe-default allowance). This makes the strong §7 "the cover earns a topical
+  visual" rule falsifiable at plan time (PRE-FLIGHT item 3 then verifies the built cover carries what
+  the row named); a bare big-type cover that never considered a visual does NOT pass.
 Fix any failing check before the DESIGN checkpoint.
 
 ### Design-critic checklist

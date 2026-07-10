@@ -44,10 +44,12 @@ consistent corners/colours, no orphaned punctuation, no large blank.
 
 ## How to use this file
 1. Find the purpose below and adopt its **design language** as your starting point —
-   set the `deckkit` palette constants (`DEEP/BLUE/ACCENTS/...`) and a **role-based font
-   pairing** (a `DISPLAY` title face + `FONT` body + `MONO`; for a CJK deck also `EADISPLAY`
-   + `EAFONT`) to match — don't ship the whole deck in one font (see `font-guidance.md`
-   "Type pairing") — and apply its layout/chrome guidance in steps 3–4.
+   set the palette with **`deckkit.set_palette(deep=…, blue=…, magenta=…, accents=[…], mono=…)`**
+   (one call after import; it also re-themes the components' built-in colour defaults, which a bare
+   `deckkit.DEEP = …` reassignment does NOT) and a **role-based font pairing** (a `DISPLAY` title
+   face + `FONT` body + `MONO`; for a CJK deck also `EADISPLAY` + `EAFONT`) to match — don't ship
+   the whole deck in one font (see `font-guidance.md` "Type pairing") — and apply its layout/chrome
+   guidance in steps 3–4.
 2. **Then ground it in current inspiration.** Tastes and conventions shift, and a
    stock blue deck looks dated. Do a quick search/fetch with the host's available web tools (e.g. "modern
    conference talk slide design 2026", "clean investor readout deck examples",

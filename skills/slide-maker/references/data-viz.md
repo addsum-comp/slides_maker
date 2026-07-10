@@ -19,7 +19,7 @@ is for when the relationship is richer.)
 | Ranked / part list keyed to a chart | **leaderboard** (native) | `deckkit.leaderboard(rows)` |
 | One hub, many dependents | **hub-and-spoke** | native (`box`+connectors); radial layout |
 | **How a total builds start→end / a variance walk** | **waterfall / bridge** | `waterfall(out, items, ...)` — floating rise/fall/total bars + connector steps; the one **semantic up/down colour** exception (not the single-highlight rule) |
-| **A multivariate profile across 3+ axes** (compare shapes) | **radar / spider** | `radar(out, axes, series, ...)` (matplotlib polar — PowerPoint's native radar is unthemeable; keep to ≤3 overlaid polygons) |
+| **A multivariate profile across 3+ axes** (compare shapes) | **radar / spider** | *no helper — hand-roll* matplotlib polar (≤3 overlaid polygons, transparent PNG in house style; PowerPoint's native radar is unthemeable) |
 | A simple single comparison / one trend | **bar / line** | `matplotlib` (the existing path) |
 
 The recipes render a themed PNG → place with `deckkit.picture(out, ..., fit="contain")`.
@@ -61,7 +61,7 @@ The recipes render a themed PNG → place with `deckkit.picture(out, ..., fit="c
   the last bar reads as a rendering bug; derive its extent from the data (`last_bar_x_end − axis_x`).
 - **Waterfall that double-counts** — showing increments AND their sum as peer bars ("+8 / +8.3 / +16.3"
   where 16.3 = 8+8.3), or stacking two *different* quantity kinds into one total (take-home extras +
-  employer pension = a "135%" bar). Show increments *or* the running total, use `deckkit.waterfall`
+  employer pension = a "135%" bar). Show increments *or* the running total, use `designed_charts.waterfall`
   (correct running-total + connectors), and keep distinct quantities in separate stacks / a side note.
 - **Hand-rolled where a component exists** — building `waterfall`/`gantt`/`dumbbell_board`/a chart from
   raw boxes re-introduces the geometry & grammar bugs the component already fixed; reach for the
@@ -72,10 +72,12 @@ The recipes render a themed PNG → place with `deckkit.picture(out, ..., fit="c
   (semantic-color-contract.md) or stay monochrome + one accent.
 
 ## The four rules every designed plot follows
-1. **Single highlight (one-accent discipline).** Recolor only the ONE series/wedge/row that
+1. **Single highlight (one-accent discipline).** Recolor only the ONE series/wedge/row/bar that
    carries the point in the accent; drop everything else to a neutral grey. The recipes take a
    `highlight` index and do this; for a multi-series categorical chart where every series matters,
    skip the highlight. Never let a chart use >2 saturated hues unless it's genuinely categorical.
+   (On a **single-series** native bar/column chart, `highlight` selects a whole series and so can't
+   pick one bar — use `native_chart(..., emphasize=<category index>)` to foreground ONE bar.)
 2. **Theme it to the deck.** Pass the deck's palette (`palette=ACCENTS`, or pull from a generated
    template with `palette_from_image`) and `dark=True` for a dark deck, so the chart looks built-in,
    not pasted. Charts render on a transparent background, so they sit on any slide fill. **On a CJK

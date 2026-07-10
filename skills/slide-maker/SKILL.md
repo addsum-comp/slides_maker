@@ -134,7 +134,11 @@ delegation must never produce. Content checkpoint = the deck
 memory sentence + emotional-curve line + pace check + ONE table (`# | 角色 | 记忆句(takeaway) |
 承载证据`) — the table's takeaway column, read top to bottom, IS the Takeaway spine: append only
 the plan's one-line spine verdict, never the spine paragraph (new plan fields like the money
-slide / Spoken thread live in the FULL plan; at most a one-line marker appears here); Design
+slide / Spoken thread live in the FULL plan; at most a one-line marker appears here). **The 承载证据
+column carries a concrete SOURCE TRACE, not a vague label** — a locator ("Fig 3 / p.4 ¶2", a table
+cell, a short verbatim span) — so a watching auto-mode user can catch a per-slide grounding mismatch
+even though the checkpoint is an FYI, not a stop (this is the cheapest fidelity catch on the path
+delegation uses most; the comprehension gate still forbids shipping any unverified claim). Design
 checkpoint = look/palette/type/motif in ~4 lines + the rhythm-map table +
 the three design musts + logo plan. Keep each under ~25 lines — the user reads it in the
 terminal and answers in one click. Do **NOT** write `content-plan.md` / `design-plan.md` files
@@ -785,8 +789,11 @@ than the current working directory, so `python /path/to/build_<deck>.py` works f
   it consistent chrome with `deckkit.title_bar()` / `deckkit.footer()`. **Don't just
   accept deckkit's default blue — design the look to fit the purpose.** Read
   `references/design-by-purpose.md` for a per-purpose design language (palette mood,
-  density, layout, chrome) and set the `deckkit` palette constants + a **role-based font
-  pairing** (`DISPLAY` title face + `FONT` body + `MONO`; add `EADISPLAY`+`EAFONT` for CJK) to
+  density, layout, chrome) and set the palette via **`deckkit.set_palette(deep=…, blue=…, magenta=…,
+  mono=…, accents=[…])`** (call it ONCE right after import — a bare `deckkit.MAGENTA = …` does NOT
+  re-theme components whose signature default is that colour, since those defaults are bound at
+  import; `set_palette` rewrites them for you) + a **role-based font pairing** (`DISPLAY` title face
+  + `FONT` body + `MONO`; add `EADISPLAY`+`EAFONT` for CJK) to
   match — or adopt a one-switch **`scripts/presets.py`** `preset(name)` (glassmorphism / swiss /
   editorial_paper / editorial_report / risograph / memphis: palette + fonts + surface + image-prompt)
   and tune it — then do a quick web-search for current, well-regarded examples of *this kind* of
@@ -1449,7 +1456,7 @@ critic round — full rationale in `references/design-principles.md`):
   baseline/value-axis runs under **all** its bars (not stopping short of the last one), and a
   cumulative/waterfall shows increments *or* their total, never both as peer bars (a "+8 / +8.3 /
   +16.3" trio is a double-count); keep different quantity kinds in separate stacks. Prefer
-  `deckkit.waterfall` over hand-rolled floating boxes (`design-principles.md` "Designed plots").
+  `designed_charts.waterfall` over hand-rolled floating boxes (`design-principles.md` "Designed plots").
 - **Geometry matches the number** — read one bar/band/cell's *size or colour* against its *printed
   value*: a magnitude column/bar starts at **0** (a cropped axis makes 210/220/230 read as a ~3×
   cliff); a proportional shape (funnel band, bubble) is sized to `value/max`, not clamped up by a

@@ -80,6 +80,57 @@ def contrast_ratio(c1, c2):
     return (l1 + 0.05) / (l2 + 0.05)
 
 
+_BLACK = RGBColor(0x11, 0x11, 0x11)   # near-black escalation ink for the muddy mid-luminance band
+
+
+def _legible_ink(bg, light=None, dark=None):
+    """Pick the on-fill label ink over ``bg``. Prefer the house pair (WHITE vs DEEP navy) so the
+    deck's dark ink stays navy everywhere it works; but if NEITHER clears the 4.5:1 body floor — a
+    mid-luminance fill where navy reads too light and white too dark (the classic mid-blue funnel
+    band / segmented sliver) — escalate the dark side to near-black so the label stays legible. This
+    makes 'contrast-aware' an actual guarantee, not a coin-flip between two candidates that can both
+    lose. Replaces the ``WHITE if contrast_ratio(WHITE,bg) >= contrast_ratio(DEEP,bg) else DEEP`` idiom."""
+    light = WHITE if light is None else light
+    dark = DEEP if dark is None else dark
+    cw, cd = contrast_ratio(light, bg), contrast_ratio(dark, bg)
+    best = light if cw >= cd else dark
+    if contrast_ratio(best, bg) < 4.5 and contrast_ratio(_BLACK, bg) > max(cw, cd):
+        return _BLACK
+    return best
+
+
+def _darken_to(color, bg, target=4.5):
+    """Darken ``color`` toward near-black — KEEPING its hue — until it clears ``target`` contrast on
+    ``bg``. For a same-hue label on a light tint of its own accent (a swimlane header, a tinted chip)
+    where the raw accent reads too faint: the hue survives as the visual key, legibility is guaranteed."""
+    c = _as_rgbc(color)
+    for t in (0.0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9):
+        cc = _blend(c, _BLACK, t)
+        if contrast_ratio(cc, bg) >= target:
+            return cc
+    return _blend(c, _BLACK, 0.9)
+
+
+def _numlabel(v):
+    """A HUMAN number label for on-chart values — never scientific notation. ``f"{v:g}"`` renders
+    any magnitude >= 1e6 as '4.58e+06', which is unreadable on a slide; this gives '4.58M' instead
+    (k/M/B/T for big magnitudes, thousands separators for 1e4–1e6, plain ``:g`` for small numbers so
+    existing labels < 1e4 are byte-identical). Non-numeric values pass through as ``str()``."""
+    try:
+        x = float(v)
+    except (TypeError, ValueError):
+        return str(v)
+    if isinstance(v, bool):
+        return str(v)
+    a = abs(x)
+    for div, suf in ((1e12, "T"), (1e9, "B"), (1e6, "M")):
+        if a >= div:
+            return f"{x / div:.2f}".rstrip("0").rstrip(".") + suf
+    if a >= 1e4:                                          # 12,000 / 540,000 — exact, with separators
+        return f"{x:,.0f}" if x == int(x) else f"{x:,.2f}".rstrip("0").rstrip(".")
+    return f"{x:g}"                                       # small numbers unchanged (byte-identical)
+
+
 def _rgb_dist(a, b):
     """Euclidean RGB distance — a quick proxy for 'are these two fills visually distinct?'.
     (Use this, NOT contrast_ratio, for category colours: two different hues can share a
@@ -180,9 +231,58 @@ DISPLAY = None            # optional DISPLAY/title font (Latin) — when set, ti
                           # whole deck — see references/font-guidance.md ("Type pairing").
 EADISPLAY = None          # optional CJK DISPLAY/title font (e.g. "Hiragino Sans GB" titles over a
                           # "Hiragino Sans GB"/"Noto Sans CJK SC" EAFONT body). Falls back to EAFONT.
-# To re-theme a whole deck (e.g. to match a style example), reassign these AND the
-# palette constants above right after importing deckkit, before building — set_font
-# resolves FONT at call time, so `deckkit.FONT = "Helvetica Neue"` takes effect.
+# To re-theme a whole deck (e.g. to match a style example): call `deckkit.set_palette(...)`
+# ONCE right after import, before building. FONT/DISPLAY/EAFONT/EADISPLAY/MONO and the ACCENTS
+# cycle resolve at call time, so reassigning those globals directly also works — but the SCALAR
+# colour defaults baked into component signatures (accent=MAGENTA, ink=DEEP, marker=BLUE, …) are
+# bound at import and do NOT follow a bare `deckkit.MAGENTA = ...`; set_palette() rewrites those
+# defaults for you, so a single call re-themes the whole component set. See set_palette below.
+
+
+def set_palette(*, deep=None, blue=None, teal=None, magenta=None, slate=None, mute=None,
+                mono=None, font=None, display=None, eadisplay=None, eafont=None, accents=None):
+    """Re-theme the whole deck in ONE call, right after import and before building. Reassigns the
+    palette/font globals AND rewrites every component's colour keyword-default that still points at
+    an OLD constant — so ``accent=``/``ink=``/``marker=`` defaults pick up the new hue instead of
+    silently keeping the built-in navy/blue/magenta. Each component keeps its OWN default ROLE
+    (e.g. scorecard's blue accent vs title_bar's rule) — only the *value* behind that role is
+    remapped. Colours accept an ``RGBColor`` or an ``'RRGGBB'`` hex string; fonts are names.
+
+        deckkit.set_palette(deep='0B1F3A', blue='2563EB', magenta='F97316', mono='Menlo')
+
+    Idempotent-safe; call once. Font-only re-theming can still use bare global reassignment."""
+    global DEEP, BLUE, TEAL, MAGENTA, SLATE, MUTE, ACCENTS, MONO, FONT, DISPLAY, EADISPLAY, EAFONT
+    remap = {}   # id(old_constant) -> new value, for rewriting frozen signature defaults
+
+    def _c(old, new):
+        if new is None:
+            return old
+        nv = _as_rgbc(new)
+        if nv is not old:
+            remap[id(old)] = nv
+        return nv
+    DEEP = _c(DEEP, deep); BLUE = _c(BLUE, blue); TEAL = _c(TEAL, teal)
+    MAGENTA = _c(MAGENTA, magenta); SLATE = _c(SLATE, slate); MUTE = _c(MUTE, mute)
+    if mono is not None: MONO = mono
+    if font is not None: FONT = font
+    if display is not None: DISPLAY = display
+    if eadisplay is not None: EADISPLAY = eadisplay
+    if eafont is not None: EAFONT = eafont
+    if accents is not None:
+        ACCENTS = [_as_rgbc(c) for c in accents]
+    elif remap:
+        ACCENTS = [remap.get(id(c), c) for c in ACCENTS]   # keep the cycle in sync with the new hues
+    if remap:
+        import types as _types
+        for _obj in list(globals().values()):
+            if isinstance(_obj, _types.FunctionType):
+                kw = _obj.__kwdefaults__
+                if kw:
+                    for k, v in list(kw.items()):
+                        if id(v) in remap:
+                            kw[k] = remap[id(v)]
+                if _obj.__defaults__:
+                    _obj.__defaults__ = tuple(remap.get(id(v), v) for v in _obj.__defaults__)
 
 
 # ====================================================================== text
@@ -482,35 +582,56 @@ def offset_shadow(slide, x, y, w, h, fill, *, dx=0.06, dy=0.06, shadow=None,
     return box(slide, x, y, w, h, fill=fill, line=line, line_w=line_w, round=round, r=r)
 
 
-_GOOD = RGBColor(0x1F, 0x9D, 0x55)   # positive delta (green)
-_BAD = RGBColor(0xE0, 0x3A, 0x2E)    # negative delta (red)
+_GOOD = RGBColor(0x1F, 0x9D, 0x55)    # positive delta (green) — bright, for glass/dark tiles
+_BAD = RGBColor(0xE0, 0x3A, 0x2E)     # negative delta (red)   — bright, for glass/dark tiles
+_GOOD_D = RGBColor(0x15, 0x80, 0x3D)  # darker green (5.0:1 on white) — for the light tile
+_BAD_D = RGBColor(0xC4, 0x2E, 0x22)   # darker red  (5.6:1 on white)  — for the light tile
 
 def scorecard(slide, x, y, w, h, label, value, *, delta=None, caption=None, good_up=True,
-              ink=DEEP, accent=BLUE, glass_tint=None):
+              ink=DEEP, accent=BLUE, glass_tint=None, size=None):
     """A KPI scorecard tile: small-caps label · oversized value · colored ▲/▼ delta · tiny
     caption — the 'current state in numbers' building block. `value`/`label` may be numbers or
-    strings (coerced). `delta` is a string ('+3.2pp' / '-18%'); an unsigned value reads as an
-    increase, so **a sign is required to mark a decrease**. Its colour is auto-set GREEN/RED by
-    direction vs `good_up` (a falling cost with good_up=False is green). `glass_tint` makes it a
-    glass tile (use on dark decks). Lay out 3-6 with columns()."""
+    strings (coerced). The value AUTO-FITS the tile width (it never wraps into the delta chip in a
+    tight 4-up band — that was a real collision); pass `size` to force a point size. `delta` is a
+    string ('+3.2pp' / '-18%'); an unsigned value reads as an increase, so **a sign is required to
+    mark a decrease**. Its colour is auto-set GREEN/RED by direction vs `good_up` (a falling cost
+    with good_up=False is green), and DARKENED on the light tile so it clears the 4.5:1 body floor.
+    `glass_tint` makes it a glass tile (use on dark decks). Lay out 3-6 with columns()."""
     if glass_tint is not None:
         glass_card(slide, x, y, w, h, glass_tint); lab_c, val_c, cap_c = WHITE, WHITE, RGBColor(0xCF, 0xD7, 0xE6)
+        good_c, bad_c = _GOOD, _BAD                                        # bright reads on the dark tint
     else:
         box(slide, x, y, w, h, fill=WHITE, line=RGBColor(0xE3, 0xE8, 0xEE), line_w=1.0, round=True, r=0.1)
         box(slide, x, y, 0.1, h, fill=accent, round=True, r=0.05)          # accent spine
         lab_c, val_c, cap_c = MUTE, ink, MUTE
+        good_c, bad_c = _GOOD_D, _BAD_D                                    # darker so it clears 4.5:1 on white
     px = x + 0.28
     text(slide, px, y + 0.22, w - 0.5, 0.3, [[(str(label).upper(), 11, lab_c, True, False)]], space_after=0)
-    text(slide, px, y + 0.5, w - 0.5, 0.8, [[(str(value), 33, val_c, True, False)]], space_after=0)
-    cy = y + 1.32
+    # value auto-fits: fit_text_size handles multi-word values, and a WIDTH check via _natural_width_in
+    # shrinks a wide single-token number (fit_text_size sees a 1-token value as 1 line at any width).
+    vsz = size if size is not None else fit_text_size([(str(value), True)], w - 0.5, 0.8, 33, min_size=16)
+    nat = _natural_width_in([(str(value), True)], vsz, None)
+    if nat > (w - 0.5):
+        vsz = max(16, vsz * (w - 0.5) / nat)
+    delta_h = 0.30 if delta else 0.0
+    cap_h = 0.40 if caption else 0.0
+    # shrink the value (down to 14pt) so label + value + delta + caption ALL fit the card height —
+    # a short 4-up tile can't hold a 33pt value AND a delta AND a caption without them colliding.
+    while vsz > 14 and (0.5 + vsz / 72.0 * 1.2 + 0.08 + delta_h + cap_h) > (h - 0.04):
+        vsz -= 1.0
+    tbv = text(slide, px, y + 0.5, w - 0.5, 0.8, [[(str(value), vsz, val_c, True, False)]], space_after=0)
+    tbv.text_frame.word_wrap = False                                      # never char-break the number
+    cy = max(y + 1.32, y + 0.5 + vsz / 72.0 * 1.2 + 0.08)                 # airy floor when there's room
+    if cy + delta_h + cap_h > y + h - 0.04:                              # ...compressed only when tight
+        cy = max(y + 0.5 + vsz / 72.0 * 1.2 + 0.08, y + h - 0.04 - delta_h - cap_h)
     if delta:
         d = str(delta).strip()
         up = not d.startswith(("-", "▼"))            # unsigned / '+' = increase; sign required for a decrease
-        dc = _GOOD if (up == good_up) else _BAD
-        text(slide, px, cy, w - 0.5, 0.3, [[(("▲ " if up else "▼ ") + d.lstrip("+-▲▼ "), 12, dc, True, False)]], space_after=0)
-        cy += 0.3
+        dc = good_c if (up == good_up) else bad_c
+        text(slide, px, cy, w - 0.5, 0.28, [[(("▲ " if up else "▼ ") + d.lstrip("+-▲▼ "), 12, dc, True, False)]], space_after=0)
+        cy += delta_h
     if caption:
-        text(slide, px, cy, w - 0.5, 0.4, [[(caption, 10.5, cap_c, False, False)]], space_after=0)
+        text(slide, px, cy, w - 0.5, cap_h, [[(caption, 10.5, cap_c, False, False)]], space_after=0)
 
 
 def leaderboard(slide, x, y, w, rows, *, row_h=0.5, gap=0.1, ink=DEEP):
@@ -558,13 +679,19 @@ def editorial_header(slide, eyebrow, title, *, x=0.6, y=0.55, w=None, accent=MAG
     # line_spacing pinned to 1.0: the rule position below is single-spacing math, and a
     # one-line display headline needs no body leading (the CJK default would push the
     # glyphs down onto the rule — LibreOffice adds the extra leading ABOVE the line).
-    tb = text(slide, x, y + 0.34, w, 0.8, [[(title, size, ink, True, False, disp)]],
+    # MEASURE the wrapped title so the hairline sits below the LAST line — a hardcoded
+    # one-line rule y strikes a 2-line title through.
+    nlines = measure_lines([(title, True)], size, w, font=disp)
+    lh = size / 72.0 * 1.18
+    tb = text(slide, x, y + 0.34, w, max(0.8, nlines * lh), [[(title, size, ink, True, False, disp)]],
               space_after=0, line_spacing=1.0)
     if EADISPLAY:
         for p in tb.text_frame.paragraphs:
             for r in p.runs:
                 _apply_ea(r, EADISPLAY)
-    box(slide, x + 0.02, y + 0.34 + size / 72.0 * 1.18, rule_w, 0.05, fill=accent)
+    rule_y = y + 0.34 + max(lh, nlines * lh)          # floor = one-line render (byte-identical)
+    box(slide, x + 0.02, rule_y, rule_w, 0.05, fill=accent)
+    return rule_y + 0.18
 
 
 def big_numeral(slide, x, y, n, *, mode="marker", color=MAGENTA, size=None, w=None,
@@ -660,6 +787,27 @@ def hub_spoke(slide, cx, cy, radius, center, spokes, *, hub=(1.7, 1.0), node=(1.
     a circle of `radius`, connectors drawn behind. `center`='label', spokes=['a','b',...] or
     [(title,sub)]. Use for a platform+modules / metric+drivers; not for sequences (use a pipeline)."""
     n = len(spokes); pts = []
+    # build-time collision guard (fail loud like timeline/vstack, don't silently overlap): a spoke
+    # card clears the hub iff it separates on EITHER axis, so the min radius for spoke i is
+    # min(A/|cosθ|, B/|sinθ|); the layout needs the MAX of that over all spokes.
+    gap = 0.08
+    A = (hub[0] + node[0]) / 2 + gap
+    B = (hub[1] + node[1]) / 2 + gap
+    need = 0.0
+    for i in range(n):
+        ang = math.radians(-90 + i * 360.0 / n)
+        ca, sa = abs(math.cos(ang)), abs(math.sin(ang))
+        need = max(need, min(A / ca if ca > 1e-6 else float("inf"),
+                             B / sa if sa > 1e-6 else float("inf")))
+    if radius < need - 1e-6:
+        raise ValueError(f"hub_spoke(): radius {radius:.2f}in is too small — the hub and spoke cards "
+                         f"overlap; need radius >= {need:.2f}in (or shrink hub=/node=).")
+    if n > 1:
+        arc = 2 * radius * math.sin(math.pi / n)
+        if arc < node[0] + gap - 1e-6:
+            raise ValueError(f"hub_spoke(): {n} spokes on radius {radius:.2f}in land {arc:.2f}in apart "
+                             f"but each card is {node[0]:.2f}in wide — adjacent cards overlap; widen "
+                             f"radius, reduce spokes, or shrink node=.")
     for i in range(n):
         ang = math.radians(-90 + i * 360.0 / n)
         pts.append((cx + radius * math.cos(ang), cy + radius * math.sin(ang)))
@@ -799,16 +947,17 @@ def timeline(slide, x, y, w, events, *, orientation="h", highlight=None, accent=
             ex = centers[i] if n > 1 else (x + w / 2)
             when, title = ev[0], ev[1]; cap = ev[2] if len(ev) > 2 else ""
             em = (highlight is None or i == highlight)
-            dc = accent if em else axis_c
-            box(slide, ex - 0.09, ay - 0.09, 0.18, 0.18, fill=dc, round=True, r=0.09)
+            dc = accent if em else axis_c            # DOT/graphic colour — may de-emphasise to grey
+            tc = accent if em else MUTE              # DATE TEXT colour — floors at MUTE (6:1) so a
+            box(slide, ex - 0.09, ay - 0.09, 0.18, 0.18, fill=dc, round=True, r=0.09)  # dimmed date stays legible
             above = (polarity == "alternate" and i % 2 == 1)
             if above:                                     # mirrored stack: when nearest the dot
-                text(slide, _lx(ex, label_w), ay - 0.48, label_w, 0.3, [[(str(when), 13, dc, True, False)]], align=PP_ALIGN.CENTER, space_after=0)
+                text(slide, _lx(ex, label_w), ay - 0.48, label_w, 0.3, [[(str(when), 13, tc, True, False)]], align=PP_ALIGN.CENTER, space_after=0)
                 text(slide, _lx(ex, label_w), ay - 0.80, label_w, 0.3, [[(title, 12, ink, True, False)]], align=PP_ALIGN.CENTER, space_after=0)
                 if cap:
                     text(slide, _lx(ex, label_w + 0.2), ay - 1.30, label_w + 0.2, 0.5, [[(cap, 10.5, MUTE, False, False)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.BOTTOM, space_after=0)
             else:
-                text(slide, _lx(ex, label_w), ay + 0.18, label_w, 0.3, [[(str(when), 13, dc, True, False)]], align=PP_ALIGN.CENTER, space_after=0)
+                text(slide, _lx(ex, label_w), ay + 0.18, label_w, 0.3, [[(str(when), 13, tc, True, False)]], align=PP_ALIGN.CENTER, space_after=0)
                 text(slide, _lx(ex, label_w), ay + 0.5, label_w, 0.3, [[(title, 12, ink, True, False)]], align=PP_ALIGN.CENTER, space_after=0)
                 if cap:
                     text(slide, _lx(ex, label_w + 0.2), ay + 0.78, label_w + 0.2, 0.5, [[(cap, 10.5, MUTE, False, False)]], align=PP_ALIGN.CENTER, space_after=0)
@@ -819,9 +968,10 @@ def timeline(slide, x, y, w, events, *, orientation="h", highlight=None, accent=
         for i, ev in enumerate(events):
             ey = y + i * step + 0.1
             when, title = ev[0], ev[1]; cap = ev[2] if len(ev) > 2 else ""
-            em = (highlight is None or i == highlight); dc = accent if em else axis_c
+            em = (highlight is None or i == highlight)
+            dc = accent if em else axis_c; tc = accent if em else MUTE   # dot may grey; date text floors at MUTE
             box(slide, ax - 0.09, ey - 0.09, 0.18, 0.18, fill=dc, round=True, r=0.09)
-            text(slide, ax + 0.35, ey - 0.16, w - 0.5, 0.3, [[(str(when) + "  ", 13, dc, True, False), (title, 13, ink, True, False)]], space_after=0)
+            text(slide, ax + 0.35, ey - 0.16, w - 0.5, 0.3, [[(str(when) + "  ", 13, tc, True, False), (title, 13, ink, True, False)]], space_after=0)
             if cap:
                 text(slide, ax + 0.35, ey + 0.16, w - 0.5, 0.4, [[(cap, 10.5, MUTE, False, False)]], space_after=0)
     if orientation == "h" and polarity == "alternate":
@@ -864,7 +1014,7 @@ def dot_strip(slide, x, y, w, points, lo, hi, *, label_w=None, stagger="auto",
     ay = y + 0.5
     X, draw_axis = axis_scale(x, w, lo, hi)
     draw_axis(slide, ay, color=axis_c)
-    fmt = lambda v: f"{v:g}"
+    fmt = _numlabel
     meta = []                                             # value-sorted layout records
     for i in sorted(range(len(points)), key=lambda k: float(points[k][1])):
         label, v = str(points[i][0]), points[i][1]
@@ -981,15 +1131,20 @@ def _set_spc(shape, pts):
     return shape
 
 
-def part_eyebrow(slide, x, y, text_str, *, w=6.0, color=MUTE, font=MONO, size=11, track=1.5):
+def part_eyebrow(slide, x, y, text_str, *, w=6.0, color=MUTE, font=None, size=11, track=1.5):
     """A small TRACKED caps eyebrow in the chrome (usually mono) font — the editorial/technical
-    'part label'. Route every kicker/eyebrow through one chrome font for a quiet signature."""
+    'part label'. Route every kicker/eyebrow through one chrome font for a quiet signature.
+    ``font`` resolves to the CURRENT module ``MONO`` at call time, so reassigning ``deckkit.MONO``
+    re-themes it (a def-time default would freeze the import-time value → Consolas tofu)."""
+    font = font or MONO
     tb = text(slide, x, y, w, 0.3, [[(text_str.upper(), size, color, True, False, font)]], space_after=0)
     return _set_spc(tb, track)
 
 
-def page_marker(slide, page, total=None, *, font=MONO, color=MUTE, size=9):
-    """A tiny mono page marker at bottom-right ('03 / 14') — chrome, not content."""
+def page_marker(slide, page, total=None, *, font=None, color=MUTE, size=9):
+    """A tiny mono page marker at bottom-right ('03 / 14') — chrome, not content. ``font`` resolves
+    to the current ``MONO`` at call time (reassigning ``deckkit.MONO`` re-themes it)."""
+    font = font or MONO
     sw, sh = _slide_size(slide)
     label = f"{int(page):02d} / {int(total):02d}" if total else f"{int(page):02d}"
     text(slide, sw - 1.6, sh - 0.42, 1.2, 0.3, [[(label, size, color, True, False, font)]],
@@ -997,29 +1152,46 @@ def page_marker(slide, page, total=None, *, font=MONO, color=MUTE, size=9):
 
 
 def cover(slide, title, *, issue_label=None, subtitle=None, mode_caption=None, x=0.7, y=None,
-          accent=MAGENTA, ink=DEEP, bg=None, display=None, chrome=MONO):
+          accent=MAGENTA, ink=DEEP, bg=None, display=None, chrome=None, caption_c=None):
     """A publication-style COVER (issue label + big display title + accent rule + subtitle + a
     date/mode caption) designed to be mirrored by colophon() as a bookend. Stronger than a plain
-    title slide for editorial/report/zine decks."""
+    title slide for editorial/report/zine decks. A long title is auto-fit and MEASURED so the
+    accent rule + subtitle flow below its real bottom (never bisecting a 2-3-line title). On a
+    DARK cover (a light ``ink``), the bottom caption auto-switches to a legible muted grey; pass
+    ``caption_c`` to force it. ``chrome`` resolves to the current ``MONO`` at call time."""
+    chrome = chrome or MONO
     sw, sh = _slide_size(slide)
     if bg is not None:
         box(slide, 0, 0, sw, sh, fill=bg)
     yy = (sh / 2 - 1.1) if y is None else y
     if issue_label:
         part_eyebrow(slide, x + 0.02, yy - 0.5, issue_label, color=accent, font=chrome)
-    text(slide, x, yy, sw - 2 * x, 1.4, [[(title, 46, ink, True, False, display)]], space_after=2, line_spacing=1.0)
-    box(slide, x + 0.02, yy + 1.5, 1.4, 0.06, fill=accent)
+    tw = sw - 2 * x
+    tsz = fit_text_size([(title, True)], tw, 1.4, 46, font=display, min_size=30)   # cap runaway titles
+    n = measure_lines([(title, True)], tsz, tw, font=display)
+    lh = tsz / 72.0 * 1.2
+    text(slide, x, yy, tw, max(1.4, n * lh), [[(title, tsz, ink, True, False, display)]],
+         space_after=2, line_spacing=1.0)
+    rule_y = max(yy + 1.5, yy + n * lh + 0.14)          # floor keeps 1-2 line covers byte-identical
+    box(slide, x + 0.02, rule_y, 1.4, 0.06, fill=accent)
     if subtitle:
-        text(slide, x, yy + 1.7, sw - 2 * x, 0.5, [[(subtitle, 16, ink, False, False)]], space_after=0)
+        text(slide, x, rule_y + 0.20, tw, 0.5, [[(subtitle, 16, ink, False, False)]], space_after=0)
     if mode_caption:
-        part_eyebrow(slide, x + 0.02, sh - 0.7, mode_caption, color=MUTE, font=chrome)
+        mc = caption_c if caption_c is not None else (
+            RGBColor(0x8A, 0x93, 0xA6) if contrast_ratio(ink, WHITE) < 3.0 else MUTE)
+        part_eyebrow(slide, x + 0.02, sh - 0.7, mode_caption, color=mc, font=chrome)
 
 
 def colophon(slide, tagline, *, credits=None, tooling=None, x=0.7, accent=MAGENTA, ink=DEEP,
-             bg=None, display=None, chrome=MONO):
+             bg=None, display=None, chrome=None, credits_label="credits", tooling_label="made with",
+             tooling_c=None):
     """A closing COLOPHON mirroring the cover: a payoff tagline + small mono credits/tooling. A
     stronger close than 'Thanks'; the credits slot doubles as a research deck's sources note.
-    `credits`/`tooling` may be a string or a list (joined with ' · ')."""
+    `credits`/`tooling` may be a string or a list (joined with ' · '). A wrapped tagline is
+    MEASURED so the rule + credits flow below it. Pass ``credits_label``/``tooling_label`` to
+    translate the chrome captions on a non-English deck (推荐/团队/制作). On a dark closing (light
+    ``ink``) the tooling line auto-switches to a legible muted grey; ``tooling_c`` forces it."""
+    chrome = chrome or MONO
     if isinstance(credits, (list, tuple)):
         credits = " · ".join(map(str, credits))
     if isinstance(tooling, (list, tuple)):
@@ -1028,21 +1200,30 @@ def colophon(slide, tagline, *, credits=None, tooling=None, x=0.7, accent=MAGENT
     if bg is not None:
         box(slide, 0, 0, sw, sh, fill=bg)
     yy = sh / 2 - 0.9
-    text(slide, x, yy, sw - 2 * x, 1.4, [[(tagline, 40, ink, True, False, display)]], space_after=2, line_spacing=1.0)
-    box(slide, x + 0.02, yy + 1.4, 1.4, 0.06, fill=accent)
-    cy = yy + 1.72
+    tw = sw - 2 * x
+    n = measure_lines([(tagline, True)], 40, tw, font=display)
+    lh = 40 / 72.0 * 1.2
+    text(slide, x, yy, tw, max(1.4, n * lh), [[(tagline, 40, ink, True, False, display)]],
+         space_after=2, line_spacing=1.0)
+    rule_y = max(yy + 1.4, yy + n * lh + 0.12)          # floor keeps the one-line close byte-identical
+    box(slide, x + 0.02, rule_y, 1.4, 0.06, fill=accent)
+    cy = rule_y + 0.32
+    tc = tooling_c if tooling_c is not None else (
+        RGBColor(0x8A, 0x93, 0xA6) if contrast_ratio(ink, WHITE) < 3.0 else MUTE)
     if credits:
-        part_eyebrow(slide, x + 0.02, cy, "credits", color=accent, font=chrome)
-        text(slide, x, cy + 0.28, sw - 2 * x, 0.6, [[(credits, 12, ink, False, False, chrome)]], space_after=0)
+        part_eyebrow(slide, x + 0.02, cy, credits_label, color=accent, font=chrome)
+        text(slide, x, cy + 0.28, tw, 0.6, [[(credits, 12, ink, False, False, chrome)]], space_after=0)
         cy += 0.92
     if tooling:
-        part_eyebrow(slide, x + 0.02, cy, "made with", color=accent, font=chrome)
-        text(slide, x, cy + 0.28, sw - 2 * x, 0.4, [[(tooling, 11, MUTE, False, False, chrome)]], space_after=0)
+        part_eyebrow(slide, x + 0.02, cy, tooling_label, color=accent, font=chrome)
+        text(slide, x, cy + 0.28, tw, 0.4, [[(tooling, 11, tc, False, False, chrome)]], space_after=0)
 
 
-def sources_page(slide, sources, *, title="Sources", cols=2, x=0.7, y=1.4, accent=MAGENTA, ink=DEEP, chrome=MONO):
+def sources_page(slide, sources, *, title="Sources", cols=2, x=0.7, y=1.4, accent=MAGENTA, ink=DEEP, chrome=None):
     """Render references as mono numbered columns under an accent header — a research deck's
-    colophon / a credible 'where this came from' close."""
+    colophon / a credible 'where this came from' close. ``chrome`` resolves to the current
+    ``MONO`` at call time."""
+    chrome = chrome or MONO
     sw, sh = _slide_size(slide)
     part_eyebrow(slide, x, 0.6, title, color=accent, font=chrome, size=13)
     box(slide, x, 1.02, 1.2, 0.05, fill=accent)
@@ -1087,8 +1268,10 @@ def wireframe_grid(slide, x, y, w, h, cells, *, cols=4, rows=3, highlight=None, 
              [[(label.upper(), 10, accent if em else ink, True, False, MONO)]], space_after=0)
 
 
-def spec_list(slide, x, y, lines, *, font=MONO, color=DEEP, size=12, gap=0.32):
-    """Monospace 'derived = base × n' spec lines — pairs with wireframe_grid for a systems deck."""
+def spec_list(slide, x, y, lines, *, font=None, color=DEEP, size=12, gap=0.32):
+    """Monospace 'derived = base × n' spec lines — pairs with wireframe_grid for a systems deck.
+    ``font`` resolves to the current ``MONO`` at call time (reassigning ``deckkit.MONO`` re-themes it)."""
+    font = font or MONO
     cy = y
     for ln in lines:
         text(slide, x, cy, 6.0, 0.3, [[(ln, size, color, False, False, font)]], space_after=0); cy += gap
@@ -2006,7 +2189,7 @@ def chip(slide, x, y, w, h, title, sub, fill, tcolor=None):
     contrast against `fill` — so a chip on a light accent (gold/teal) gets dark text
     instead of unreadable white. Pass `tcolor` explicitly to override."""
     if tcolor is None:
-        tcolor = WHITE if contrast_ratio(WHITE, fill) >= contrast_ratio(DEEP, fill) else DEEP
+        tcolor = _legible_ink(fill)
     box(slide, x, y, w, h, fill=fill, round=True)
     runs = [[(title, 14, tcolor, True, False)]]
     if sub:
@@ -2064,7 +2247,7 @@ def repeat_row(slide, x, y, w, h, n, label_fmt="{i}", *, sub="", show=2, fill=BL
         by = y + (h - bh) / 2
         bx = x + avail + gap
         box(slide, bx, by, badge_w, bh, fill=fill, round=True)
-        bc = WHITE if contrast_ratio(WHITE, fill) >= contrast_ratio(DEEP, fill) else DEEP
+        bc = _legible_ink(fill)
         text(slide, bx, by, badge_w, bh, [[("× %d" % n, 16, bc, True, False)]],
              align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
     cap = caption if caption is not None else sub
@@ -2080,7 +2263,7 @@ def modbox(slide, x, y, w, h, role, fname, fill, tcolor=None, check=False):
     """Module box for a code/architecture diagram: big role word + mono filename.
     `tcolor=None` auto-picks white/dark ink for contrast against `fill` (see chip)."""
     if tcolor is None:
-        tcolor = WHITE if contrast_ratio(WHITE, fill) >= contrast_ratio(DEEP, fill) else DEEP
+        tcolor = _legible_ink(fill)
     box(slide, x, y, w, h, fill=fill, round=True)
     role_runs = [[(line, 16, tcolor, True, False)] for line in role.split("\n")]
     text(slide, x + 0.05, y + 0.12, w - 0.1, 0.55, role_runs, align=PP_ALIGN.CENTER,
@@ -2196,7 +2379,7 @@ def series_from_csv(path, x_col, y_cols, *, delimiter=None, encoding="utf-8"):
 
 def native_chart(slide, x, y, w, h, categories, series, *, kind="line_markers",
                  palette=None, dark=False, font=None, highlight=None, legend=True,
-                 value_fmt=None, smooth=True, zero_base=True):
+                 value_fmt=None, smooth=True, zero_base=True, emphasize=None):
     """An **EDITABLE native PowerPoint chart** (a real chart object: click to edit data/labels in
     PowerPoint, and **any non-Latin labels — CJK · Cyrillic · Greek · …** — render via PowerPoint's own
     fonts, **no tofu**, unlike the rasterised designed_charts recipes). Prefer this whenever editability
@@ -2214,7 +2397,11 @@ def native_chart(slide, x, y, w, h, categories, series, *, kind="line_markers",
     is only 1.09× larger — the classic 'cropped-axis drama' that MISREPRESENTS magnitude. It fires
     only for column/bar with all-non-negative data; line/line_markers keep auto-scale (a trend line
     legitimately wants a cropped axis). Pass ``zero_base=False`` only for a *deliberate* zoomed
-    magnitude axis, and say why."""
+    magnitude axis, and say why.
+
+    **`emphasize=<category index>`** foregrounds ONE bar in a SINGLE-series column/bar chart (that
+    bar keeps the accent, the rest drop to grey) — the per-category form of the single-highlight
+    rule, since `highlight` selects a whole SERIES and so can't pick one bar on a one-series chart."""
     from pptx.chart.data import CategoryChartData
     from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
     KIND = {"line": XL_CHART_TYPE.LINE, "line_markers": XL_CHART_TYPE.LINE_MARKERS,
@@ -2235,6 +2422,17 @@ def native_chart(slide, x, y, w, h, categories, series, *, kind="line_markers",
             allv = [float(v) for _, vals in series for v in vals]
             if allv and min(allv) >= 0:
                 ch.value_axis.minimum_scale = 0
+        except Exception:
+            pass
+    # single-highlight for a ONE-series bar/column chart: colour points per-category so one bar pops
+    if emphasize is not None and kind in ("column", "bar") and len(series) == 1:
+        pal = [_as_rgb(c) for c in (palette or ACCENTS)]
+        muted = RGBColor(0x8A, 0x93, 0xA6) if dark else RGBColor(0xB8, 0xBE, 0xCC)
+        try:
+            pts = ch.series[0].points
+            for i, pt in enumerate(pts):
+                pt.format.fill.solid()
+                pt.format.fill.fore_color.rgb = pal[0] if i == emphasize else muted
         except Exception:
             pass
     return ch
@@ -2520,7 +2718,19 @@ def table(slide, x, y, w, rows, col_w=None, header=True, highlight=None,
     a table is for exact values."""
     ncol = max(len(r) for r in rows)
     nrow = len(rows)
-    col_w = col_w or [w / ncol] * ncol
+    if col_w is None:
+        # content-aware default: size each column to its widest cell (so a text label column isn't
+        # starved into widows while numeric columns waste space), then normalise to span w.
+        pad = 0.24                                     # cell L+R margins + a little breathing room
+        natw = []
+        for j in range(ncol):
+            mx = 0.0
+            for i in range(nrow):
+                txt = rows[i][j] if j < len(rows[i]) else ""
+                mx = max(mx, _natural_width_in([(txt, header and i == 0)], size, font))
+            natw.append(max(mx, 0.4) + pad)
+        tot_w = sum(natw) or w
+        col_w = [nw * w / tot_w for nw in natw]
     h = row_h * nrow
     tbl = slide.shapes.add_table(nrow, ncol, Inches(x), Inches(y), Inches(w), Inches(h)).table
     _clear_table_style(tbl)
@@ -2867,27 +3077,41 @@ def _slide_size(slide):
     return prs.slide_width / 914400, prs.slide_height / 914400
 
 
-def title_bar(slide, title, kicker="", accent=MAGENTA, title_c=DEEP, w_in=None):
+def title_bar(slide, title, kicker="", accent=BLUE, title_c=DEEP, w_in=None):
     """Lightweight slide chrome for the no-template branch: optional kicker, title,
-    and a short accent rule. Pair with footer().
+    and a short accent rule. Pair with footer(). Returns the content-top y (just below the
+    accent rule) so a caller can flow the body beneath a title that wrapped to 2 lines.
 
     By default this reads the actual deck width from ``slide`` so it works on
     widescreen templates, custom ``blank_deck(w_in, h_in)`` sizes, and posters.
-    Pass ``w_in`` only when deliberately overriding that geometry."""
+    Pass ``w_in`` only when deliberately overriding that geometry. The kicker and the accent
+    rule share the ONE ``accent`` hue (default BLUE, the primary accent) — pass ``accent=MAGENTA``
+    for a deliberate callout. A long (assertion-style) title is auto-fit to a ≤2-line budget and
+    the rule is MEASURED to sit below the LAST line, so it never strikes a wrapped title through."""
     if w_in is None:
         w_in, _ = _slide_size(slide)
+    tw = w_in - 1.1
     if kicker:
-        text(slide, 0.55, 0.30, w_in - 1.1, 0.3, [[(kicker.upper(), 11, BLUE, True, False)]], space_after=0)
+        text(slide, 0.55, 0.30, tw, 0.3, [[(kicker.upper(), 11, accent, True, False)]], space_after=0)
         ty = 0.54
     else:
         ty = 0.40
-    tb = text(slide, 0.55, ty, w_in - 1.1, 0.7,
-              [[(title, 26, title_c, True, False, DISPLAY or FONT)]], space_after=0)  # title gets the DISPLAY face
+    disp = DISPLAY or FONT
+    # auto-fit into a ≤2-line budget (floor 18pt) so a sentence-length title can't run the body off
+    # the fixed content band, then measure the real line count to place the rule below the last line.
+    tsz = fit_text_size([(title, True)], tw, 26 / 72.0 * _LINT_LINE_H * 2 + 0.02, 26,
+                        font=disp, min_size=18)
+    nlines = measure_lines([(title, True)], tsz, tw, font=disp)
+    lh = tsz / 72.0 * _LINT_LINE_H
+    tb = text(slide, 0.55, ty, tw, max(0.7, nlines * lh),
+              [[(title, tsz, title_c, True, False, disp)]], space_after=0)  # title gets the DISPLAY face
     if EADISPLAY:                                    # ...and a distinct CJK display face if set
         for p in tb.text_frame.paragraphs:
             for r in p.runs:
                 _apply_ea(r, EADISPLAY)
-    box(slide, 0.57, ty + 0.62, 1.1, 0.045, fill=accent)
+    rule_y = max(ty + 0.62, ty + nlines * lh + 0.06)   # floor keeps the one-line render byte-identical
+    box(slide, 0.57, rule_y, 1.1, 0.045, fill=accent)
+    return rule_y + 0.20
 
 
 def footer(slide, tag="", page=None, w_in=None, h_in=None):
@@ -3084,7 +3308,7 @@ def node(slide, x, y, w, h, label, *, shape="roundrect", fill=None, line=None, l
     o.shadow.inherit = False
     if hub:
         o.fill.solid(); o.fill.fore_color.rgb = acc; o.line.fill.background()
-        tc = tcolor if tcolor is not None else (WHITE if contrast_ratio(WHITE, acc) >= contrast_ratio(DEEP, acc) else DEEP)
+        tc = tcolor if tcolor is not None else (_legible_ink(acc))
     else:
         o.fill.solid(); o.fill.fore_color.rgb = WHITE
         o.line.color.rgb = ln; o.line.width = Pt(line_w)
@@ -3294,7 +3518,7 @@ def step_list(slide, x, y, w, items, *, orientation="vertical", accent=None, ink
             d = 0.5
             box(slide, cx + cw / 2 - d / 2, y, d, d, fill=acc if on else WHITE,
                 line=None if on else acc, line_w=1.4, round=True, r=d / 2)
-            tc = (WHITE if contrast_ratio(WHITE, acc) >= contrast_ratio(DEEP, acc) else DEEP) if on else acc
+            tc = (_legible_ink(acc)) if on else acc
             text(slide, cx + cw / 2 - d / 2, y, d, d, [[(numr(i), 15, tc, True, False)]],
                  align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
             if i: connector(slide, (cx - g + 0.02, y + d / 2), (cx - 0.02, y + d / 2), color=_blend(acc, WHITE, 0.4))
@@ -3309,7 +3533,7 @@ def step_list(slide, x, y, w, items, *, orientation="vertical", accent=None, ink
         d = 0.42; on = (active_idx == i)
         box(slide, x, cy, d, d, fill=acc if (on or active_idx is None) else _blend(acc, WHITE, 0.0),
             round=True, r=d / 2)
-        tc = WHITE if contrast_ratio(WHITE, acc) >= contrast_ratio(DEEP, acc) else DEEP
+        tc = _legible_ink(acc)
         text(slide, x, cy, d, d, [[(numr(i), 14, tc, True, False)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
         text(slide, x + d + 0.18, cy - 0.02, w - d - 0.18, 0.32, [[(title, 14.5, ic, True, False)]], space_after=0)
         bh = 0.3
@@ -3605,8 +3829,8 @@ def cycle_diagram(slide, cx, cy, nodes, *, rx=1.5, ry=1.0, node_size=0.42, ring_
 
 def dumbbell_board(slide, x, y, w, rows, *, row_h=0.52, label_w=None, accent=None, before_c=None,
                    track_c=None, ink=None, mute=None, hero=None, hero_c=None, threshold=None,
-                   value_font=None, label_size=14, sub_size=10, value_size=14, before_size=10,
-                   font=None):
+                   regress=None, value_font=None, label_size=14, sub_size=10, value_size=14,
+                   before_size=10, font=None):
     """A BEFORE→AFTER evidence board — one dumbbell row per metric, each on ITS OWN scale, with
     the collision-free geometry that otherwise needs hand-debugging (value labels above the dots,
     single-line name+sub so proximity reads correctly, per-row lo/hi so direction is honest and
@@ -3623,14 +3847,30 @@ def dumbbell_board(slide, x, y, w, rows, *, row_h=0.52, label_w=None, accent=Non
     (lower-is-better) row mirrors it, so the labels cannot collide at any span.
     `hero` = row index to emphasise (left accent bar + bold name) · `threshold` = optional
     (row_idx, value, tick_label) drawing a vertical reference tick on that row (e.g. the 100%
-    line NRR must cross). Budget ~0.52in/row + margins; keep w ≥ ~8 so value labels clear.
-    Returns the bottom y."""
+    line NRR must cross). **`regress`** = a set/list of row indices that got WORSE — their after-dot,
+    connector, and value recolour to the risk red and the value gets a ▾ mark, so a mixed board
+    doesn't paint a regression in the celebratory 'improved' accent (colour is never the only
+    signal — the number and the ▾ carry it too). `label_w` defaults to the MEASURED widest row
+    label (capped), so short metric names don't strand a huge empty gutter — pass it for very long
+    names. Budget ~0.52in/row + margins; keep w ≥ ~8 so value labels clear. Returns the bottom y."""
     acc = accent if accent is not None else RGBColor(0x4C, 0xC3, 0x8A)
     bc = before_c if before_c is not None else MUTE
     tc = track_c if track_c is not None else RGBColor(0xE3, 0xE6, 0xEC)
     ic_ = ink if ink is not None else DEEP
     mc = mute if mute is not None else MUTE
-    lw = label_w if label_w is not None else 0.42 * w
+    reg = set(regress or ())
+    acc_text = _darken_to(acc, WHITE)                  # the accent VALUE label darkened to stay legible
+    #                                                    on white (the bright dot/connector keep `acc`)
+    if label_w is not None:
+        lw = label_w
+    else:                                              # measure the widest label so the gutter fits it
+        measured = 0.0
+        for row in rows:
+            nw = _natural_width_in([(str(row[0]), False)], label_size, font)
+            if row[1]:
+                nw += _natural_width_in([("   " + str(row[1]), False)], sub_size, font)
+            measured = max(measured, nw)
+        lw = min(max(measured + 0.15, 1.0), min(0.42 * w, 2.4))
     bx0, bx1 = x + lw + 0.15, x + w - 1.02
     for i, row in enumerate(rows):
         name, sub, v0, v1, lo, hi, unit = row[:7]
@@ -3653,11 +3893,14 @@ def dumbbell_board(slide, x, y, w, rows, *, row_h=0.52, label_w=None, accent=Non
             if len(threshold) > 2 and threshold[2]:
                 text(slide, xk + 0.06, ry + 0.20, 0.7, 0.22,
                      [[(str(threshold[2]), sub_size, mc, False, False, font)]], space_after=0)
-        connector(slide, (x0, ry + 0.15), (x1, ry + 0.15), color=acc, width=2.2, arrow=True)
+        is_reg = i in reg                              # a regressed row: risk red + ▾, never the accent
+        row_acc = _BAD_D if is_reg else acc            # dot + connector (bright graphic)
+        val_acc = _BAD_D if is_reg else acc_text       # value TEXT (legible on white)
+        connector(slide, (x0, ry + 0.15), (x1, ry + 0.15), color=row_acc, width=2.2, arrow=True)
         box(slide, x0 - 0.05, ry + 0.10, 0.10, 0.10, fill=bc, round=True, r=0.05)
-        box(slide, x1 - 0.06, ry + 0.09, 0.12, 0.12, fill=acc, round=True, r=0.06)
-        fmt = lambda v: f"{v:g}"
-        after_txt = fmt(v1) + (" " + unit if unit else "")
+        box(slide, x1 - 0.06, ry + 0.09, 0.12, 0.12, fill=row_acc, round=True, r=0.06)
+        fmt = _numlabel
+        after_txt = ("▾ " if is_reg else "") + fmt(v1) + (" " + unit if unit else "")
         # Direction-aware OUTWARD labels: rightward rows keep the original geometry byte-for-byte;
         # a leftward (lower-is-better) row mirrors it — after-label LEFT of x1, before-label RIGHT
         # of x0 — so end labels can never collide with each other at any span. (Known latent limit,
@@ -3668,14 +3911,14 @@ def dumbbell_board(slide, x, y, w, rows, *, row_h=0.52, label_w=None, accent=Non
                  [[(fmt(v0), before_size, mc, False, False, value_font or font)]],
                  align=PP_ALIGN.RIGHT, space_after=0)
             text(slide, x1 + 0.10, ry - 0.21, 0.98, 0.28,
-                 [[(after_txt, value_size, acc, True, False,
+                 [[(after_txt, value_size, val_acc, True, False,
                     value_font or font)]], space_after=0)
         else:
             text(slide, x0 + 0.10, ry - 0.185, 0.6, 0.24,
                  [[(fmt(v0), before_size, mc, False, False, value_font or font)]],
                  space_after=0)
             text(slide, x1 - 1.08, ry - 0.21, 0.98, 0.28,
-                 [[(after_txt, value_size, acc, True, False,
+                 [[(after_txt, value_size, val_acc, True, False,
                     value_font or font)]], align=PP_ALIGN.RIGHT, space_after=0)
         if v_mid is not None:
             xm = X(v_mid)
@@ -3731,26 +3974,35 @@ def concept_equation(slide, x, y, w, h, terms, *, op="=", accent=None, ink=None,
 
 
 def cta_button(slide, x, y, w, h, label, *, variant="primary", accent=None, tcolor=None,
-               arrow=True, mono=False):
+               arrow=True, mono=False, bg=None):
     """A call-to-action button: filled `variant='primary'` (accent fill) or `variant='secondary'`
-    (outline). Optional trailing → arrow / mono command label. Use on closing/cover masters."""
+    (outline). Optional trailing → arrow / mono command label. Use on closing/cover masters. The
+    outline (`secondary`) label defaults to the accent, which can be too faint on the SLIDE
+    background it sits on — pass `bg=` your closing-slide colour and, if the accent doesn't clear
+    4.5:1 on it, the label recolours to a legible ink (the outline stays accent). `tcolor` overrides."""
     acc = accent if accent is not None else BLUE
     if variant == "primary":
         box(slide, x, y, w, h, fill=acc, round=True, r=min(h / 2, 0.16))
-        tc = tcolor if tcolor is not None else (WHITE if contrast_ratio(WHITE, acc) >= contrast_ratio(DEEP, acc) else DEEP)
+        tc = tcolor if tcolor is not None else (_legible_ink(acc))
     else:
         box(slide, x, y, w, h, fill=None, line=acc, line_w=1.4, round=True, r=min(h / 2, 0.16))
-        tc = tcolor if tcolor is not None else acc
+        if tcolor is not None:
+            tc = tcolor
+        elif bg is not None and contrast_ratio(acc, bg) < 4.5:
+            tc = _legible_ink(bg)                    # accent too faint on this slide bg → legible ink
+        else:
+            tc = acc
     lab = label + ("  →" if arrow else "")
     text(slide, x, y, w, h, [[(lab, 13, tc, True, False, MONO if mono else None)]],
          align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
 
 
-def cta_pair(slide, x, y, w, h, primary, secondary, *, accent=None, gap=0.2):
-    """Primary (filled) + secondary (outline) CTA buttons side by side, equal height."""
+def cta_pair(slide, x, y, w, h, primary, secondary, *, accent=None, gap=0.2, bg=None):
+    """Primary (filled) + secondary (outline) CTA buttons side by side, equal height. Pass `bg=`
+    the slide background so the outline button's label stays legible on a dark closing."""
     bw = (w - gap) / 2
     cta_button(slide, x, y, bw, h, primary, variant="primary", accent=accent)
-    cta_button(slide, x + bw + gap, y, bw, h, secondary, variant="secondary", accent=accent)
+    cta_button(slide, x + bw + gap, y, bw, h, secondary, variant="secondary", accent=accent, bg=bg)
 
 
 def status_stamp(slide, x, y, text_str, *, color=None, size=0.95, rotation=-12):
@@ -3803,8 +4055,12 @@ def pull_quote(slide, x, y, w, quote, *, attribution="", accent=None, ink=None, 
     ic = ink if ink is not None else DEEP
     f = serif or DISPLAY or "Georgia"
     text(slide, x, y - 0.1, 0.7, 0.7, [[("“", 54, acc, True, False, f)]], space_after=0)
-    text(slide, x + 0.05, y + 0.5, w, 1.4, [[(quote, size, ic, False, True, f)]], space_after=2, line_spacing=1.1)
-    yy = y + 0.5 + (size / 72.0) * 1.1 * (1 + len(quote) // max(1, int(w * 9))) + 0.2
+    # MEASURE the wrapped quote (char-count estimates undercount wide quotes and the attribution
+    # then rides up into the ink). Match the real render height: _LINT_LINE_H × the 1.1 line_spacing.
+    nl = measure_lines([(quote, False)], size, w, font=f)
+    qh = nl * (size / 72.0) * _LINT_LINE_H * 1.1
+    text(slide, x + 0.05, y + 0.5, w, max(0.5, qh), [[(quote, size, ic, False, True, f)]], space_after=2, line_spacing=1.1)
+    yy = y + 0.5 + qh + 0.12
     if attribution:
         text(slide, x + 0.05, yy, w, 0.3, [[("— " + attribution, 12, MUTE, False, False)]], space_after=0)
         yy += 0.3
@@ -3840,21 +4096,34 @@ def tradeoff_list(slide, x, y, w, plus, minus, *, pos=None, neg=None, recommende
     return cy
 
 
-def segmented_bar(slide, x, y, w, h, parts, *, labels=None, accents=None, show_pct=True):
+def segmented_bar(slide, x, y, w, h, parts, *, labels=None, accents=None, show_pct=True, legend="auto"):
     """A cumulative 100% SEGMENTED bar. parts = list of values (auto-normalised). Distinct hues.
-    Returns bottom y."""
+    On-bar labels AUTO-FIT their segment; a segment too thin to carry a label (< 0.5in) is NOT
+    silently dropped — with ``legend='auto'`` its name+% appears in a compact swatch legend below,
+    so no category is lost (the previous behaviour dropped the sliver's label entirely). Returns
+    bottom y (past the legend if one was drawn)."""
     tot = sum(parts) or 1
     cols = accents or palette(len(parts), ACCENTS)
     cx = x
+    dropped = []
     for i, v in enumerate(parts):
         seg = w * v / tot
         box(slide, cx, y, seg, h, fill=cols[i], round=False)
+        pct = f"{round(100 * v / tot)}%"
+        name = labels[i] if labels else ""
         if show_pct and seg > 0.5:
-            tc = WHITE if contrast_ratio(WHITE, cols[i]) >= contrast_ratio(DEEP, cols[i]) else DEEP
-            lab = (labels[i] + " " if labels else "") + f"{round(100 * v / tot)}%"
-            text(slide, cx, y, seg, h, [[(lab, 10.5, tc, True, False)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+            tc = _legible_ink(cols[i])
+            lab = (name + " " if name else "") + pct
+            lsz = fit_text_size([(lab, True)], seg - 0.1, h - 0.04, 10.5, min_size=7)   # shrink to fit
+            text(slide, cx, y, seg, h, [[(lab, lsz, tc, True, False)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+        elif show_pct:
+            dropped.append((cols[i], name if name else pct, pct if name else ""))
         cx += seg
-    return y + h
+    yb = y + h
+    if show_pct and legend and dropped:
+        leaderboard(slide, x, yb + 0.12, min(w, 4.2), dropped, row_h=0.34, gap=0.06)  # never lose the sliver's %
+        yb = yb + 0.12 + len(dropped) * 0.40
+    return yb
 
 
 def meter_bar(slide, x, y, w, frac, *, label=None, value=None, value_unit=None,
@@ -3904,7 +4173,7 @@ def meter_bar(slide, x, y, w, frac, *, label=None, value=None, value_unit=None,
 def year_badge(slide, x, y, text_str, *, fill=None, tcolor=None, w=0.95, h=0.4):
     """A small year/date PILL badge (anchors chronology on timelines/cards)."""
     f = fill if fill is not None else GOLD
-    tc = tcolor if tcolor is not None else (WHITE if contrast_ratio(WHITE, f) >= contrast_ratio(DEEP, f) else DEEP)
+    tc = tcolor if tcolor is not None else (_legible_ink(f))
     box(slide, x, y, w, h, fill=f, round=True, r=h / 2)
     text(slide, x, y, w, h, [[(str(text_str), 12, tc, True, False)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
 
@@ -4445,14 +4714,14 @@ def tier_stack(slide, x, y, w, h, tiers, *, mode="pyramid", direction=None, acce
         val_str = None
         if values is not None and i < len(values) and values[i] not in (None, ""):
             v = values[i]
-            val_str = f"{v:g}" if isinstance(v, (int, float)) and not isinstance(v, bool) else str(v)
+            val_str = _numlabel(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else str(v)
         band_cy = cy + band_h / 2.0
         # a value-proportional band can now be a thin sliver — too narrow to hold a label INSIDE.
         # auto-route those to a side leader so the honest geometry stays legible (never inflate the
         # band just to fit its text).
         too_thin = labels == "inside" and band_w < 0.85
         if labels == "inside" and not too_thin:
-            tc = WHITE if contrast_ratio(WHITE, cols[i]) >= contrast_ratio(DEEP, cols[i]) else DEEP
+            tc = _legible_ink(cols[i])
             lsize = fit_text_size([(str(lab), True)], max(0.4, band_w - 0.24), band_h - 0.06, 14,
                                   font=font, min_size=8)
             runs = [[(str(lab), lsize, tc, True, False, font)]]
@@ -4507,7 +4776,13 @@ def gantt(slide, x, y, w, tasks, *, axis_min=None, axis_max=None, ticks=None, ti
     labelled swimlane bands — then a task's 4th element is its LANE index; without ``lanes`` the 4th
     element is an ACCENT index into ``accents``. ``today`` drops a vertical marker line; ``highlight``
     (a flat task index) recolours one bar. **Fails loudly** (``ValueError``) if a bar falls off the
-    axis, on the ``timeline``/``vstack`` precedent. Returns the bottom y."""
+    axis, on the ``timeline``/``vstack`` precedent.
+
+    **VERTICAL BUDGET (size your region for it — the height is DERIVED, not fitted):** the board is
+    ``header_h(≈0.5) + Σ tasks·row_h + Σ lanes·(lane_head + band pad)`` tall ≈ ``0.5 + n_tasks·row_h
+    + n_lanes·0.5`` at the default ``row_h=0.42``. A 3-lane / 9-task board is ≈ 5.3in — near a full
+    content band. If that overflows your slide, lower ``row_h`` (~0.34), split lanes across two
+    slides, or drop a lane; there is no auto-shrink. Returns the bottom y."""
     if not tasks:
         raise ValueError("gantt() needs at least one task")
     lo = axis_min if axis_min is not None else min(t[1] for t in tasks)
@@ -4552,7 +4827,7 @@ def gantt(slide, x, y, w, tasks, *, axis_min=None, axis_max=None, ticks=None, ti
     if ticks:
         # gridlines/today are CONNECTORS (not filled boxes) so a full-height line crossing the
         # swimlane band containers is never mis-flagged as escaping one of them
-        tls = tick_labels if tick_labels is not None else [f"{t:g}" for t in ticks]
+        tls = tick_labels if tick_labels is not None else [_numlabel(t) for t in ticks]
         sw, _sh = _slide_size(slide)
         for t, lbl in zip(ticks, tls):
             gx = X(t)
@@ -4566,8 +4841,11 @@ def gantt(slide, x, y, w, tasks, *, axis_min=None, axis_max=None, ticks=None, ti
         connector(slide, (tx, grid_top), (tx, chart_bottom), style="dashed",
                   color=MAGENTA, width=1.4, arrow=False)
     for li, lname, bt, bh in lane_bands:
+        # keep the lane's HUE as its key, but darken it until the header clears contrast on the
+        # light same-hue band (raw GOLD/TEAL on their own 6%-tint read ~3:1 otherwise).
+        lc = _darken_to(pool[li % len(pool)], tint(pool[li % len(pool)], 0.06))
         text(slide, x, bt + 0.01, label_w - 0.12, lane_head_h,
-             [[(str(lname).upper(), 10, pool[li % len(pool)], True, False, font)]],
+             [[(str(lname).upper(), 10, lc, True, False, font)]],
              anchor=MSO_ANCHOR.MIDDLE, space_after=0)
     for ti, t, row_top, li in rows_out:
         lab, s0, e0 = t[0], t[1], t[2]
@@ -4651,14 +4929,16 @@ def _eval_mark(slide, cx, cy, val, *, font=None, size=15):
 
 
 def eval_matrix(slide, x, y, w, options, criteria, cells, *, mark="ball", recommend=None,
-                row_h=0.42, legend=True, accents=None, ink=None, font=None):
+                row_h=0.42, legend=True, accents=None, ink=None, font=None,
+                recommend_label="Recommended", scale_label="SCALE"):
     """A decision / OPTION-vs-CRITERIA scoring grid: a header row of option names (columns), a left
     column of criteria labels (rows), and a cell grid. ``cells`` is a 2-D list ``cells[row][col]``:
     ``0..4`` for ``mark='ball'`` (a :func:`harvey_ball` per cell) or ``'yes'``/``'no'``/``'partial'``
     for ``mark='mark'`` (semantic ✓/✕/◐). ``recommend=<col idx>`` tints that column and drops a
     ``corner_tab`` "RECOMMENDED" on it — foreground the ONE option the analysis picks. ``legend=True``
     adds a small on-canvas 0–100 % harvey-ball key (ball mode only). ``accents[0]`` sets the
-    recommend/ball hue; ``ink`` the label colour. Returns the bottom y."""
+    recommend/ball hue; ``ink`` the label colour. Pass ``recommend_label``/``scale_label`` to
+    translate the chrome on a non-English deck (推荐方案 / 评分). Returns the bottom y."""
     ic = ink if ink is not None else DEEP
     nopt, ncrit = len(options), len(criteria)
     if nopt == 0 or ncrit == 0:
@@ -4670,7 +4950,7 @@ def eval_matrix(slide, x, y, w, options, criteria, cells, *, mark="ball", recomm
     if recommend is not None and 0 <= recommend < nopt:
         rx = x + crit_w + recommend * col_w
         box(slide, rx, y + head_h, col_w, ncrit * row_h, fill=tint(acc, 0.10), round=True, r=0.06)
-        corner_tab(slide, rx, y, col_w, "Recommended", fill=acc, w=min(1.7, col_w + 0.3))
+        corner_tab(slide, rx, y, col_w, recommend_label, fill=acc, w=min(1.7, col_w + 0.3))
     for c, opt in enumerate(options):
         ox = x + crit_w + c * col_w
         emph = (recommend == c)
@@ -4699,7 +4979,7 @@ def eval_matrix(slide, x, y, w, options, criteria, cells, *, mark="ball", recomm
     if legend and mark == "ball":
         ly = bottom + 0.2
         lx = x + crit_w
-        text(slide, x, ly, crit_w - 0.12, 0.24, [[("SCALE", 9, MUTE, True, False, font)]],
+        text(slide, x, ly, crit_w - 0.12, 0.24, [[(scale_label, 9, MUTE, True, False, font)]],
              anchor=MSO_ANCHOR.MIDDLE, space_after=0)
         for k in range(5):
             hx = lx + k * 0.92
@@ -4772,11 +5052,11 @@ def heat_matrix(slide, x, y, w, h, values, row_labels, col_labels, *, scale="seq
             box(slide, gx + c * cw, gy + r * ch, cw, ch, fill=col)
             lbl = None
             if cell_labels is True:
-                lbl = f"{values[r][c]:g}"
+                lbl = _numlabel(values[r][c])
             elif cell_labels is not None:
                 lbl = str(cell_labels[r][c])
             if lbl is not None:
-                tc = WHITE if contrast_ratio(WHITE, col) >= contrast_ratio(DEEP, col) else DEEP
+                tc = _legible_ink(col)
                 text(slide, gx + c * cw, gy + r * ch, cw, ch, [[(lbl, 10.5, tc, True, False, font)]],
                      align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
     bottom = gy + grid_h
@@ -4788,9 +5068,9 @@ def heat_matrix(slide, x, y, w, h, values, row_labels, col_labels, *, scale="seq
             vv = lo + (i / (nseg - 1)) * (hi - lo)
             box(slide, gx + i * bar_w / nseg, lgy, bar_w / nseg + 0.006, 0.14,
                 fill=_heat_color(vv, lo, hi, scale, accent, div_zero=div_zero))
-        text(slide, gx, lgy + 0.16, 1.2, 0.2, [[(f"{lo:g}", 9, MUTE, False, False, font)]],
+        text(slide, gx, lgy + 0.16, 1.2, 0.2, [[(_numlabel(lo), 9, MUTE, False, False, font)]],
              align=PP_ALIGN.LEFT, space_after=0)
-        text(slide, gx + bar_w - 1.2, lgy + 0.16, 1.2, 0.2, [[(f"{hi:g}", 9, MUTE, False, False, font)]],
+        text(slide, gx + bar_w - 1.2, lgy + 0.16, 1.2, 0.2, [[(_numlabel(hi), 9, MUTE, False, False, font)]],
              align=PP_ALIGN.RIGHT, space_after=0)
         bottom = lgy + 0.38
     return bottom

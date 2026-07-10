@@ -170,7 +170,7 @@ def _dumbbell_directional():
         ("Latency", "p95", 1240, 620, 0, 1500, "ms"),       # leftward, wide span
         ("ARR", "+51%", 4980, 6350, 4300, 6800, "万"),      # rightward control (legacy geometry)
         ("NRR", "", 92, 108, 85, 118, "%", 100),            # rightward + v_mid (8-element row)
-    ])
+    ], label_w=0.42 * w)   # explicit label_w exercises the byte-identity frame guard below
     labels = {"0.62", "0.55 $", "1240", "620 ms", "4980", "6350 万", "92", "108 %", "100"}
     inks = []
     for sh in s.shapes:

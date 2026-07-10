@@ -49,6 +49,13 @@ deckkit.EAFONT = "Hiragino Sans GB"  # CJK glyphs (macOS render-loop-safe; or "M
 and numbers stay on `FONT`. Mixed "中文 + English 28%" text then looks intentional and
 travels correctly. (Without `EAFONT`, CJK falls back to an uncontrolled default.)
 
+**Translate the component CHROME too.** A few components ship English chrome words baked in;
+on a non-English deck, pass the translated label so no stray English leaks onto an otherwise
+Chinese slide: `eval_matrix(..., recommend_label="推荐方案", scale_label="评分")`,
+`colophon(..., credits_label="团队", tooling_label="制作")`. Component data you pass — titles,
+labels, values — is already in your language; only these built-in words need the override, so scan
+the render for any stray English chrome.
+
 ### Font choices
 | Role | Portable (recommended) | macOS | Windows |
 |---|---|---|---|

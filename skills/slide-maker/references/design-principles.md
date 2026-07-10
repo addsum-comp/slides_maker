@@ -147,7 +147,7 @@ tiles via `deckkit.scorecard`. For a single obvious number use a hero stat, not 
   +16.3" trio reads as three additions when 16.3 = 8 + 8.3). Use dashed connectors to carry the running
   total between floats, end on ONE total/subtotal bar, and keep *different kinds* of quantity apart
   (e.g. employee take-home extras vs employer-paid pension are two stacks, not one 135% total — show
-  the second as a separate labelled note, not stacked into the first). `deckkit.waterfall` /
+  the second as a separate labelled note, not stacked into the first). `designed_charts.waterfall` /
   `designed_charts` render this correctly; prefer them over hand-rolling floating boxes.
 - **The geometry must MATCH the number — three ways an encoding silently lies.** A picture that
   misrepresents its own data is worse than a broken layout; before shipping any value-driven chart,

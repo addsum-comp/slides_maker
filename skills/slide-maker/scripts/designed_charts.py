@@ -277,8 +277,9 @@ def waterfall(out, items, *, palette=None, dark=False, font=None, total_label="T
             ax.text(i, tops[i] + lblpad, "+" + _numlabel(deltas[i]), ha="center", va="bottom",
                     fontsize=9.5, color=up_c, fontweight="bold")
         else:
-            ax.text(i, bases[i] - lblpad, "−" + _numlabel(abs(deltas[i])), ha="center", va="top",
-                    fontsize=9.5, color=down_c, fontweight="bold")
+            ax.text(i, bases[i] - lblpad, "-" + _numlabel(abs(deltas[i])), ha="center", va="top",
+                    fontsize=9.5, color=down_c, fontweight="bold")  # ASCII '-' (U+2212 tofus in CJK fonts;
+            #                                          matches axes.unicode_minus=False on the tick labels)
     ax.set_xticks(xs); ax.set_xticklabels(labels, fontsize=10, color=ink)
     ax.set_ylim(min(0.0, allmin) - lblpad * 2, allmax + lblpad * 4)
     ax.axhline(0, color=grid, lw=1.0, zorder=1)
