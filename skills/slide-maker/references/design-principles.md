@@ -598,6 +598,10 @@ ask of each element "is there suitable, balanced space around it, or is it crowd
   markers; ✅/🚀/🔥 decoration; the rounded-card-with-a-left-border-accent everywhere; three-near-identical
   "feature cards"; **a multi-colour decorative strip / spine / rainbow rule stamped on every slide**
   (palette-as-ornament — the palette shows through the content, not through a swatch bar);
+  **a full-width takeaway strip parked at the bottom of nearly every page** (rotate the slot —
+  architecture-rotation rule); **every element panelled on an already-calm canvas** (free at least
+  a third of the protagonists); **chips/rosters/pillars naming tools or categories with NO icon
+  family** (self-verify (g));
   over-exposed default fonts used without intent; and **fabricated specifics** (made-up
   stats, fake quotes, invented logos). *(An invented **fake of a real entity's official logo** is the tell; a clearly-flagged designed **wordmark** stand-in — used only when no real logo exists or could be found — is sanctioned, see `review-rubrics.md` / `image-generation.md` "Logo / brand mark".)* Meta-heuristic: **when you feel the urge to *add* something to
   make a plain slide "look nicer," that urge is usually the slop signal — subtract instead** (more

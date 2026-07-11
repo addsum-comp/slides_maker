@@ -8,6 +8,16 @@ and both are avoidable:
    scratch and the two never merged. (This has happened to a real user; it is the most
    damaging post-delivery failure.)
 
+## Two cheap disciplines worth keeping
+- **Versioned critic rounds:** keep each critic-round build as `deck_v<N>.pptx` (+ its renders)
+  instead of overwriting in place; when applying round-N fixes, diff the new renders against
+  round N-1 for the slides you did NOT touch — a "fix" that regresses a previously-approved slide
+  is the loop's classic own-goal, and the diff catches it deterministically.
+- **Prewire note (decide-goal decks):** the hand-off note may include one line — "this deck asks
+  for a decision: consider walking the key approver(s) through the storyline 1:1 before the
+  meeting, so the meeting confirms rather than debates" (the consulting prewire norm; out of
+  scope for the builder, high value for the presenter).
+
 ## What the deliverable folder contains
 The deck + `render/` PNGs (+ PDF), the build script (source of truth), the speaker-notes source,
 and the final lint/stats snapshot — a tidy, buildable bundle. The content/design PLANS are **not**

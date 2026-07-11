@@ -317,7 +317,11 @@ each slide in isolation and can't retrofit rhythm, so this is yours.
   all** — rhythm there comes from imagery STRENGTH (faint plate ↔ full-strength hero/divider
   imagery); a foreign flat canvas abandons the plate (`generated-template.md`).
 - **A WOW / hero slide every ~6–8 slides** — a bold number, a dramatic statement, or an iconic diagram
-  that passes the squint test from across a room.
+  that passes the squint test from across a room. **For the money slide on a high-stakes deck**
+  (investor pitch, defense, exec decision), consider offering **2 layout variants rendered as
+  PNGs** at the design checkpoint and letting the user pick via option prompt — slides are code,
+  so a second take on the ONE slide that decides the meeting costs minutes, not hours (never do
+  this for every slide; one or two beats at most).
 - **~50–70% whitespace target — but whitespace must be DESIGNED, not leftover.** When a slide feels
   thin, diagnose which failure it is: **(a) the point is under-served** — the far more common case —
   fix it UPSTREAM with substance (send it back to the content plan: add the supporting detail,

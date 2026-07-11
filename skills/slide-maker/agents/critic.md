@@ -609,14 +609,16 @@ Do not just skim for the first few obvious issues. Run these passes:
      is fine but decoration is not. The fix is **restyle / resize / use fewer** (or let the native device
      lead), NOT "remove all icons". An icon on **every KPI/stat tile** or on an **evidence slide**
      remains a finding (`icons.md` Scenario fit).
-   - **Icon ABSENCE on an icon-FIT preset (the inverse — flag a MISS):** the converse of the check
-     above. On an **icon-native preset** (`dark_tech`, `consulting`, `glassmorphism`, `blueprint`[line])
-     whose content is **category/step-rich** (named patterns, pipeline stages, tools/memory/protocols,
-     production layers, feature/section cards) yet ships **zero icons** — leaning entirely on plain
-     text panels — that's a *miss*, not restraint: an icon family is exactly the recognition device the
-     register is reaching for. Flag it (minor→major by how icon-able the content is) with the fix
-     "label the categories/steps with one coherent family" (`icons.md` "actively plan an icon family").
-     (Still never one-per-bullet / decoration — judge by the rule-of-thumb.)
+   - **Icon ABSENCE on category/entity-rich content (the inverse — flag a MISS):** the converse of
+     the check above, and scoped to **ANY deck or branch** — generated-template and custom identities
+     included, not just icon-fit presets (self-verify (g) / PRE-FLIGHT 12(e) make icons a MUST there).
+     Content that names **categories, tools, roles, pillars, steps, entities** (named patterns,
+     pipeline stages, tools/memory/protocols, production layers, feature/section cards) yet ships
+     **zero icons** — leaning entirely on plain text panels — is a *miss*, not restraint, unless the
+     plan records the one-clause waiver. Flag it (minor→major by how icon-able the content is) with
+     the fix "label the categories/steps with one coherent family, weight/style matched to the
+     register" (`icons.md` "Scenario fit"). (Still never one-per-bullet / decoration — judge by the
+     rule-of-thumb.)
    - **Build/meta annotation leaked onto a slide (BLOCKER):** any text describing *how the slide was
      made* rather than its content — e.g. "（可点击编辑的原生图表）"/"(editable native chart)",
      "(AI-generated)"/"AI 生成", "(placeholder)"/"占位", "(draft)"/"草稿", "(sample/示例)", "generated

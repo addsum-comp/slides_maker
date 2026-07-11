@@ -131,7 +131,10 @@ same standard as an interviewed deck. And if the deep read later contradicts an 
 (the material turns out self-read-shaped, denser, or more formal than the first scan suggested),
 REVISE the pick and say so in the next FYI — riding a wrong guess to delivery is the one failure
 delegation must never produce. Content checkpoint = the deck
-memory sentence + emotional-curve line + pace check + ONE table (`# | 角色 | 记忆句(takeaway) |
+memory sentence + a 2-line brief/ledger DIGEST (the comprehension brief's one-sentence message +
+a claim-ledger tally, e.g. `ledger: 14 claims · 14 verified · 0 open` — full brief + ledger stay
+in the plan, posted on request or on any digest anomaly) + emotional-curve line + pace check +
+ONE table (`# | 角色 | 记忆句(takeaway) |
 承载证据 | units`) — the `units` column is the count of content units the row carries (the
 distribution pass's output): a `1` on a standalone content slide or a `6+` on a spoken beat is
 visible at a glance, so an about-to-be-empty or about-to-be-dense page gets caught at the
@@ -143,7 +146,8 @@ cell, a short verbatim span) — so a watching auto-mode user can catch a per-sl
 even though the checkpoint is an FYI, not a stop (this is the cheapest fidelity catch on the path
 delegation uses most; the comprehension gate still forbids shipping any unverified claim). Design
 checkpoint = look/palette/type/motif in ~4 lines + the rhythm-map table +
-the three design musts + logo plan **+ one required `direction gate:` line — on the
+the three design musts + a one-line Form-ledger/diversity verdict + the image opt-in list (the
+few proposed generated images, for approval) + logo plan **+ one required `direction gate:` line — on the
 design-clean branch either `picked A/B/C/D of 3 (html: <path>)` or the named carve
 (e.g. `carve: user said just-go` / `carve: Mode-A mimic`); a design checkpoint on branch (c)
 with no direction-gate line is not ready** (this is the gate artifact that keeps the
@@ -234,8 +238,8 @@ Direct-question fallback:
 ```text
 Before I build, please give me:
 1. Template/brand: existing template, new template, design a clean one, or generate one with an image tool?
-2. Purpose/audience/time: who is this for, how long — and is it presented live, screen-shared, or sent to self-read? Main goal: inform, support a decision, or inspire action?
-3. Source material: paper, deck, doc, figures, repo, or none?
+2. Purpose/audience/time: who is this for, how long — and is it presented live, screen-shared, sent to self-read, or presented live THEN sent around (hybrid: presented density on-slide, self-sufficient speaker notes)? Main goal: inform, support a decision, or inspire action? — If decide/inspire, one cheap follow-up: what exactly is the ASK, who says yes, and what's the biggest objection you expect? (Duarte's briefing trio; it sharpens the money slide and the close.)
+3. Source material: paper, deck, doc, figures, repo, or none? — When material IS provided, one follow-up: condense freely, preserve key phrasing verbatim, or hybrid (verbatim for claims/numbers, condense elsewhere)? Record the answer; it governs every rewrite downstream.
 4. Style/language: density (≈a phrase / one sentence / 2–3 sentences per point?), tone (minimal/corporate/academic/playful), and language (中文/English/etc.)?
 ```
 
@@ -288,9 +292,9 @@ and content confirmed, but you may collapse template/style to a sensible default
 in one line* ("I'll do a clean minimal look — say if you have a template") rather than a
 full prompt. Scaling ≠ skipping — never infer purpose or content. Some answers trigger a quick follow-up *after* the
 batch: *a conference talk* → ask which venue, then research it; *a new template* → they
-hand over the file; *"design a clean one" (no template)* → offer the **direction gate**
-(see Q1's design-one branch; unless Q4 is a Mode-A mimic example — then the example is the
-look; skip the gate) — recommend showing **3** rendered style directions to pick
+hand over the file; *"design a clean one" (no template)* → run the **direction gate**
+(DEFAULT on this branch — see Q1's design-one branch for the named skip carves; a Q4 Mode-A
+mimic example decides the look and skips it) — show **3** rendered style directions to pick
 from before the full build; *"generate a template with an image tool"* → run the
 mini-interview + generation + feedback loop in `references/generated-template.md`, then **skip
 the direction gate** (the look is already decided). The four:
@@ -354,9 +358,10 @@ the direction gate** (the look is already decided). The four:
        in it to confirm fidelity** before building. **Once they pick, delete the throwaway
        `_directions/` preview files + rejected token-sets** (keep only the chosen style), then
        build the full deck in it — don't leave demo files littering Downloads.
-     - *Picks design-one* → build a single look shaped to purpose, as above.
-     This offer is **skippable, never forced** — a brand-new from-scratch deck is exactly
-     when showing options pays off, but a user in a hurry can decline in one click.
+     - *Picks design-one (via a named carve)* → build a single look shaped to purpose, as above.
+     The gate is the DEFAULT on this branch, skipped only via the named carves above — a
+     brand-new from-scratch deck is exactly when showing options pays off; "just design one
+     and go" remains one click away, but it is the user's exception, never your shortcut.
    - *Generate a template with an image tool* → **a bespoke visual identity** — a styled, **text-free**
      hero/divider illustration, then reproduced natively so every content block fits it — for a vivid,
      designed deck (launch, event, brand, playful pitch) where a clean default isn't enough. **Follow
@@ -676,7 +681,10 @@ over-budget row with no recorded "over budget → notes/split" resolution goes b
 empty/hedged/untraced brief is **not ready** — send it back to the planner. Fold in the user's
 edits to the story, then move to design (Step 2).
 > **🔴 CHECKPOINT — CONTENT:** show the comprehension brief + claim ledger + narrative arc + the
-> per-slide takeaways/content, and confirm the pace/slide-count, before any design work begins.
+> per-slide takeaways/content, and confirm the pace/slide-count, before any design work begins —
+> rendered as the compact ≤~25-line checkpoint artifact defined under the 🔴 CHECKPOINT convention
+> (the brief + ledger appear as its 2-line digest; post the full versions on request or on any
+> digest anomaly — unverified rows, open questions).
 
 ## Step 2 — Design the deck (use the slide-design agent)
 With the **Content plan approved**, first build the **Evidence manifest** — so the art director
@@ -760,7 +768,9 @@ generated. Fold in the user's design edits, then set up the canvas (Step 3).
 > **🔴 CHECKPOINT — DESIGN:** show the Design language + Form ledger + the 3 design musts + the
 > image opt-in list + (for a company/product/single-entity deck) the **logo plan** — the real
 > logo if the search found it, else a **designed wordmark by default** for the user to confirm or
-> override — and get the user's OK before building.
+> override — presented as the compact checkpoint artifact from the 🔴 CHECKPOINT convention block
+> (same fields, incl. the rhythm-map table and the `direction gate:` line — picked direction or
+> named carve) — and get the user's OK before building.
 
 ## Step 3 — Set up the canvas
 **First, decide where the deck lands.** Deliver each deck as one self-contained

@@ -161,7 +161,7 @@ def _check_ink(out_png):
     try:
         from PIL import Image
     except ImportError:
-        return _check_ink(out_png)
+        return out_png  # no Pillow → can't verify ink; hand the PNG back unchecked
     im = Image.open(out_png)
     if im.mode == "RGBA" and not im.getchannel("A").getbbox():
         raise RuntimeError(

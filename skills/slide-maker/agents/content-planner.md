@@ -92,7 +92,10 @@ abstract/conclusion stresses most; if your one-sentence message would surprise t
 wrong — fix it before continuing.
 **Spine test:** read the Takeaway spine (Narrative arc output) forward as one paragraph and
 backward slide-by-slide; a takeaway that can't join the paragraph is rewritten, or its slide
-cut/merged/moved behind a divider — a plan whose spine doesn't argue is not ready.
+cut/merged/moved behind a divider — a plan whose spine doesn't argue is not ready. Add one
+**grouping verdict** (Minto's third check): name the N pillars that support the deck message and
+confirm they neither overlap nor leave a hole the room will notice — one line, e.g.
+`grouping: 3 pillars (market · product · ask), no overlap, no gap`.
 
 ### 2 — Research and fact-check the web (for any deck, not just no-source)
 Use the web for **three jobs**, and run it whether or not you have a source:
@@ -145,10 +148,12 @@ they are not yours to apply.)*
 You are not summarizing the material; you are **editing it for a room of busy people**. Deep
 understanding (§1) is the raw material — this stance is what turns it into content people lean
 forward for. While building the arc and the per-slide content, keep asking the questions an experienced editor asks:
+- **Openings for decide/status arcs default to SCQA** — Situation the room already agrees with → Complication that breaks it → the Question the room now asks → your Answer (the deck). The Complication→Question handoff is what makes the audience *ask for* the recommendation before it arrives; a decide-deck that opens on the answer wastes its one chance at pull.
 - **Where is the material's native TENSION?** Attention is earned by a *gap* — between what the
   audience believes and what the material shows, between effort and result, between two numbers
   that shouldn't coexist (投入↑ 而增长↓). Find the tension already IN the source and put it early;
   a deck that opens with background instead of tension has lost the room before slide 3.
+- **Inspire/pitch arcs may use the sparkline** — alternate current-reality and future-state beats across the middle (not one contrast at the end), and engineer ONE deliberate peak the room will retell (Duarte's STAR moment); name the peak slide in the arc.
 - **What's the one thing they DON'T already know?** Lead with the insight they can't predict, not
   the context they can. If a slide tells the audience only things they'd have guessed, it's filler.
 - **Which single CONCRETE detail carries the point?** One vivid, specific fact (a 21 万 contract
@@ -287,7 +292,13 @@ agent decides form, layout, icons, and motion downstream. For each slide record:
     two stages later.
 - **Spoken thread (PRESENTED decks only — omit the field entirely for a self-read deck).** For
   each slide, 1–3 sentences of what the presenter actually *says*: the spoken transition-in that
-  answers the slide's *question* column, then the spoken point. You own the story, so you author
+  answers the slide's *question* column, then the spoken point. **The thread ADDS to the slide —
+  the transition-in plus the elaboration or example — it never re-reads the slide's own words**
+  (Mayer's redundancy principle: narration that repeats on-slide text verbatim HURTS
+  comprehension; if thread and slide say the same sentence, one of them changes). On the hook
+  and the closing/ask slides of a presented deck, prefer first-person voice — "we found", "I'm
+  asking for" — over the neutral third person; those two beats are where a human voice earns
+  the room. You own the story, so you author
   the narration — the builder pipes it verbatim into speaker notes (`dk.speaker_notes`,
   PRE-FLIGHT 1), the lint measures it, and the critics read it; a narration invented at build
   time bypasses your VOICE PASS and your claim ledger. Record it as a 7th table column or an
@@ -383,6 +394,12 @@ and state which question (what / how / why) the slide answers. Do **not** name a
 type, diagram, component, layout, icon, or build here — those are the slide-design agent's
 decisions. Use *notes* for content caveats (e.g. "self-read: fuller copy", "forward-looking — see
 below", "needs asset — see open questions").
+
+## Anticipated Q&A → backup plan  *(required for defense / exec-readout / investor-pitch purposes; optional elsewhere)*
+3–5 hard questions this room will actually ask, each mapped to: answered-on-slide-N, or a named
+BACKUP/appendix slide (drafted content in one line), or an honest "open — flag to presenter".
+Consulting norm: the meeting is won in the appendix; a decide-deck with zero backup slides walks
+in naked.
 
 ## Forward-looking additions
 Anything you drafted that isn't in the source (future work / next steps / the ask), **clearly

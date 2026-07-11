@@ -120,8 +120,12 @@ Build the **full** deck in the approved content + design plan — single-author 
   few archetype slides, not the whole deck.
 - **Critic at the gate:** previews shown to the user should already pass a quick
   critic — the human resolves *taste*, not bugs.
-- **Async fallback:** Gate A (direction) should never hard-block — if the user goes quiet, pick
-  the best-fit direction yourself and **flag it**. Gates B and C ARE the Step-1/Step-2 🔴
+- **Async fallback — split by how Gate A was triggered:** in *opt-in collaborative mode*, Gate A
+  never hard-blocks — if the user goes quiet, pick the best-fit direction yourself and **flag it**
+  (post the directions link + your pick, so they can veto later). But when Gate A runs as the
+  *default direction gate on the Q1(c) design-clean branch* (SKILL.md), it is checkpoint-grade:
+  silence does not waive it — post the link, state what you're waiting on, and stop (only the
+  explicit per-deck AUTO WAIVER converts it to auto-pick + FYI). Gates B and C ARE the Step-1/Step-2 🔴
   checkpoints: silence does not waive a 🔴 stop (only an explicit per-deck "decide everything
   yourself" directive does — SKILL.md, "The per-deck AUTO WAIVER"). At B/C, post the compact
   checkpoint table (per the 🔴 CHECKPOINT convention), state in one line exactly what

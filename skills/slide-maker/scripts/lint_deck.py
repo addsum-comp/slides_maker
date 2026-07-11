@@ -122,15 +122,21 @@ def _boxes(slide, sw, sh):
                             run_colors.append((r.text.strip()[:24],
                                                None if r.font.color.type is None else "THEME"))
         fill_rgb = None                                  # solid-fill colour of this shape, if resolvable
-        try:
+        fill_unk = False                                 # True = fill exists but colour unknowable
+        try:                                             #   (gradient/picture/pattern, or theme solid)
             from pptx.enum.dml import MSO_FILL
-            if s.fill.type == MSO_FILL.SOLID:
+            ft = s.fill.type
+            if ft == MSO_FILL.SOLID:
+                fill_unk = True                          # theme colour raises below, leaving unk=True
                 fill_rgb = str(s.fill.fore_color.rgb)
+                fill_unk = False
+            elif ft in (MSO_FILL.GRADIENT, MSO_FILL.PATTERNED, MSO_FILL.PICTURE, MSO_FILL.TEXTURED):
+                fill_unk = True
         except Exception:
             fill_rgb = None
         is_pic = str(s.shape_type).startswith("PICTURE")
         out.append({"l": l, "t": t, "w": w, "h": h, "r": l + w, "b": t + h,
-                    "runs": run_colors, "fill": fill_rgb, "pic": is_pic,
+                    "runs": run_colors, "fill": fill_rgb, "unk": fill_unk, "pic": is_pic,
                     "st": str(s.shape_type).split()[0], "txt": txt, "full": full, "size": size or 12.0,
                     "paras": paras, "solid": s.shape_type in SOLID, "align": align, "anchor": anchor,
                     "text": bool(s.has_text_frame and txt), "descr": descr, "mathfont": mathfont,
@@ -244,11 +250,14 @@ def _contrast(h1, h2):
 
 def _backing_fill(bx, ti):
     """The topmost solid fill under text shape bx[ti]: the shape's OWN fill if solid, else the
-    highest lower-z shape whose box covers the text (center inside + >=50% overlap). A picture
-    in between wins and returns None (backing colour unknowable). Slide bg unknown -> None."""
+    highest lower-z shape whose box covers the text (center inside + >=50% overlap). A picture,
+    gradient, or theme fill in between returns "UNKNOWN" (backing colour unknowable — the caller
+    must skip, never assume white). Slide bg unknown -> None."""
     t = bx[ti]
     if t["fill"]:
         return t["fill"]
+    if t.get("unk"):
+        return "UNKNOWN"
     cx, cy = (t["l"] + t["r"]) / 2, (t["t"] + t["b"]) / 2
     ta = max(t["w"] * t["h"], 1e-6)
     best = None
@@ -259,8 +268,8 @@ def _backing_fill(bx, ti):
         ix, iy = _inter(s, t)
         if ix * iy < 0.5 * ta:
             continue
-        if s["pic"]:
-            best = None                                  # image behind the text: can't judge
+        if s["pic"] or s.get("unk"):
+            best = "UNKNOWN"                             # image/gradient behind the text: can't judge
         elif s["fill"]:
             best = s["fill"]
     return best
@@ -444,11 +453,12 @@ def _slide_stats(slide, bx, sw, sh):
     # single largest run (a per-slide hero numeral / statement) so a legit hero doesn't mask a title.
     top_band = 0.20 * sh
     title_pt = 0.0
+    title_txt = ""
     for s in bx:
         if s["text"] and not s["bg"] and s["t"] < top_band and s["full"]:
             wc = len(s["full"].split())
-            if 0 < wc <= 12:
-                title_pt = max(title_pt, s["size"])
+            if 0 < wc <= 12 and s["size"] > title_pt:
+                title_pt, title_txt = s["size"], s["full"]
     # char-weighted median of body-class runs (>11pt, excludes footer/caption chrome). Char-weighting
     # already downweights a short hero numeral (a 2-char "96" barely counts vs a body paragraph), so
     # no run needs dropping — the median lands on the tier the reader actually reads.
@@ -467,7 +477,8 @@ def _slide_stats(slide, bx, sw, sh):
     except Exception:
         pass
     return {
-        "title_pt": title_pt, "body_tier": body_tier, "halves": halves, "boxy": boxy,
+        "title_pt": title_pt, "title_txt": title_txt,
+        "body_tier": body_tier, "halves": halves, "boxy": boxy,
         "notes": notes_text,
         "notes_words": _text_load(notes_text),
         "pingfang": pingfang,
@@ -488,11 +499,20 @@ def _slide_stats(slide, bx, sw, sh):
         "big_pic_fg": any(s["pic"] and not s["bg"] and s["w"] * s["h"] >= 0.10 * sw * sh for s in bx),
         # a wide strip parked in the bottom band (the insight_banner / takeaway-strip pattern) —
         # fine on a few pages, a template tell when it's on nearly every page
-        "bottom_strip": any(s["solid"] and not s["bg"] and s["w"] >= 0.6 * sw
+        # solid shapes OR filled text boxes both count (a filled TEXT_BOX is the most common
+        # takeaway-banner construction); theme-colour-filled text boxes stay uncounted (fill=None)
+        "bottom_strip": any((s["solid"] or (s["text"] and s["fill"])) and not s["bg"]
+                            and s["w"] >= 0.6 * sw
                             and s["t"] >= 0.70 * sh and 0.25 <= s["h"] <= 1.4 for s in bx),
-        # how far down the canvas the content actually reaches (footer chrome excluded)
-        "content_bottom": (max((s["t"] + s["h"] for s in bx
-                                if not s["bg"] and s["t"] < footer_y), default=0.0) / sh),
+        # how far down the canvas the content actually reaches. Excluded so they can't fake a
+        # full page: bg plates; footer-band starts; footer-CLASS chrome (≤10.5pt text starting in
+        # the bottom 1.2in — the same ≤10.5pt chrome convention used elsewhere); and skinny
+        # full-height decorative rails. Shape bottoms clamp to the canvas (no >1.0 from overflow).
+        "content_bottom": (max((min(s["b"], sh) for s in bx
+                                if not s["bg"] and s["t"] < footer_y
+                                and not (s["text"] and s["size"] <= 10.5 and s["t"] > sh - 1.2)
+                                and not (not s["text"] and s["w"] < 0.4 and s["h"] > 0.5 * sh)),
+                               default=0.0) / sh),
         "n_chart": len([s for s in slide.shapes if getattr(s, "has_chart", False)]),
         "build": has_timing,
         "trans": has_trans,
@@ -513,10 +533,20 @@ def _render_col_void(im):
               + [px[0, r] for r in range(54)] + [px[95, r] for r in range(54)])
     canvas = tuple(sorted(ch[k] for ch in border)[len(border) // 2] for k in range(3))
     lo, hi = int(0.20 * 54), int(0.86 * 54)
+    # per-row canvas reference from the side margins — survives vertical gradients and
+    # header/footer band chrome (which corrupt the single global border median). When the two
+    # margins disagree (the margin itself holds content), fall back to the global median.
+    # Known residuals (advisory check, load-gated): horizontal gradients; a slide whose only
+    # interior content is one full-bleed horizontal bar reads as void — genuinely thin anyway.
+    ref = {}
+    for r in range(lo, hi):
+        samp = [px[1, r], px[2, r], px[93, r], px[94, r]]
+        spread = max(sum(abs(a[k] - b[k]) for k in range(3)) for a in samp for b in samp)
+        ref[r] = tuple(sorted(s_[k] for s_ in samp)[2] for k in range(3)) if spread <= 60 else canvas
     run = best = 0
     for c in range(int(0.04 * 96), int(0.96 * 96)):
         ink = sum(1 for r in range(lo, hi)
-                  if sum(abs(px[c, r][k] - canvas[k]) for k in range(3)) > 90)
+                  if sum(abs(px[c, r][k] - ref[r][k]) for k in range(3)) > 90)
         if ink / max(1, hi - lo) < 0.02:
             run += 1
             best = max(best, run)
@@ -532,6 +562,7 @@ def _load_render_lums(path, renders_dir, n):
     so a standalone lint (no ./render) is byte-for-byte unchanged. Cheap: each PNG is downscaled
     to ~64px wide before the pixel walk."""
     import os
+    auto = renders_dir is None
     if renders_dir is None:
         cand = os.path.join(os.path.dirname(os.path.abspath(str(path))), "render")
         renders_dir = cand if os.path.isdir(cand) else None
@@ -542,9 +573,22 @@ def _load_render_lums(path, renders_dir, n):
     except ImportError:
         return None
     import glob
-    pngs = sorted(glob.glob(os.path.join(renders_dir, "slide*.png")))
+    # numeric sort: lexical sorting breaks at >=100 slides (slide100 between slide10 and slide11)
+    pngs = sorted(glob.glob(os.path.join(renders_dir, "slide*.png")),
+                  key=lambda p: int(re.sub(r"\D", "", os.path.basename(p)) or 0))
     if len(pngs) != n:
         return None
+    # stale-render guard (auto-discovered dir only — an explicit --renders is the user's contract):
+    # a matching PNG COUNT from an older build of a different deck would silently feed wrong
+    # lum/sat/void into the render-based checks
+    if auto:
+        try:
+            if max(os.path.getmtime(p) for p in pngs) < os.path.getmtime(str(path)) - 1:
+                print(f"  [stats] note: ignoring {renders_dir} — renders predate the deck "
+                      f"(re-render before linting to enable pixel checks)")
+                return None
+        except OSError:
+            pass
     out = []
     for p in pngs:
         try:
@@ -691,6 +735,11 @@ def _print_stats(rows, mode, sw, sh, lums=None, static_ok=False):
         if not any(len(rep & r["skel"]) / max(1, len(rep | r["skel"])) >= 0.75 for rep in skel_reps):
             skel_reps.append(r["skel"])
     n_skel = len(skel_reps)
+    spine = [(i + 1, r["title_txt"]) for i, r in enumerate(rows) if r.get("title_txt")]
+    if len(spine) >= 3:
+        print("     title spine (the consultants' titles-only test — read it as one argument):")
+        for num, t in spine:
+            print(f"       {num:2d}. {t[:78]}")
     print(f"     fonts: body-median {body_med:.0f}pt · deck max {max((r['max_pt'] for r in rows), default=0):.0f}pt "
           f"· type drama {drama:.1f}× · size tokens in use {len(tokens)} (target 4-5 deck-wide) · "
           f"distinct skeletons {n_skel} | "
@@ -853,13 +902,16 @@ def lint(path, mode="presented", json_out=None, renders_dir=None, static_ok=Fals
         # a dark-master template is never false-flagged. This closes the canonical grey-on-white gap
         # (a theme-default/undrawn background made _backing_fill return None and skip the check).
         dark_plate = any(s["bg"] and s["fill"] and _lum(s["fill"]) < 0.45 for s in bx)
+        unk_plate = any(s["bg"] and (s["pic"] or s.get("unk")) for s in bx)
         for ti, s in enumerate(bx):
             if not s["text"] or not s["runs"]:
                 continue
             back = _backing_fill(bx, ti)
+            if back == "UNKNOWN":
+                continue                                 # picture/gradient backing → unknowable, skip
             if not back:
-                if dark_plate:
-                    continue                             # unresolved dark canvas → skip (no false positive)
+                if dark_plate or unk_plate:
+                    continue                             # unresolved / plate canvas → skip (no false positive)
                 back = "FFFFFF"                          # confident light canvas → check grey-on-white
             for snip, rc in s["runs"]:
                 if rc == "THEME":

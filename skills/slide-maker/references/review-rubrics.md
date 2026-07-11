@@ -32,6 +32,10 @@ These criteria are grounded in established presentation research, not invented:
 ---
 
 ## Universal rubric
+> **Skim test (decide-goal decks):** before scoring dimensions, read ONLY the slide titles plus
+> slides 1–2, for ~90 seconds. Can you state the recommendation and the exact ask? If not, that
+> is a deck-level MAJOR — completeness is rarely the problem; clarity of the ask is.
+
 Score each dimension; cite specific slides.
 
 > **Scope the density dimensions by DELIVERY MODE first.** Items 1 (one-idea), 3 (cognitive-load /
@@ -216,10 +220,12 @@ Score each dimension; cite specific slides.
    deck — is a finding even if the five marks pass (item 11); the fix is **restyle / fewer**, with the
    native device (seal/`cjk_numeral`, photography, `year_badge`/duotone) leading and *composing with* a
    matched icon, not forbidding one.
-   **Conversely** — on an **icon-FIT preset** (`dark_tech` / `consulting` / `glassmorphism` / `blueprint`)
-   whose content is category/step-rich (named patterns, pipeline stages, tools/memory/protocols,
-   production/feature layers) — **shipping ZERO icons is itself a finding** (a miss, not restraint:
-   `icons.md` "actively plan an icon family"). **Corner-rounding** (rounded vs hard-edged) is a deck-wide language — a square-cornered
+   **Conversely** — on **ANY deck whose content names tools/entities/roles/pillars/categories/steps**
+   (named patterns, pipeline stages, tools/memory/protocols, production/feature layers — every
+   branch, incl. generated-template and custom identities, not just icon-fit presets) —
+   **shipping ZERO icons is itself a finding** (a miss, not restraint — self-verify (g) /
+   PRE-FLIGHT 12(e)) unless the plan records the one-clause waiver; on a delicate/minimal
+   register match the icon weight/style to the register (`icons.md` "Scenario fit"). **Corner-rounding** (rounded vs hard-edged) is a deck-wide language — a square-cornered
    image inside rounded cards (or vice-versa) is a consistency finding.
    **Deck-level rhythm (scan all slides together):** across a *long* deck, does the visual
    protagonist and density vary (a paced sequence — chart / diagram / photo / big-number / quote,
