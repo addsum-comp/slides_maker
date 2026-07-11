@@ -143,7 +143,11 @@ cell, a short verbatim span) — so a watching auto-mode user can catch a per-sl
 even though the checkpoint is an FYI, not a stop (this is the cheapest fidelity catch on the path
 delegation uses most; the comprehension gate still forbids shipping any unverified claim). Design
 checkpoint = look/palette/type/motif in ~4 lines + the rhythm-map table +
-the three design musts + logo plan. Keep each under ~25 lines — the user reads it in the
+the three design musts + logo plan **+ one required `direction gate:` line — on the
+design-clean branch either `picked A/B/C/D of 3 (html: <path>)` or the named carve
+(e.g. `carve: user said just-go` / `carve: Mode-A mimic`); a design checkpoint on branch (c)
+with no direction-gate line is not ready** (this is the gate artifact that keeps the
+3-directions step from silently vanishing). Keep each under ~25 lines — the user reads it in the
 terminal and answers in one click. Do **NOT** write `content-plan.md` / `design-plan.md` files
 into the deliverable folder (they clutter it; the conversation is the record) — unless the user
 explicitly asks for plan files.
@@ -322,13 +326,18 @@ the direction gate** (the look is already decided). The four:
      and **shape the look to the chosen purpose** (step 3 / `references/design-by-purpose.md`)
      rather than always shipping the same default blue — a defense, an exec readout,
      and a lecture should not look alike.
-     **Because the look is entirely yours to invent here, default to offering the
-     direction gate** — this is the one branch where preference, not just quality, is
-     unresolved, so let the user *choose* the look rather than guessing one for them.
-     After the interview, ask in the host's natural style — structured choices when
-     available, otherwise a direct text question — between **"see 3 style directions first
-     (recommended)"** and **"just design one and go."**
-     - *Picks the 3 directions* → run **Gate A** of `references/collaborative-mode.md`
+     **Because the look is entirely yours to invent here, the direction gate RUNS BY
+     DEFAULT on this branch — a 🔴 checkpoint-grade step, not an optional offer.** This is
+     the one branch where preference, not just quality, is unresolved; history shows an
+     "offer" gets skipped under momentum (a whole deck shipped without the user ever seeing
+     a choice of looks), so the gate is the default and skipping is the exception. Named
+     carves (skip ONLY when one applies, and say so in one clause at the design checkpoint):
+     the user explicitly says "just design one and go / 你定"; a Q4 Mode-A mimic example
+     decides the look; the deck reuses a registered template; or a tiny-ask (1–2 slide)
+     edit. Under a full per-deck AUTO WAIVER, still GENERATE the three directions, auto-pick
+     the best fit, and post the rendered images + pick as the FYI (mirror of the Q1(d)
+     image-tool hero checkpoint) — the waiver removes the stop, never the artifact.
+     - *Running the gate* → run **Gate A** of `references/collaborative-mode.md`
        with **3 *differentiated* directions** (distinct light/dark, warm/cool, serif/sans —
        not three shades of one idea), each captured as a **design-token set** (palette +
        portable fonts + motif) and rendered by `scripts/archetypes_html.py` into **ONE
