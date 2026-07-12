@@ -91,7 +91,7 @@ something.
   takeaway/role/question/beat table, the claim ledger, the per-figure carrying-element rows, and
   the Design plan's declared contracts (skeleton rhythm map · WOW slide(s) · money slide ·
   semantic-colour ledger · type tokens · motion manifest · the chosen preset name + its `guard`
-  string verbatim (or `custom look — no preset guards`) · the `logo plan:` line with its evidence
+  string verbatim (or `custom look — no preset guards`) (on the generated-template branch, plus the four identity-propagation contract lines — palette · type register · component geometry · surface) · the `logo plan:` line with its evidence
   token · the checkpoint motif line (device + meaning + legibility mode) · the approved image opt-in
   rows with their per-row source tokens (+ license/credit notes and any declared stylized deviation) ·
   the chosen mimic mode A/B + style-brief
@@ -694,7 +694,13 @@ Do not just skim for the first few obvious issues. Run these passes:
      generated-template deck also check the CANVAS:** every interior content slide should carry the
      **shallow low-contrast background** of the template — a flat single-colour content page among textured
      ones (a missing content background) is the #1 half-finished tell; flag it. (On a plain/flat-by-design
-     background, opaque blocks are fine.)
+     background, opaque blocks are fine.) **And check the OTHER two layers of the identity — an
+     IDENTITY-PROPAGATION BREAK is the same tell at the type/component level:** on a generated-identity
+     deck, judge the native type and component geometry against the plan's four-line
+     identity-propagation contract (`generated-template.md` §3 — type register · outline weight ·
+     corner language · shadow · fill flatness): an off-register default face (e.g. neo-grotesque body
+     on a comic/hand-drawn identity) or stock component geometry (hairline squared cards on a bold-
+     outline rounded identity) means the style lives only in the background — major.
    - **Deck rhythm (a deck-level check — scan all the thumbnails together):** across a **long** deck,
      do the **visual protagonist and density vary** (chart → diagram → photo → big-number → quote, with
      dense slides paced by airy ones), or does it read as **one template repeated**? Flag a long deck

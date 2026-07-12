@@ -514,7 +514,10 @@ sections:
 The chosen **`preset`** (or a custom look), named by *beating the default pull* and anchored to a
 concrete exemplar, with its **palette · type pairing · surface · ONE signature motif** — plus the
 preset's **`guard` line verbatim** (or `custom look — no preset guards`; any deviation from a guard
-is recorded here as a named deviation, naming the guard it overrides), the
+is recorded here as a named deviation, naming the guard it overrides) — and on the
+**generated-template branch**, the four-line **identity-propagation contract**
+(`generated-template.md` §3: palette extracted · type register derived from the image's character ·
+component geometry read off the image, outline/corner/shadow/fill · surface treatment), the
 atmosphere/polish moves committed deck-wide (only those that fit the register) and the one deck-wide
 **image art-direction** + the (secondary) transition choice. Include a **Semantic Colour Ledger**
 (`design-intelligence-addendum.md` §6) — a *role | token | used-for | must-not* table binding each accent

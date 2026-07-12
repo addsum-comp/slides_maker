@@ -289,7 +289,12 @@ Score each dimension; cite specific slides.
    cleanup), an image row with no source token from that section's
    grammar, a required credit missing, photographic supplements stacked onto an abstract subject
    that native forms should carry — and on photo-friendly topics, wall-to-wall photos where the
-   opt-in discipline should have held; **pendulum overshoot** *(any round after the first — critic-fix and user-feedback rounds alike)* — a fix
+   opt-in discipline should have held; **identity-propagation break (generated-template branch)** —
+   the generated identity lives only in the background: native type off-register (a neo-grotesque
+   body on a comic/hand-drawn identity) or component geometry at stock defaults (hairline squared
+   cards on a bold-outline rounded identity), judged against the plan's four-line
+   identity-propagation contract (`references/generated-template.md` §3; the frosted-block check
+   owns the surface layer — this finding owns the type + geometry layers); **pendulum overshoot** *(any round after the first — critic-fix and user-feedback rounds alike)* — a fix
    for named feedback that swung to the opposite extreme (muted → rainbow chrome, dense → bare, static
    → everything animated) instead of moving the criticised dial one deliberate step in the content
    layer (`references/handoff-and-iteration.md` "Move the dial") — when the round record carries a

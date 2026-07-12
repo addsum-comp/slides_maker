@@ -200,10 +200,24 @@ Study the generated image the way you'd study a provided style example
   `zigzag()`, `dot()`, `triangle()`, `squiggle()`), drawn with `deckkit` autoshapes in the
   palette, with the same outline weight. **Sprinkle them sparingly** as accents near content —
   never over the text.
-- **Component treatments** — define the template's card / stat / emphasis-band / chip /
-  title-chrome look as helpers (e.g. a rounded card with a **colour-header band**, a dark
-  **emphasis band** with an accent headline, an accent-bar **title chrome**). Content slides call
-  these so every block is on-system.
+- **Component treatments — GEOMETRY derived from the image, not defaulted.** Define the template's
+  card / stat / emphasis-band / chip / title-chrome look as helpers, and set their geometry by
+  READING four properties off the generated image:
+  (1) **outline weight** — comic/hand-drawn → bold 2–3pt ink-coloured outlines on cards and chips;
+  blueprint/technical → hairlines, some dashed; painterly → no outlines, shape by fill;
+  (2) **corner language** — comic/soft-organic → rounded; pixel/brutalist → square, zero radius;
+  one radius scale across ALL components (mixed corner languages are an existing critic flag);
+  (3) **shadow/depth** — comic → hard offset shadows (`offset_shadow`, zero blur); soft-organic →
+  diffuse or none; flat/minimal → none;
+  (4) **fill flatness** — comic/pixel → flat fills, no gradients; painterly → soft tints; frosted
+  glass only where imagery sits underneath.
+  A COMIC identity, concretely: 2.5pt ink outlines + rounded corners + hard offset shadows + flat
+  palette fills + speech-bubble/burst motif helpers sharing the same outline weight. **Echo, don't
+  cosplay:** the plates carry the heavy style; components pick up the palette + these four
+  properties — never painted mimicry of the artwork — and the floors never bend to style
+  (contrast ≥4.5:1, text always native/editable, legibility before flavour). Component outlines/shadows are part of the CONTENT surface
+  language, not chrome — the chrome budget still governs title furniture, rules and footers at
+  every register.
 - **A `content_bg(slide)` helper — the shallow interior background, called FIRST on every content
   slide.** This is what stops content pages being flat. Per the 🔴 MUST it places the **GENERATED
   interior plate**: `deckkit.picture(bg_plate, fit="cover")` then a **light scrim** (`scrim_overlay`, or
@@ -216,10 +230,39 @@ Study the generated image the way you'd study a provided style example
   on every slide. Decide the corner once to fit the template (top-right is the usual choice; move it
   if the title chrome or motifs occupy that corner) and keep it consistent. On a vivid hero, add a
   small scrim/light plate behind the logo so it stays legible.
-- **Type + chrome** — pick a display font that fits the vibe (portable; see `font-guidance.md`)
-  and set `deckkit.FONT`/`EAFONT`; define `title_bar`/`footer` to the template's chrome.
+- **Type register — derive it from the image's CHARACTER, never choose it independently.** A
+  gorgeous plate with an off-register default face on top is the type-level version of the
+  pasted-on card. Map the identity family to a register, then pick portable faces inside it
+  (portability + CJK pairing: `references/multilingual.md`, `references/font-guidance.md` — a
+  style-matched face must be install-safe or get a register-adjacent system fallback, flagged at
+  hand-off):
+
+  | Identity family | Latin register | CJK pairing note |
+  |---|---|---|
+  | Comic / hand-drawn / doodle | rounded humanist or comic-adjacent display (Comic Neue if installed → Trebuchet MS/Verdana fallback) | a rounded 圆体-class face if installed → Hiragino Sans GB fallback; never a brush Kai (reads formal, not playful) |
+  | Blueprint / technical / terminal | technical sans + mono labels (Consolas/Menlo class) | Hiragino Sans GB · mono digits |
+  | Ink-wash / brush / 东方 | serif Latin (Georgia class) | Kai/Song per `east-asian-aesthetic.md`; lining digits beside CJK |
+  | Pixel / retro / arcade | geometric sans or mono, square terminals | Hiragino Sans GB; avoid rounded faces |
+  | Painterly / organic / botanical | humanist serif or light humanist sans | Songti or Hiragino by warmth |
+  | Editorial / magazine / collage | high-contrast serif display + grotesque body | Songti display + Hiragino body |
+  | Corporate-clean / minimal | neo-grotesque (Helvetica Neue class) | Hiragino Sans GB |
+  | Luxury / museum | serif display, generous tracking | Songti; thin rules |
+
+  An identity OUTSIDE these families (cinematic-photoreal, memphis/pop, collage…) follows the
+  same logic, not a dead-end: read the letterform character the image itself implies (what type
+  would a poster in this world use?), pick the nearest register, and record the reasoning in the
+  contract's type line — the table is a map, not a cage. On a CJK-only deck the Latin column
+  still governs numerals and any Latin fragments.
+
+  Set `deckkit.FONT`/`EAFONT` from the chosen pair; define `title_bar`/`footer` to the template's
+  chrome in the same register.
 - Put all of this in the deck's `style.py` (copy `references/examples/style_example.py` as the
-  starting shape).
+  starting shape) — **and record the four-line IDENTITY-PROPAGATION CONTRACT in the Design plan**:
+  `palette: extracted from hero` · `type: <register — faces + CJK pair>` · `geometry:
+  <outline/corner/shadow/fill read off the image>` · `surface: <frosted / tint / outlined>`. These
+  four lines accompany the hero + sample-content renders at the 🔴 hero checkpoint (or its
+  auto-waiver FYI), so the user approves the whole SYSTEM — not just the pictures — and the critic
+  judges the built deck against them.
 
 ### 4 — Render a sample and get feedback (hard gate)
 Build **two** slides — the **cover** (hero image + native title/badges) and **one real content

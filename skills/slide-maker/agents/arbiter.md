@@ -42,7 +42,7 @@ coordinator applies the rule.
   **claim ledger** (`claim | type | source | verbatim value | verified? | as-of | tense`), the
   **per-figure carrying-element rows**, and the Design plan's declared contracts (rhythm map ·
   WOW/money slide · semantic-colour ledger · type tokens · motion manifest · the chosen preset
-  name + its `guard` string verbatim (or `custom look — no preset guards`) · the `logo plan:` line
+  name + its `guard` string verbatim (or `custom look — no preset guards`) (on the generated-template branch, plus the four identity-propagation contract lines — palette · type register · component geometry · surface) · the `logo plan:` line
   with its evidence token · the checkpoint motif line (device + meaning + legibility mode) · the
   approved image opt-in rows with their per-row source tokens (+ license/credit notes and any
   declared stylized deviation) · the chosen mimic

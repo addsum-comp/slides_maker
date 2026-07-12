@@ -95,7 +95,9 @@ checkpoint artifact is a **compact terminal-friendly markdown table** pasted int
 conversation (approval stop normally, FYI under the auto waiver). The waiver covers the
 preference/approval 🔴 stops — the content and design checkpoints, the Q1=d hero checkpoint,
 and the redesign diagnosis+scope check: under a full per-deck auto directive, post each in
-chat as the FYI (for the hero: the rendered hero + sample-content-slide image paths; for the
+chat as the FYI (for the hero: the rendered hero + sample-content-slide image paths + the four
+identity-propagation contract lines — palette · type register · component geometry · surface,
+per `generated-template.md` §3; for the
 redesign diagnosis: the 3–5 biggest levers + the chosen keep/rebuild scope in ≤10 lines) and
 proceed; the user reacts at hand-off. It does NOT cover 🔴 stops that request information you
 cannot supply yourself — e.g. the missing-`~/Downloads` save-location checkpoint, which has no
@@ -1615,7 +1617,7 @@ Then run the **actor-critic loop** — this is the quality engine, and the criti
      carrying-element rows**, and the Design plan's **declared contracts** — the skeleton rhythm
      map, the WOW slide(s), the money slide (the slide the deck exists for), the semantic-colour
      ledger, the type tokens, the motion manifest, the **chosen preset name + its `guard` string
-     verbatim** (or `custom look — no preset guards`), the **`logo plan:` line with its evidence
+     verbatim** (or `custom look — no preset guards`) (on the generated-template branch, plus the four identity-propagation contract lines — palette · type register · component geometry · surface), the **`logo plan:` line with its evidence
      token**, the **checkpoint motif line** (device + meaning + legibility mode), the **approved
      image opt-in rows with their per-row source tokens** (+ license/credit notes and any declared
      stylized deviation), and — **when a Q4 style example is in play** —
