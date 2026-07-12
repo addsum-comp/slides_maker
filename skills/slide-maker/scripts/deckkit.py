@@ -1153,7 +1153,7 @@ def page_marker(slide, page, total=None, *, font=None, color=MUTE, size=9):
 
 
 def cover(slide, title, *, issue_label=None, subtitle=None, mode_caption=None, x=0.7, y=None,
-          accent=MAGENTA, ink=DEEP, bg=None, display=None, chrome=None, caption_c=None):
+          accent=MAGENTA, ink=DEEP, bg=None, display=None, chrome=None, caption_c=None, rule=True):
     """A publication-style COVER (issue label + big display title + accent rule + subtitle + a
     date/mode caption) designed to be mirrored by colophon() as a bookend. Stronger than a plain
     title slide for editorial/report/zine decks. A long title is auto-fit and MEASURED so the
@@ -1174,7 +1174,8 @@ def cover(slide, title, *, issue_label=None, subtitle=None, mode_caption=None, x
     text(slide, x, yy, tw, max(1.4, n * lh), [[(title, tsz, ink, True, False, display)]],
          space_after=2, line_spacing=1.0)
     rule_y = max(yy + 1.5, yy + n * lh + 0.14)          # floor keeps 1-2 line covers byte-identical
-    box(slide, x + 0.02, rule_y, 1.4, 0.06, fill=accent)
+    if rule:
+        box(slide, x + 0.02, rule_y, 1.4, 0.06, fill=accent)
     if subtitle:
         text(slide, x, rule_y + 0.20, tw, 0.5, [[(subtitle, 16, ink, False, False)]], space_after=0)
     if mode_caption:
