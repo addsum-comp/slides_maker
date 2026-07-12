@@ -96,7 +96,11 @@ this arc, proceed?").
 ### Gate C — Design plan (the Step 2 DESIGN checkpoint)
 This gate **is the design checkpoint surfaced as a gate** — present the **slide-design** agent's
 work: the **Design language** (the direction fixed at Gate A, now expanded into a full spec), the
-**form ledger** + **rhythm**, the **per-slide design**, and the **image opt-in list**. Approve
+**form ledger** + **rhythm**, the **per-slide design**, and the **image opt-in list** (each row
+carrying its source token per the REFERENT RULE, `references/image-generation.md`), plus the
+**motif line** (device + meaning + how a stranger reads it) and — on a single-entity deck — the
+**`logo plan:` line WITH its evidence token**; Gate C shows the same fields as SKILL.md's
+🔴 CHECKPOINT — DESIGN spec. Approve
 before building all slides — this catches form / layout / motion direction errors before the
 costly build. Confirm any scope shift here too ("9 slides in *Editorial* — proceed?").
 

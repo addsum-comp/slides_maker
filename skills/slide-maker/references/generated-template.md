@@ -308,10 +308,16 @@ them, and show both. The content slide is essential: it proves the blocks actual
   motifs); body text must clear 4.5:1 against whatever the background leaves under it. A subtle
   background that forces every text block onto its own opaque card has been made too strong. **But there is a FLOOR as well: the plate must stay SUBTLY VISIBLE** — a viewer should be able to *see* the body page is textured, not have to guess. Muting is one-directional pressure, so it's easy to over-scrim the plate into a flat near-white field that satisfies 'a plate on every page' in code yet reads as absent — the same failure as no plate at all. If you can't tell the plate is there at a glance, the scrim is too heavy: lift it until the hero's motif is faintly but genuinely perceptible, and recover text contrast with the frosted blocks rather than by erasing the plate.
 - **Logo = the REAL mark, present where it belongs** — for a company/institution/product deck the
-  logo appears on every page; use the real asset (image-generation.md's hierarchy), never a faked or
-  recolored one, and if it's missing, ask the user or use an honest "logo here" placeholder.
+  logo appears on every page; when found, use the real asset **untouched** (image-generation.md's
+  hierarchy), never a faked or recolored one; not found → a clean typographic wordmark flagged as a
+  designer's stand-in (never a literal "logo here" string in a shipped deck). Either way the DESIGN
+  checkpoint's `logo plan:` line carries its evidence token per the slide-design LOGO PRINCIPLE.
 - **Generated real things must be right** — if the hero depicts real objects/places, the
   size/proportion/count/colour must be factually correct (the image-generation fidelity rule).
+  Identity plates (hero / dividers / interior plate) are the REFERENT RULE's sanctioned carve — a
+  place-anchored deck renders the real place as DECLARED STYLIZED ART in the chosen style, never as
+  fake photography; the factual-rightness rule (size/proportion/count/colour) still applies to the
+  stylized rendering.
 
 ## Checklist
 - [ ] Mini-interview done (scenario; style offered as a choice — **best-fit library styles** +

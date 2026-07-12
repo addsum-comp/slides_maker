@@ -20,6 +20,7 @@ and both are avoidable:
 
 ## What the deliverable folder contains
 The deck + `render/` PNGs (+ PDF), the build script (source of truth), the speaker-notes source,
+`assets/` (incl. `sourced/credits.txt` when sourced photos exist),
 and the final lint/stats snapshot — a tidy, buildable bundle. The content/design PLANS are **not**
 files here: they are presented directly in chat as compact tables at the two checkpoints (that
 conversation is the record); write plan `.md` files only if the user explicitly asks.
@@ -47,7 +48,8 @@ Say it plainly, in one or two lines:
 - **Caveats worth a sentence:** fonts substitute if the recipient's machine lacks them
   (text may reflow — note any CJK/brand-font dependency from `multilingual.md`); the
   layout is absolutely positioned, so heavily expanding a text box won't auto-reflow its
-  neighbours (normal PowerPoint behaviour).
+  neighbours (normal PowerPoint behaviour); and credit portability — CC BY/BY-SA credits live
+  on-slide / on the sources page + `credits.txt`, so keep them if the images are reused.
 - **PDF on request.** `render_deck.sh` already leaves a `.pdf` beside the PNGs; offer it
   as a shareable read-only copy.
 

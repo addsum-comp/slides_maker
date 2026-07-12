@@ -124,7 +124,10 @@ Use the web for **three jobs**, and run it whether or not you have a source:
   tool / framework / model, a teaching deck showing an app, or a status deck naming a vendor —
   **web-search for the entity's REAL logo plus its real brand colours / fonts** as part of research,
   and record what you found: the **source URL** for a found asset, or an explicit **not-found**, in
-  the plan. If not found, **note it in Open questions** so the slide-design agent defaults to a
+  the plan — record it **token-ready**: the source URL feeds `official asset — <source>`, the
+  explicit not-found feeds `searched, none found → designed wordmark (flagged)`; this line is what
+  the DESIGN checkpoint's `logo plan:` evidence token is assembled from. If not found, **note it in
+  Open questions** so the slide-design agent defaults to a
   **designed wordmark** — a **NOTE for design, not a content blocker** (a missing logo never blocks
   the plan). This stays a **content/research act — you find the asset**; *whether and where* a mark
   is placed is the slide-design agent's call. (A **multi-organisation** deck — survey / landscape /

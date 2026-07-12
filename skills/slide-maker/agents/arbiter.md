@@ -41,7 +41,10 @@ coordinator applies the rule.
   message + emotional-curve line, the per-slide takeaway/role/question/beat table, the
   **claim ledger** (`claim | type | source | verbatim value | verified? | as-of | tense`), the
   **per-figure carrying-element rows**, and the Design plan's declared contracts (rhythm map ·
-  WOW/money slide · semantic-colour ledger · type tokens · motion manifest · the chosen mimic
+  WOW/money slide · semantic-colour ledger · type tokens · motion manifest · the `logo plan:` line
+  with its evidence token · the checkpoint motif line (device + meaning + legibility mode) · the
+  approved image opt-in rows with their per-row source tokens (+ license/credit notes and any
+  declared stylized deviation) · the chosen mimic
   mode A/B when a Q4 style example was given) — the cross-check
   targets for the fidelity class and for confirming/refuting any contract-break finding. **The
   source stays ground truth: check slide vs ledger row AND ledger row vs source — a slide that

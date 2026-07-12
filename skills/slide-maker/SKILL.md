@@ -148,8 +148,10 @@ delegation uses most; the comprehension gate still forbids shipping any unverifi
 checkpoint = look/palette/type/motif in ~4 lines (the **motif line states device + meaning + how a
 stranger reads it** — label/legend/figurative, the slide-design STRANGER TEST) + the rhythm-map table +
 the three design musts + a one-line Form-ledger/diversity verdict + the image opt-in list (the
-few proposed generated images, for approval) + the **`logo plan:` line with its evidence token**
-(`official asset — <source>` / `searched, none found → wordmark (flagged)` / `n/a — <reason>`; a bare
+few proposed images, for approval — **each row carries its source token**: `generated — <tool>` /
+`sourced — <origin> (<license>)` / `provided — …` / a `searched, none found → …` rung (full grammar:
+`references/image-generation.md` step 5), per the REFERENT RULE in `image-generation.md`) + the **`logo plan:` line with its evidence token**
+(`official asset — <source>` / `searched, none found → designed wordmark (flagged)` / `n/a — <reason>`; a bare
 "wordmark" with no recorded search on a single-entity deck = incomplete, even as an auto-waiver FYI)
 **+ one required `direction gate:` line — on the
 design-clean branch either `picked A/B/C/D of 3 (html: <path>)` or the named carve
@@ -177,7 +179,7 @@ every **🔴 CHECKPOINT** is a hard stop.
 | **🔴 MUST** / **Never …** | Required / forbidden — breaking it ships a broken or misleading deck |
 | **🔴 CHECKPOINT** | Hard stop — present, then wait for the user before proceeding |
 | **default** | The standard choice when the user hasn't said otherwise (override on request) |
-| **by taste / opt-in** | A judgment call (generated images, motion) — apply where it helps, justify where not. Icons are NOT in this class: on category/entity-rich content they are a design must (self-verify (g) · PRE-FLIGHT 12(e)) |
+| **by taste / opt-in** | A judgment call (generated/sourced images, motion) — apply where it helps, justify where not; the image SOURCE is not a taste call once an image is planned (REFERENT RULE). Icons are NOT in this class: on category/entity-rich content they are a design must (self-verify (g) · PRE-FLIGHT 12(e)) |
 | **carve / exception** | A named case where a rule deliberately yields — follow the carve, don't over-apply it |
 
 > **Enforcement invariant (for anyone evolving this skill):** every 🔴 MUST must be *wired into a gate
@@ -200,7 +202,7 @@ every **🔴 CHECKPOINT** is a hard stop.
 | Style + component catalogue (looks · presets · when to use each) | `references/design-gallery.md` |
 | Charts (which type · editable-native vs raster) | `references/data-viz.md` |
 | Science schematics (force / ray / circuit / apparatus …) | `references/schematic-diagrams.md` |
-| Generated images (when/how · text-free · topical) | `references/image-generation.md` |
+| Generated + sourced imagery (when/how · text-free · topical · REFERENT RULE + source tokens) | `references/image-generation.md` |
 | Generated-template branch (hero + shallow bg + frosted blocks) | `references/generated-template.md` |
 | Icons (one family · recolored · treatments) | `references/icons.md` |
 | Mimic a provided style example | `references/style-analysis.md` |
@@ -763,17 +765,29 @@ icons, or — when builds are opted in — leaves a built slide half-staged or f
 clearly help is **not ready** — send it back to the art director.
 **The per-slide content-image opt-in is a CROSS-CUTTING choice, available on EVERY deck** — it is
 *not* tied to the template choice and is *separate from* Q1's "generate a template with an image
-tool" path (which makes the visual identity). Whenever an image tool is available, offer it
-regardless of how the deck was templated — a **registered**, **provided**, **clean**, or
-**generated** template can all carry generated *content* images. Two guardrails the art director
+tool" path (which makes the visual identity). Offer the opt-in whenever an image tool OR web access
+for sourced photos is available — generation rows need the tool; sourced rows need only the
+Commons/Openverse/press-kit search — regardless of how the deck was templated: a **registered**, **provided**, **clean**, or
+**generated** template can all carry generated *content* images. Three guardrails the art director
 enforces and the checkpoint shows: **(a) each proposed plate is *content-related* — it depicts THAT
-slide's actual subject, never generic "fancy" filler** (`image-generation.md`); and **(b) it is
+slide's actual subject, never generic "fancy" filler** (`image-generation.md`); **(b) it is
 SMART about where — plates only for the few slides that genuinely earn one, NEVER every slide, even
-when the user has opted into image generation.** The user then approves which (if any) are
-generated. Fold in the user's design edits, then set up the canvas (Step 3).
+when the user has opted into image generation** (the dose rule holds on photo-friendly topics too —
+only the PRESSURE inverts: a travel/city deck's temptation is wall-to-wall photos); and **(c) the
+REFERENT RULE picks the source for content images** (`references/image-generation.md` "Sourced real
+imagery" — the owning section: token grammar, scope carves for generated-template identity plates
+and cover mood, tie-breaks, and the `searched, none found → …` fallback rungs): a real-and-specific
+subject (a named place, real product, real person) gets a REAL license-clear sourced photo —
+generation *claiming photographic reality* of a real thing is a fidelity bug, while a declared
+stylized illustration is a nameable deviation; a generic-concrete subject may be generated; an
+abstract subject gets native forms, not photos. Every image row carries its source token per that
+grammar. The user then approves which (if any) are
+generated or sourced. Fold in the user's design edits, then set up the canvas (Step 3).
 > **🔴 CHECKPOINT — DESIGN:** show the Design language + Form ledger + the 3 design musts + the
-> image opt-in list + (for a company/product/single-entity deck) the **`logo plan:` line WITH its
-> evidence token** (`official asset — <source>` / `searched, none found → wordmark (flagged)` /
+> image opt-in list (each row with its `generated — <tool>` / `sourced — <origin> (<license>)` /
+> `provided — …` / `searched, none found → …` rung — full grammar: `references/image-generation.md`
+> step 5 — source token) + (for a company/product/single-entity deck) the **`logo plan:` line WITH its
+> evidence token** (`official asset — <source>` / `searched, none found → designed wordmark (flagged)` /
 > `n/a — <reason>`) + the **motif line stating the device AND its meaning + how it's made legible**
 > (label / legend / figurative — the STRANGER TEST) — presented as the compact checkpoint artifact from the 🔴 CHECKPOINT convention block
 > (same fields, incl. the rhythm-map table and the `direction gate:` line — picked direction or
@@ -1371,12 +1385,12 @@ those here; read its report instead).
 2. **Builds — opted-in? then FULLY staged**: builds appear only if the user opted in; every animated slide reveals ALL its content beats in order (nothing content-bearing pre-shown but the title/frame — no half-animated slide), starting from an empty content area (first beat included), with no spoiling summary/legend in the base.
 3. **Plan↔code correspondence**: (a) mechanical — diff the design plan's per-slide rows against the slide-function docstrings (icon family included; the classic inline-mode miss); (b) spot-check — each `build:` docstring has matching `Build.step` calls in its function body; (c) **cover carries its promises** — the built cover shows the self-verify-(l) device, the motif's label/legend where the plan said the STRANGER TEST is satisfied by labeling, and the `logo plan:` asset placed as planned (official file untouched; on a single-entity deck a cover with no logo and no recorded `n/a` reason is a ✗).
 4. **Charts native**: every chart is editable-native unless a matplotlib look was deliberately chosen; legends sit off the data.
-5. **Evidence real**: every domain image/figure is the real computed/source artifact — no plausible stand-in; PDF crops checked on all four edges.
+5. **Evidence real**: every domain image/figure is the real computed/source artifact — no plausible stand-in; PDF crops checked on all four edges; every SOURCED photo comes from a sanctioned origin (Commons / Openverse / press kit / user file), its subject verified against caption/geotag/category, its license recorded (credit placed where required), and it is palette-treated so mixed sources read as one deck; no generated CONTENT image claims photographic reality for a real-and-specific subject (REFERENT RULE, `references/image-generation.md` — generated-template identity plates and declared stylized illustrations are exempt; a real subject with no findable photo uses a recorded `searched, none found → …` rung).
 6. **Colour keyed**: the semantic-colour ledger's meanings are taught on-slide (key at first use) and no accent appears outside its bound meaning; chrome stays quiet (motif ≤3 appearances).
 7. **Claims current**: every time-bound ledger row re-verified with as-of = TODAY; the deck carries its "as of" date.
 8. **Language & hygiene**: one language throughout; zero meta-annotations ("placeholder"/"TODO"/"AI-generated"); voice pass done on every line.
 9. **Eye path**: squint each slide — first look lands on the named hero, 3–4 hierarchy levels survive the blur.
-10. **Hand-off ready**: font/portability deps + per-slide click order noted for the hand-off; open questions carried, not dropped; output dir resolved + announced (`~/Downloads/<deck>/` or the user's stated choice).
+10. **Hand-off ready**: font/portability deps + per-slide click order noted for the hand-off; open questions carried, not dropped; output dir resolved + announced (`~/Downloads/<deck>/` or the user's stated choice); image licenses/credits noted (sourced photos).
 11. **Titles bound to takeaways**: every content slide's title IS the plan's takeaway or a compression keeping its subject + verb + claim; **list the slide numbers** of compressions and of noted exceptions (bare topic labels are fine on cover/divider/agenda/closing; a named exception covers: Mode A "match its title treatment", a registered user template with a fixed title register, or a slide whose planned takeaway demonstrably lands as its named hero / `insight_banner` / `takeaway_rail` — note which element carries it). Emitting the slide numbers, not just a ✓, is what forces the per-slide comparison.
 12. **Form diversity & frame fill — EMIT THE TALLY**: write the deck's form-family tally as one literal line (`cards/panels: N · diagram: N · chart/proportional: N · big-type/editorial: N · timeline/roadmap: N · hero-image: N …`) and check six things against it: (a) **no family >~40% of content slides** — a first draft's greedy default is the card/panel, and per-slide checks can't see deck-level sameness, so this tally is the one place the crutch becomes visible; (b) every slide whose content is a RATIO / FLIP / DIVISION / PROCESS uses the form that *shows* it (a proportional bar, a topology diagram, a split, a roadmap), not a box that states it; (c) each interior slide **fills its frame** — a slide whose content ends in the top half either gets enriched, merged with its neighbour, or names its deliberate quiet register in one clause; (d) **one canvas system** — no background value/colour flip landing on exactly one interior slide (a flip must recur as a divider family or bookend; on the generated-template branch the plate stays on every content page and rhythm comes from imagery strength — `ONE-OFF CANVAS FLIP` lint is the render-time backstop); (e) **icons where content is categorical** — list the slides whose content names tools/entities/roles/pillars/categories; each such slide carries the planned icon family (one family, palette-recolored) or a one-clause waiver — "opt-in" never waives this silently (self-verify (g)); (f) **architecture rotation** — emit a second one-line tally of each content slide's TAKEAWAY SLOT (bottom-strip / side-rail / inline / headline / none) and CONTAINMENT (panelled / direct-on-canvas): no single takeaway slot on more than ~half the content slides (a bottom strip on every page is a template tell — `BOTTOM-STRIP MONOCULTURE` lint backstops it), and on a calm canvas at least ~1/3 of content slides put their protagonist directly on the canvas, un-panelled. Emitting the tallies + the (b)/(c)/(d)/(e)/(f) slide numbers, not just a ✓, is what forces the deck-level look a slide-by-slide build never takes.
 
@@ -1597,7 +1611,10 @@ Then run the **actor-critic loop** — this is the quality engine, and the criti
      takeaway / role / question / beat table**, the **claim ledger**, the **per-figure
      carrying-element rows**, and the Design plan's **declared contracts** — the skeleton rhythm
      map, the WOW slide(s), the money slide (the slide the deck exists for), the semantic-colour
-     ledger, the type tokens, the motion manifest, and — **when a Q4 style example is in play** —
+     ledger, the type tokens, the motion manifest, the **`logo plan:` line with its evidence
+     token**, the **checkpoint motif line** (device + meaning + legibility mode), the **approved
+     image opt-in rows with their per-row source tokens** (+ license/credit notes and any declared
+     stylized deviation), and — **when a Q4 style example is in play** —
      the **chosen mimic mode (A/B) + style-brief pointer** (so the design lens judges style against
      the right bar: a Mode-B restyle's deliberately-different palette is correct, not a fidelity
      miss). Like the motion manifest it extends, the

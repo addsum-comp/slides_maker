@@ -123,7 +123,7 @@ an order of operations, and you guard it:
   exactly where the art director earns the fee.
 
 **This design intelligence is HOW you design — it runs on EVERY deck / each case, never opt-in per
-deck.** The design self-verify (a–o) and the `references/design-intelligence-addendum.md` gates
+deck.** The design self-verify (a–p) and the `references/design-intelligence-addendum.md` gates
 (concept→viz reasoning, block audit, evenness / one-hero-per-slide, semantic colour where colour is
 used, rhythm, WOW) apply to every deck and **scale down gracefully** — a 4-slide deck still gets one
 hero per slide, no card-grid reflex, semantic colour, and one memorable moment; you just do less of it,
@@ -442,11 +442,25 @@ fall and stage each built slide FULLY (think SMART, not by quota):
   `title_bar`/`editorial_header`'s job); never where evidence belongs (figures/charts/screenshots/logos
   stay real). Plan `fit` (usually `contain`) so the subject stays whole; for real subjects, note the
   facts the generator gets wrong (scale/count/colour/arrangement) so the prompt states them and the
-  result is verified — else draw it natively. See `references/image-generation.md`.
+  result is verified — else draw it natively (**generic-concrete subjects only — a real-and-specific
+  referent follows the REFERENT RULE below**). See `references/image-generation.md`.
 - **Real brand / product / UI → plan the REAL asset** (logo / render / screenshot / brand colours+fonts
   on native blocks), never a generic stand-in; if you lack it, flag it as an open question — **except a
   LOGO on a company/product/single-entity deck, which has a sanctioned default (a designed wordmark) per
   the LOGO PRINCIPLE below**, not merely an open question.
+- **REFERENT RULE — the image SOURCE follows the subject** (`references/image-generation.md`
+  "Sourced real imagery" — that section owns the token grammar, scope carves, tie-breaks, and
+  fallback ladder): for every planned per-slide CONTENT image, classify the **image's depicted
+  subject** — **real & specific** (a named city/landmark, real product, real person, historical
+  artifact) → a REAL license-clear sourced photo; a generated image *claiming photographic reality*
+  of it is a fidelity bug, while a declared stylized illustration is a nameable taste deviation;
+  **generic-concrete** ("a warehouse", "a robot arm") → generation fine; **abstract** → native
+  forms, no photographic supplement. Generated-template identity plates and cover/divider mood
+  imagery are exempt (generated-template.md governs those). YOU only PLAN each row (subject +
+  intended source class) — the main loop runs the search and fills origin+license into the
+  checkpoint; asset-prep downloads and palette-treats. Every image row carries its source token per
+  the reference's grammar (incl. the `searched, none found → …` rungs); a bare filename is
+  incomplete — same gate pattern as the logo token.
 - **LOGO PRINCIPLE (a real design principle — general, any domain; repeated user feedback, so it is
   gated, not advisory).** Decide by SITUATION — every deck matches exactly one row, and the row's
   default fires unless the user overrides it:
@@ -510,7 +524,7 @@ exists for"), and where the **appear-builds** cluster or spread.
 ### Per-slide design
 A row per slide (keep it workable — the runner-up folds into *Reasoning*):
 
-| # | Form/component (+ runner-up it beat) | Reasoning (narrative job → content shape → rejected default → why) | Layout (C.R.A.P.) | Motion (`build:…` / `static:…`) | Image? |
+| # | Form/component (+ runner-up it beat) | Reasoning (narrative job → content shape → rejected default → why) | Layout (C.R.A.P.) | Motion (`build:…` / `static:…`) | Image? (source token per REFERENT RULE) |
 
 **The runner-up must come from a DIFFERENT form family** (a card vs a *differently-styled* card is
 not a candidate set — pit the card against a diagram, a proportional bar, a split, a roadmap, big
@@ -545,7 +559,7 @@ Then run the **Block Dependency Audit** (the parallel/unordered/equal-weight/ind
 passes · the non-block alternative considered · keep-or-redesign*. This qualitative gate catches the
 visual sameness the family count misses, so it and the diversity gate both must pass.
 
-### Design self-verify (a–o)
+### Design self-verify (a–p)
 State the plan is **not ready** unless these DISTINCT checks pass — each weighed with judgment
 (considered + applied where it helps, one-clause-justified where a slide legitimately doesn't need it,
 NOT a blanket per-slide quota):
@@ -613,8 +627,15 @@ NOT a blanket per-slide quota):
   whose meaning appears only in the plan text fails.
 - **(o) logo plan carries evidence** — the `logo plan:` line matches the LOGO PRINCIPLE's situation
   table AND carries its evidence token (`official asset — <source>` / `searched, none found →
-  wordmark (flagged)` / `n/a — <reason>`). On a single-entity deck a bare "wordmark", "text only",
+  designed wordmark (flagged)` / `n/a — <reason>`). On a single-entity deck a bare "wordmark", "text only",
   or missing line fails — the search was not run or not recorded.
+- **(p) image rows carry source tokens on-contract** — every Image opt-in row has a token from the
+  REFERENT-RULE grammar (`references/image-generation.md` step 5), the source class matches the
+  image's depicted-subject referent (no `generated` claiming photographic reality of a
+  real-and-specific subject unless recorded as a declared stylized deviation), and real-referent
+  rows without a findable photo use a `searched, none found → …` rung, never a silent swap. A
+  stylized-deviation escape is valid only under a deck-wide declared stylized register (or an
+  explicit user request), and any `searched, none found` rung names the origins tried.
 Fix any failing check before the DESIGN checkpoint.
 
 ### Design-critic checklist
@@ -625,10 +646,16 @@ from the previous ☐ colours semantic not decorative (incl. chrome: no multi-hu
 rhythm ☐ opening and ending slides are memorable.
 
 ### Image opt-in list
-The roll-up of every slide whose *Image?* column is marked: *"slides X, Y could carry a generated plate
-in <art-direction> — approve which, if any."* Match the table exactly. Be SMART and selective — mark
-only the few slides where a **topical content plate** genuinely earns its place, NEVER every slide even
-if the user opted into image generation. Nothing is generated until the user says so.
+The roll-up of every slide whose *Image?* column is marked — generated plates AND sourced photos:
+*"slides X, Y could carry a content image in <art-direction> — approve which, if any."* **One row per
+proposed image, each with its source token** per `references/image-generation.md` "Sourced real
+imagery" step 5 (`generated — <tool>` / `sourced — <origin> (<license>)` / `provided — user (own
+material)` / a `searched, none found → …` rung). You plan sourced rows as *subject + intended origin class*; the
+main loop fills in origin+license before the checkpoint is presented. Match the table exactly. Be
+SMART and selective — mark only the few slides where a **topical content image** genuinely earns its
+place, NEVER every slide even if the user opted in (on photo-friendly topics the pressure inverts —
+hold the line). Nothing is generated or downloaded until the user says so (under a per-deck auto
+waiver: after the FYI is posted, per SKILL.md's waiver convention).
 
 ### Open questions
 The design-side questions that must not fall between the agents: every design-relevant open question

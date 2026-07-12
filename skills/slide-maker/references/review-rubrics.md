@@ -269,10 +269,22 @@ Score each dimension; cite specific slides.
    appearance; **logo missing or unevidenced on a single-entity deck** — the deck's subject is one
    company / product / brand / institution (stakeholder readout, pitch, org report) yet no official
    logo appears on the cover and the plan's `logo plan:` line carries no evidence token
-   (`official asset — <source>` / `searched, none found → wordmark (flagged)` / `n/a — <reason>`) —
+   (`official asset — <source>` / `searched, none found → designed wordmark (flagged)` / `n/a — <reason>`) —
    the slide-design LOGO PRINCIPLE's situation table is the reference: name which row the deck
    matches and what the row's default demanded (a typeset wordmark with no recorded search is the
-   documented failure mode, not a pass); **pendulum overshoot** *(any round after the first — critic-fix and user-feedback rounds alike)* — a fix
+   documented failure mode, not a pass); **sourced/generated image off-contract (REFERENT RULE)** —
+   a content image whose source class fights its subject's referent per
+   `references/image-generation.md` "Sourced real imagery": a generated image **passed off as
+   photographic reality** of a real-and-specific subject (a named place, real product, real person)
+   is a FIDELITY finding — but a plainly stylized illustration in the deck's declared art-direction,
+   recorded as a named deviation or user request, is a taste call, and a recorded `searched, none
+   found → …` rung is a sanctioned exit, not a finding (the critic spot-checks at least one recorded
+   `searched, none found` rung — if an instantly-findable license-clear Commons hit refutes it, the
+   rung itself IS a finding); also flag: a sourced photo whose subject was
+   never verified against its caption/geotag, an image row with no source token from that section's
+   grammar, a required credit missing, photographic supplements stacked onto an abstract subject
+   that native forms should carry — and on photo-friendly topics, wall-to-wall photos where the
+   opt-in discipline should have held; **pendulum overshoot** *(any round after the first — critic-fix and user-feedback rounds alike)* — a fix
    for named feedback that swung to the opposite extreme (muted → rainbow chrome, dense → bare, static
    → everything animated) instead of moving the criticised dial one deliberate step in the content
    layer (`references/handoff-and-iteration.md` "Move the dial") — when the round record carries a
@@ -344,7 +356,9 @@ Score each dimension; cite specific slides.
    fake of a real entity's official logo** (an invented mark passed off as the real one) is a **blocker**.
    What *satisfies* the check: the **real logo** (from search), or — when it wasn't found — a **clean
    designed typographic wordmark clearly flagged as a non-official stand-in** (the sanctioned default; do
-   **not** flag that as 'fake' — designing a mark is correct for the user's own / a new product). (Not for
+   **not** flag that as 'fake' — designing a mark is correct for the user's own / a new product). A
+   wordmark satisfies **only** when the plan's `logo plan:` line records the search
+   (`searched, none found → designed wordmark (flagged)`) — see item 9's logo-unevidenced finding. (Not for
    multi-org / neutral-academic decks; don't double a template's own branding; see `image-generation.md`
    "Logo / brand mark".)
    **Currency:** if the deck makes time-bound / falsifiable claims (a "latest / current", a count, a

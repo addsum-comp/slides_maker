@@ -137,6 +137,75 @@ many organisations (a survey, a literature review, a market landscape), or a neu
 where house branding would be noise — there, name entities inline instead. Same fidelity rule as
 above: the real mark or an honest placeholder, never a faked one.
 
+## Sourced real imagery — the REFERENT RULE (does the subject actually exist?)
+
+Before generating ANY content image, classify the slide subject's **referent** — the image *source*
+follows it. This is why "can we put an image here?" is the wrong first question; the right one is
+"does this subject exist in the world, and if so, why would we show a synthetic version of it?"
+
+| Referent | Examples | Image source |
+|---|---|---|
+| **Real & specific** | a named city / landmark / route, a real product or device, a real person, a historical event or artifact, a specific building / campus | **REAL photo** — license-clear sourced (pipeline below), official press asset, or the user's own file. A generated image **claiming photographic reality** of it is a *fidelity bug* (a generated "Amsterdam canal" with the wrong architecture); a **plainly stylized illustration** in the deck's declared art-direction (watercolour travel-poster register, a Q1=d identity plate) is a legitimate *taste* choice when recorded as a named deviation or user request — the escape is valid only when the deck's ONE recorded art-direction line itself declares a stylized plate register (a per-image "stylized" declaration inside an otherwise photographic/realistic register is off-contract), and under a per-deck auto waiver real-and-specific subjects DEFAULT to sourced: the stylized deviation needs an explicit user request or the declared stylized register |
+| **Generic-concrete** | "a warehouse", "a robot arm", "a classroom", "a market street" — no particular one | **Generation is fine** (often better — art-directable to the palette); a sourced photo also works |
+| **Abstract** | strategy, finance, algorithms, org design | **No photographic supplement** — native diagrams / charts / icons carry it; imagery appears only as cover/divider mood, if at all |
+
+**Scope + tie-break:** the rule governs **per-slide CONTENT images** — plates that depict a slide's
+subject as evidence or atmosphere. It does NOT govern the generated-template branch's stylized
+identity plates (hero / dividers / interior plate — `references/generated-template.md` owns those,
+and a place-anchored Q1=d deck renders the place as declared stylized art, not fake photography) or
+cover/divider *mood* imagery — the mood exemption relaxes only the SOURCING obligation, never the
+fidelity bar: mood imagery of a real-and-specific subject is still sourced or plainly stylized;
+generation claiming photographic reality of a real referent is a fidelity bug anywhere in the deck,
+cover included. Classify the **image's depicted subject, not the slide topic** — a
+Shanghai-skyline mood image on a finance slide is still a real-&-specific image; and a generic scene
+that merely *evokes* an entity (an office vibe, a lab atmosphere) is generic-concrete unless the
+deck presents it as THAT entity's actual premises. **Real living people:** a CC license clears
+copyright, not personality/publicity rights — for a commercial deck prefer official press/headshot
+assets or user-supplied photos.
+
+**The sourced-photo pipeline (real-referent subjects):**
+1. **Search license-clear sources only**: Wikimedia Commons and Openverse (both keyless APIs,
+   CC-licensed, captioned), official press kits / brand pages, or the user's own material. Never
+   grab from arbitrary image-search results — provenance and license unknown.
+2. **Verify the subject**: the file's caption / description / geotag / Commons category must confirm
+   it shows the *claimed* subject — a mislabeled photo is the photographic version of an invented
+   number, and the critic's fidelity lens checks it.
+3. **Record the license**: CC0 / CC BY / CC BY-SA / press-kit terms; attribution-required licenses
+   get a credit (small mute caption at the image, or one credits line on the sources page).
+4. **Treat to the palette** so mixed sources read as one deck: duotone/tint to the deck palette,
+   consistent crop ratios, scrims under any text-over-photo (the contrast floor still applies).
+5. **Evidence token (the gate — THIS list is the authoritative grammar; other files point here):**
+   every image row in the plan / checkpoint opt-in list states its source class:
+   - `sourced — <origin> (<license>)` — a found license-clear photo;
+   - `provided — user (own material)` — the user's own file (no license interrogation);
+   - `generated — <tool>` — a generated plate (generic-concrete subject, or declared stylized
+     illustration of a real one — say which);
+   - `searched, none found → generated, flagged illustrative` — the not-found rung: no license-clear
+     photo exists (obscure place, private premises, pre-photography history, unreachable sources) →
+     generate, clearly framed as illustration, never as photographic evidence;
+   - `searched, none found → native form` — the other sanctioned exit: drop the photo, let a map /
+     diagram / native form carry the slide.
+   A `searched, none found` rung must NAME the origins tried — write it
+   `searched (Commons, Openverse[, press kit]), none found → …`; a bare rung with no named origins
+   is incomplete, the same clause pattern as the logo token.
+   A bare filename with no token is an **incomplete plan**, same pattern as the logo-plan token.
+   (Pre-photography events can also use Commons artwork/artifact photos; the user's OWN unreleased
+   product follows the logo table's own-product logic — an honest flagged stand-in.)
+
+**Who does what:** the slide-design agent PLANS each row (subject + intended source class) — it does
+not fetch; the **main loop** runs the Commons/Openverse/press-kit search and fills `<origin>
+(<license>)` into the checkpoint artifact before presenting it (exactly how the logo evidence line
+is assembled) — and records each found photo's **direct file URL** into the asset spec handed to
+asset-prep (or keeps it for itself on small inline decks where no asset-prep runs); the
+**asset-prep executor** downloads, subject-checks, and palette-treats after
+design approval.
+
+**The dose rule is unchanged — only the PRESSURE inverts on photo-friendly topics:** on a travel /
+city / place-anchored deck the temptation flips from too-few earned images to wall-to-wall photos;
+the opt-in discipline (only the slides that genuinely earn one) and balanced fullness still rule,
+with native maps, routes, and cost tables doing the informational work while photos carry the few
+atmosphere beats that deserve them.
+
 ## Planning workflow
 
 1. During Step 2 (the slide-design agent's design plan), decide each slide's visual role: source figure, deterministic chart,
@@ -259,6 +328,11 @@ Do not paste API keys into prompts, slide text, source files, or manifests. Keep
 environment (`OPENAI_API_KEY`). The native and Codex paths need no key.
 
 ## Real subjects must be factually right
+
+**Scope: this section governs GENERIC-CONCRETE real things (kinds of things — "a robot arm", "a
+container ship"), where generation is sanctioned. A real-AND-SPECIFIC referent (a named place, a
+real product, a real person) goes to the REFERENT RULE above and gets a sourced photo — or a
+declared stylized illustration, never generation passed off as photographic reality.**
 
 A generated image of **real, known things** must not be visibly *wrong*, even when it's
 "only decorative" — a teaching/explainer audience spots it instantly and it costs you

@@ -21,6 +21,7 @@ Per asset, the plan gives you a complete spec:
 - **Equation:** the exact LaTeX + the target height + mathfont/colour from `style.py`.
 - **GIF:** path + which frame is representative (for the poster).
 - **Generated plate:** the topical prompt + art-direction + placement role (the slide-design agent already wrote it).
+- **Sourced photo:** the claimed subject + download URL/origin + license (the main loop resolved these at design time per the REFERENT RULE, `references/image-generation.md`) + the palette treatment (duotone/tint, crop ratio, scrim yes/no) + any required credit text.
 - **Icon:** the `spec` (family:name) + the palette colour to recolor to.
 
 ## Jobs (each one independent — parallelize freely)
@@ -33,7 +34,10 @@ Per asset, the plan gives you a complete spec:
   in ONE manifest and run the script ONCE — it generates them **concurrently** (`--concurrency`), so the
   batch lands in ~one image's time, not N×. (Don't launch a separate process per image.)
 - **Icons** via `scripts/icons.py` `icon_png` (fetch → recolor → rasterize), one coherent family.
-Keep everything in `~/Downloads/<deck>/assets/` (`figures/`, `icons/`, `generated/`).
+- **Sourced photos**: download from the spec's URL (curl), then apply the spec's palette treatment
+  (`scripts/image_fx.py` duotone/tint + crop to the planned ratio); keep the license + credit note
+  next to the file (a one-line `credits.txt` in the folder) so the build can place the credit.
+Keep everything in `~/Downloads/<deck>/assets/` (`figures/`, `icons/`, `generated/`, `sourced/`).
 
 ## View-check every output (this is your real value)
 Mechanically verify what you produced — this is execution QA, not design judgment:
@@ -42,6 +46,8 @@ Mechanically verify what you produced — this is execution QA, not design judgm
 - an equation renders correctly (no tofu, right symbols) at ≈ body height;
 - a generated plate is **text-free**, the subject is whole, and real things look right;
 - a GIF poster frame is representative (not blank/loading);
+- a sourced photo actually downloaded (not an error page), visibly shows the spec's claimed subject,
+  and the treatment applied cleanly (no crushed blacks / clipped highlights from the duotone);
 - an icon recolored cleanly, transparent background.
 Re-do anything that fails the view-check.
 

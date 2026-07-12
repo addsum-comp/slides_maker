@@ -90,7 +90,10 @@ something.
   contracts — the deck memory sentence + emotional-curve line (peak marked), the per-slide
   takeaway/role/question/beat table, the claim ledger, the per-figure carrying-element rows, and
   the Design plan's declared contracts (skeleton rhythm map · WOW slide(s) · money slide ·
-  semantic-colour ledger · type tokens · motion manifest · the chosen mimic mode A/B + style-brief
+  semantic-colour ledger · type tokens · motion manifest · the `logo plan:` line with its evidence
+  token · the checkpoint motif line (device + meaning + legibility mode) · the approved image opt-in
+  rows with their per-row source tokens (+ license/credit notes and any declared stylized deviation) ·
+  the chosen mimic mode A/B + style-brief
   pointer when a Q4 style example was given · on a user-feedback round, that round's `user-dials:`
   line). Like the motion manifest it extends,
   it carries intent the pixels can't show. Two guard lines: **a promise is a commitment to audit,
@@ -202,7 +205,13 @@ Do not just skim for the first few obvious issues. Run these passes:
        the paper's algorithm or the code it derives from — a wrong procedure is a fidelity blocker like a
        wrong number); real brand/product-asset credibility; build/meta-annotation leaks; formula
        transcription/derivation fidelity; claim currency (as-of date); kicker-echoes-title;
-       language consistency; text-density vs delivery mode. *(Rubric items 1, 3, 6, 8, 10, 12a-fidelity.)*
+       language consistency; text-density vs delivery mode; **sourced-photo subject verification**
+       (the photo matches its claimed subject per origin caption/geotag/category) + license/credit
+       presence; **REFERENT-RULE off-contract** — a generated image claiming photographic reality of a
+       real-and-specific subject (named place / real product / real person) is a fidelity finding; a
+       declared stylized illustration recorded as a deviation is a taste call; a recorded
+       `searched, none found → …` rung is a sanctioned exit (`review-rubrics.md` item 9 +
+       `references/image-generation.md` "Sourced real imagery"). *(Rubric items 1, 3, 6, 8, 10, 12a-fidelity.)*
    - **LENS B · Design, layout & legibility — *how it looks.***
      - **Diagnose layout with the C.R.A.P. lens** (`design-principles.md` "The C.R.A.P. framework") — the
        same four principles the planner designed to, so findings name a shared cause: **Contrast** (does
@@ -222,7 +231,13 @@ Do not just skim for the first few obvious issues. Run these passes:
        `references/review-rubrics.md` (item 9) — the same list the planner designed to in `agents/slide-design.md`.
        **Also apply the anti-template deck-level checks** — the block-dependency audit, the evenness /
        squint penalty, the semantic-colour ledger, and rhythm / protagonist variation — from
-       `references/design-intelligence-addendum.md` (surfaced in `review-rubrics.md` item 9), so you score
+       `references/design-intelligence-addendum.md` (surfaced in `review-rubrics.md` item 9), plus item 9's
+       three newer checks: **opaque motif / STRANGER TEST** (state what a stranger would call the device
+       vs what the plan says it means; a label/legend is required at first appearance), **logo
+       missing-or-unevidenced** (the design side: no brand chrome on a single-entity deck, or the mark
+       jumping positions), and **sourced/generated image dose+placement off-contract** (photographic
+       supplements on abstract subjects; wall-to-wall photos on photo-friendly topics where opt-in
+       discipline should hold), so you score
        the same things the art director planned against: a *clean-but-even* deck (one grid repeated, one
        accent hue used decoratively, no clear first-read, a WOW that's merely big) is a finding even when
        every individual slide looks tidy. And apply the TASTE TELL (rubric §9
@@ -479,7 +494,9 @@ Do not just skim for the first few obvious issues. Run these passes:
      things drawn the wrong size relative to each other, e.g. a person as tall as a building),
      wrong count, wrong colour, or an impossible arrangement. Obvious to a knowledgeable
      audience; flag it even on a "decorative" plate — the fix is to specify the fact in the
-     prompt or **draw it natively** at correct proportions. Also flag a **label not aligned
+     prompt or **draw it natively** at correct proportions; for a **real-and-specific** subject the
+     sanctioned fix is a license-clear **SOURCED** photo per the REFERENT RULE (or a recorded
+     stylized-illustration deviation) — not a better prompt. Also flag a **label not aligned
      under the image feature** it names (a caption sitting away from the part it points to).
    - **Baked-in / garbled text inside a generated image — including a generated SCHEMATIC:** any
      real text, label, number, axis tick, or equation that lives *in the pixels* of an AI-generated
@@ -651,10 +668,13 @@ Do not just skim for the first few obvious issues. Run these passes:
      that never jumps). Flag a single-entity deck **missing** the persistent mark, or a logo that **jumps
      corner/size** across slides. *(Not for a multi-organisation deck — survey / landscape / review — or a
      neutral-academic talk, where house branding is noise; and don't double a logo a template already
-     carries. The mark must be the **real** one, a **designed wordmark clearly flagged as a non-official
-     stand-in** (the honest default when no real logo was found — don't flag *that* as fake), or an honest
-     placeholder, never a fabricated fake.)* Authoritative check: `review-rubrics.md` item 10 "Persistent
-     brand chrome" (design lens = missing chrome, incl. no wordmark; fidelity = a fabricated fake). (image-generation.md.)
+     carries. Satisfying marks are exactly two: the **real official asset (untouched)**, or a **designed
+     wordmark whose plan `logo plan:` line carries `searched, none found → designed wordmark (flagged)`**.
+     A bare wordmark / "text only" with NO recorded-search token is a finding — name which LOGO-PRINCIPLE
+     situation-table row the deck matches. A literal placeholder shipping in a final deck is not a
+     satisfier — it's a meta-annotation blocker. Never a fabricated fake.)* Authoritative checks:
+     `review-rubrics.md` item 10 "Persistent brand chrome" (design lens = missing chrome, incl. no
+     wordmark; fidelity = a fabricated fake) **and** item 9's "logo missing or unevidenced" finding. (image-generation.md.)
    - **Flat opaque blocks — or a flat single-colour CANVAS — on a rich/image background (a "pasted-on" /
      half-finished tell):** when content sits on a textured / photographic / 3D / generated-plate
      background, **fully opaque** cards/panels read as stuck on top rather than part of the scene. Expect
