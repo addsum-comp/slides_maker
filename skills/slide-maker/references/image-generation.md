@@ -167,9 +167,13 @@ assets or user-supplied photos.
 1. **Search license-clear sources only**: Wikimedia Commons and Openverse (both keyless APIs,
    CC-licensed, captioned), official press kits / brand pages, or the user's own material. Never
    grab from arbitrary image-search results — provenance and license unknown.
-2. **Verify the subject**: the file's caption / description / geotag / Commons category must confirm
-   it shows the *claimed* subject — a mislabeled photo is the photographic version of an invented
-   number, and the critic's fidelity lens checks it.
+2. **Verify the subject — and that the file is WATERMARK-FREE**: the file's caption / description /
+   geotag / Commons category must confirm it shows the *claimed* subject — a mislabeled photo is the
+   photographic version of an invented number, and the critic's fidelity lens checks it. View the
+   downloaded file for watermarks, stock-preview overlays, photographer stamps, or site logos: a
+   watermark is a **licensing tell** (it usually marks an unlicensed preview), so a watermarked file
+   is **rejected** — never cropped, blurred, or inpainted to hide the mark (that is license
+   circumvention, not cleanup); find a clean file or fall back to a `searched, none found → …` rung.
 3. **Record the license**: CC0 / CC BY / CC BY-SA / press-kit terms; attribution-required licenses
    get a credit (small mute caption at the image, or one credits line on the sources page).
 4. **Treat to the palette** so mixed sources read as one deck: duotone/tint to the deck palette,

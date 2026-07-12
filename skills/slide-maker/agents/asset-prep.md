@@ -47,7 +47,9 @@ Mechanically verify what you produced — this is execution QA, not design judgm
 - a generated plate is **text-free**, the subject is whole, and real things look right;
 - a GIF poster frame is representative (not blank/loading);
 - a sourced photo actually downloaded (not an error page), visibly shows the spec's claimed subject,
-  and the treatment applied cleanly (no crushed blacks / clipped highlights from the duotone);
+  is **watermark-free** (no stock-preview overlay, photographer stamp, or site logo — a watermarked
+  file is REJECTED and reported back, never cropped/blurred/inpainted to hide the mark), and the
+  treatment applied cleanly (no crushed blacks / clipped highlights from the duotone);
 - an icon recolored cleanly, transparent background.
 Re-do anything that fails the view-check.
 

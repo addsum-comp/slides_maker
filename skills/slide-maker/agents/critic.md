@@ -207,7 +207,8 @@ Do not just skim for the first few obvious issues. Run these passes:
        transcription/derivation fidelity; claim currency (as-of date); kicker-echoes-title;
        language consistency; text-density vs delivery mode; **sourced-photo subject verification**
        (the photo matches its claimed subject per origin caption/geotag/category) + license/credit
-       presence; **REFERENT-RULE off-contract** — a generated image claiming photographic reality of a
+       presence + **watermark-free** (a visible watermark/stock-preview overlay is a finding — and
+       so are crop/blur/inpaint traces where one was hidden); **REFERENT-RULE off-contract** — a generated image claiming photographic reality of a
        real-and-specific subject (named place / real product / real person) is a fidelity finding; a
        declared stylized illustration recorded as a deviation is a taste call; a recorded
        `searched, none found → …` rung is a sanctioned exit (`review-rubrics.md` item 9 +

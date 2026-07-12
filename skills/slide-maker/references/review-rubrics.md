@@ -281,7 +281,10 @@ Score each dimension; cite specific slides.
    found → …` rung is a sanctioned exit, not a finding (the critic spot-checks at least one recorded
    `searched, none found` rung — if an instantly-findable license-clear Commons hit refutes it, the
    rung itself IS a finding); also flag: a sourced photo whose subject was
-   never verified against its caption/geotag, an image row with no source token from that section's
+   never verified against its caption/geotag, a **watermarked** sourced image (a stock-preview
+   overlay, photographer stamp, or site logo — or crop/blur/inpaint traces where a mark was hidden:
+   a watermark is an unlicensed-preview tell, and removing it is license circumvention, not
+   cleanup), an image row with no source token from that section's
    grammar, a required credit missing, photographic supplements stacked onto an abstract subject
    that native forms should carry — and on photo-friendly topics, wall-to-wall photos where the
    opt-in discipline should have held; **pendulum overshoot** *(any round after the first — critic-fix and user-feedback rounds alike)* — a fix
