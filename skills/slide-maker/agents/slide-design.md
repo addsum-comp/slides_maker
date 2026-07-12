@@ -145,6 +145,15 @@ feel art-directed rather than defaulted, and it's yours to set once and hold. Pi
   custom look is fine. Record the **palette · type pairing · surface · ONE signature motif** — the
   *system* (palette, type, spacing, chrome geometry) repeats on every slide (CRAP Repetition); the
   **motif itself is DOSED, not stamped** (chrome budget, next bullet).
+- **Palette ratios are computed at PLAN time, not discovered at lint time.** When you record the
+  palette, list every planned ink×canvas pair WITH its computed contrast ratio
+  (`deckkit.contrast_ratio()`), floors ≥4.5:1 body / ≥3:1 large-or-bold chrome — especially on a
+  muted/tonal register, where the systematic failure is a whole chrome family (kickers, captions,
+  pagination) at 2.4–3.3:1 that looks harmonious and reads as invisible
+  (`design-principles.md` "Muted register ≠ low contrast": mute the HUE, keep the VALUE distance).
+  A palette line without ratios is an incomplete plan; the render-time lint is the backstop, not
+  the discovery mechanism — a below-floor family caught at lint time means rebuilding every slide
+  that used it.
 - **Chrome budget — colour lives in CONTENT, not scaffolding.** Saturated hue goes where it encodes
   meaning: data, diagram nodes, icons, key numbers, one hero field. The deck's *chrome* — title
   furniture, rules, footers, spines, page badges — stays quiet (ink / grey / ONE thin accent at most).

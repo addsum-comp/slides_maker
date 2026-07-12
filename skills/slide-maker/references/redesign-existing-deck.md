@@ -71,6 +71,39 @@ with the user on it before spending effort. So:
   something the source doesn't is a fidelity failure (see the critic's fidelity check) — the most
   damaging thing you can do to someone's own deck.
 
+### The SURGICAL FIX-PASS protocol (copy-in-place edits on a foreign deck)
+A "fix pass keeping the look" runs python-pptx edits against shapes you didn't build and can't
+rebuild. Every rule below exists because its violation shipped compounding errors on a real pass:
+
+1. **One consolidated script, run from the ORIGINAL, every time.** Never iterate mutations on an
+   already-mutated copy — each round's mis-fix becomes the next round's ground truth, and by round
+   four you're repairing your own repairs. Fold each round's learnings back into ONE script that
+   regenerates `-fixed` from the untouched source; the script is idempotent and the original is
+   never written to.
+2. **Target shapes by the lint report's COORDINATES, never by container heuristics.** "The card
+   behind this text" matchers silently grow the wrong shape (a scrim, a divider, an outer panel)
+   and report success. Match on the flagged bottom/size (`abs(bottom − flagged) < 0.06in`) plus a
+   horizontal-overlap check with the flagged text — and re-lint after every batch to prove the
+   flagged item actually moved.
+3. **Grow into MEASURED space only.** Before extending or moving any shape, know the reserved
+   bands (footer band = content above ~0.91 × slide-height; on a 10×5.625in canvas ≈ 5.10in) and
+   what sits below/beside the shape. Growth that clears a TEXT PADDING flag by invading the footer
+   band trades one finding for another — when the band leaves no room, fix the TEXT instead:
+   shrink its size a step, trim it (parking the full sentence in the speaker notes), or raise the
+   whole row.
+4. **Colour remaps are CANVAS-AWARE.** Foreign decks reuse one hex on light and dark canvases; a
+   global "darken #B9863A" fixes the cream slides and breaks the dark ones. Remap exact values
+   per slide, keyed by that slide's canvas value — keep an explicit dark-slide exclusion list.
+5. **Decorative backing shapes are IMMUNE.** Photo frames, soft-shadow plates, seal insets, and
+   scrims overlap their content BY DESIGN — "fixing" those overlaps mangles the composition.
+   Only separate ink-on-ink collisions; leave shape-on-shape layering that renders correctly.
+6. **The lint measures INK, not boxes.** Clamping a textbox's height doesn't move its ink — an
+   ink collision is fixed by separating the elements (nudge apart) or shrinking/trimming the
+   text, never by resizing the container around it.
+7. **Content removed is content PARKED.** Any trim lands verbatim in that slide's speaker notes
+   (add a full spoken thread while you're there — a foreign deck with empty notes isn't
+   presentable), so the fix pass never silently deletes the author's material.
+
 ## Step R3 — Verify, loop, and show the before/after
 Run the build → render → actor-critic loop as usual until consent. When you present, **show the
 before/after** for the slides you changed and name what each fix addressed (from the R1

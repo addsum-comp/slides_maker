@@ -173,6 +173,12 @@ tiles via `deckkit.scorecard`. For a single obvious number use a hero stat, not 
   digits at different heights ("some smaller / higher / lower") and misaligns with adjacent CJK/Latin
   on the line. Full rule + face list in `references/font-guidance.md`. Verify digit alignment in the
   render — beside CJK (`中文 15亿`) and on pure-Latin lines.
+- **A numeral STACK is measured, never hand-guessed.** The classic broken slide is a display numeral
+  (40–80pt) whose label above and caption below were placed by eye — the numeral's real ink height
+  (~1.35× its point size) swallows the caption and the render shows the digits struck through the
+  text. Stack label → numeral → caption with `deckkit.vstack()`, or seat each element off the
+  previous one's MEASURED bottom (`measure_text`); and after ANY size change to the numeral,
+  re-seat everything below it — a size tweak silently invalidates every hand-placed offset under it.
 
 ## Layout patterns — reach for the right one (apply dynamically, not always)
 Beyond columns/rows, `deckkit` has purpose-fit patterns; use the one that fits the *content*, and
@@ -772,6 +778,14 @@ anyway:
   captions on white and white text on a light accent are the usual failures. (`chip`/
   `modbox` now auto-pick a readable text colour; the `deckkit` palette defaults clear
   4.5:1 on their intended backgrounds.)
+- **Muted register ≠ low contrast — mute the HUE, not the VALUE.** The most seductive contrast
+  failure is systematic, not accidental: an elegant tonal palette (warm greys on cream, dusty
+  gold on paper, tone-on-tone teal) where *every* kicker, caption and pagination lands at
+  2.4–3.3:1 — harmonious up close, invisible from the back of a room. Desaturate toward the
+  canvas's hue family but keep the VALUE distance: a muted warm grey can be `#6E6557` on cream
+  (4.6:1) instead of `#9A927F` (2.7:1) and read just as calm. Compute the ratio for every planned
+  ink×canvas pair at design time; when a whole chrome family sits below floor, darken the family,
+  don't grant it an exemption for elegance.
 - **Don't encode meaning by colour alone** (see above) — pair hue with a label/shape.
 - **Alt-text on every informative figure.** Call `deckkit.alt_text(shape, "…")` after
   `add_picture()` (and on diagrams) with a one-line factual description ("ROC curve:
