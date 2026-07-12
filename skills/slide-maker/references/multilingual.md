@@ -88,19 +88,33 @@ an uncontrolled single fallback, the flat one-font look to fix.)*
 When Latin and CJK share a deck (any 中文 deck with English terms/numbers, or a true bilingual deck),
 design the **system** first and pick fonts second — the two scripts must read as one voice with
 similar visual weight and spacing:
-- **Pairing menu** (matched-proportion sans + sans — ONE Latin family + ONE CJK family, which
+- **Pairing menu** (matched-proportion pairs — sans+sans by default; the warm and editorial rows
+  are deliberate register moves; ONE Latin family + ONE CJK family, which
   together form the deck's text pairing; the CJK/EA and mono faces are *functional* roles under
   the ≤2-text-families rule, `font-guidance.md`; weights ≤3):
   *cross-platform / safest* → **Noto Sans + Noto Sans CJK SC** (or Source Han Sans); *macOS build
   loop* → **Helvetica Neue (or Inter, if installed) + Hiragino Sans GB** (PingFang SC only for the
   final deck, per the render-loop trap above); *Windows/Office* → **Aptos/Segoe UI + Microsoft
-  YaHei or DengXian**; *technical* → **IBM Plex Sans + Source Han Sans**. Serif-Latin + sans-CJK is
-  a deliberate *editorial* move only — never an accident.
+  YaHei or DengXian**; *technical* → **IBM Plex Sans + Source Han Sans**; *warm / friendly /
+  teaching* → a rounded-humanist Latin (**Trebuchet MS / Verdana**, or Nunito if installed) +
+  **LXGW WenKai / LXGW Bright** (free, OFL — warm Kai-flavoured without full brush formality; NOT
+  preinstalled, so install it for the build loop, **flag install/embed at hand-off**, and check the
+  render didn't silently substitute — the warm register dies in a substituted Heiti); *editorial /
+  formal* → **Georgia (or another serif Latin) + Noto Serif CJK SC / Songti SC** — serif-Latin +
+  serif-CJK is a deliberate *editorial* move, never an accident, and route big numerals through a
+  **lining-figure face** (Georgia's old-style digits wobble next to CJK — `font-guidance.md`).
+  And ANY cross-script serif/sans mix (either direction) must be deliberate, never an accident of
+  per-script defaults.
 - **Optical balance (the compensations no font pair does for you):** CJK glyphs fill the em-box, so
   at equal pt they read *larger and heavier* than Latin — in a mixed lockup, drop the CJK ~0.5–1pt
   or bump the Latin, and remember **CJK bold is visually heavier than Latin bold** (a CJK title at
   semibold often matches a Latin title at bold; reduce the CJK weight before reaching for a smaller
   size).
+- **Width budget (CJK is full-width):** every CJK glyph takes a full em, so a Chinese label needs
+  **~1.7–2× the width** of the same-length Latin label at equal pt. Size node/chip/pill/table-cell
+  widths for the **CJK** text (widen the box or shorten the label); **never shrink the font to
+  fit**, and confirm wrap in the render — the lint's wrap estimate is CJK-aware but approximate
+  (real font metrics differ; a not-installed CJK face silently substitutes with different metrics).
 - **Leading ladder (script-aware) — mind the UNITS:** targets are in **× font size** (the design
   convention): Latin ~1.15–1.3× · CJK multi-line body ~**1.3–1.45×** · mixed EN/中文 ~**1.35×**.
   PowerPoint's `line_spacing` *multiple* is a % of SINGLE spacing, which itself renders at ≈1.2×

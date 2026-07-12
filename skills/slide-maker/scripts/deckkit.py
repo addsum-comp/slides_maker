@@ -3297,15 +3297,23 @@ def highlight(s, size, base_c, accent_c, *, key_bold=True, font=None):
 def node(slide, x, y, w, h, label, *, shape="roundrect", fill=None, line=None, line_w=1.4,
          tcolor=None, sub="", dashed=False, hub=False, accent=None):
     """One diagram NODE (box/connector kit — the general architecture/flowchart builder).
-    `shape`='roundrect'|'rect'|'pill'|'circle'. By default a thin-outline pale node; `hub=True`
-    promotes it to a SOLID accent fill (the ONE focal node — keep every other node thin-outline,
-    exactly one hub). `dashed=True` marks an optional/inferred node. Returns the node's CENTER
-    (cx, cy) in inches so connector() can join it. Pair with connector() + the stroke-semantics
-    convention (solid=required · dashed=optional · dotted=feedback)."""
+    `shape`='roundrect'|'rect'|'pill'|'circle'|'diamond'|'parallelogram'|'cylinder' — the last
+    three carry standard flowchart notation (diamond=decision, parallelogram=input/output,
+    cylinder=data store; see the "Standard notation" crib in design-gallery.md). By default a
+    thin-outline pale node; `hub=True` promotes it to a SOLID accent fill (the ONE focal node —
+    keep every other node thin-outline, exactly one hub; hub optional in the system-architecture
+    recipe — the focal path can carry emphasis instead). `dashed=True` marks an optional/inferred
+    node. Returns the node's CENTER (cx, cy) in inches so connector() can join it. Pair with
+    connector() + the stroke-semantics convention (solid=required · dashed=optional ·
+    dotted=feedback). Z-ORDER: assemble freeform diagrams in fixed order — region/group boundaries
+    first, then ALL connectors, then nodes, then any floating labels — so shapes always sit above
+    lines (hub_spoke does this internally)."""
     acc = accent if accent is not None else BLUE
     ln = line if line is not None else acc
     sh = {"pill": MSO_SHAPE.ROUNDED_RECTANGLE, "roundrect": MSO_SHAPE.ROUNDED_RECTANGLE,
-          "rect": MSO_SHAPE.RECTANGLE, "circle": MSO_SHAPE.OVAL}.get(shape, MSO_SHAPE.ROUNDED_RECTANGLE)
+          "rect": MSO_SHAPE.RECTANGLE, "circle": MSO_SHAPE.OVAL,
+          "diamond": MSO_SHAPE.DIAMOND, "parallelogram": MSO_SHAPE.PARALLELOGRAM,
+          "cylinder": MSO_SHAPE.CAN}.get(shape, MSO_SHAPE.ROUNDED_RECTANGLE)
     o = slide.shapes.add_shape(sh, Inches(x), Inches(y), Inches(w), Inches(h))
     o.shadow.inherit = False
     if hub:
@@ -3329,11 +3337,17 @@ def node(slide, x, y, w, h, label, *, shape="roundrect", fill=None, line=None, l
 
 
 def connector(slide, p0, p1, *, style="solid", color=None, width=1.5, label="", arrow=True,
-              label_c=None):
+              label_c=None, head="triangle"):
     """Join two node points (cx,cy tuples from node()) with a connector. `style`='solid'
     (required) | 'dashed' (optional) | 'dotted' (feedback/inferred) — the stroke SEMANTICS that
     make a technical diagram readable. `label` = an on-shaft mono edge label (centred at midpoint).
-    `arrow=True` adds an arrowhead at p1."""
+    `arrow=True` adds an arrowhead at p1; `head`='triangle' (filled, the default) | 'open' (open V
+    — async/return per UML convention, see the "Standard notation" crib in design-gallery.md) |
+    'none'. Z-ORDER (freeform assembly): add ALL connectors BEFORE the nodes they join (region
+    boundaries → connectors → nodes → floating labels) so shapes sit above lines — plan the
+    geometry first and derive centres as (x + w/2, y + h/2), then create shapes in z-order
+    (node() returning the centre is a convenience, not an ordering requirement); a connector joins
+    node edges/centres and must never be visible crossing a box interior."""
     col = color if color is not None else MUTE
     c = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(p0[0]), Inches(p0[1]),
                                    Inches(p1[0]), Inches(p1[1]))
@@ -3341,9 +3355,10 @@ def connector(slide, p0, p1, *, style="solid", color=None, width=1.5, label="", 
     if style in ("dashed", "dotted"):
         ln = c.line._get_or_add_ln()
         ln.append(parse_xml(f'<a:prstDash {nsdecls("a")} val="{"dash" if style == "dashed" else "sysDot"}"/>'))
-    if arrow:
+    if arrow and head != "none":
         ln = c.line._get_or_add_ln()
-        ln.append(parse_xml(f'<a:tailEnd {nsdecls("a")} type="triangle" w="med" len="med"/>'))
+        _ht = "arrow" if head == "open" else "triangle"
+        ln.append(parse_xml(f'<a:tailEnd {nsdecls("a")} type="{_ht}" w="med" len="med"/>'))
     if label:
         mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
         text(slide, mx - 0.8, my - 0.16, 1.6, 0.3, [[(label, 9, label_c or col, False, False, MONO)]],
@@ -3351,13 +3366,15 @@ def connector(slide, p0, p1, *, style="solid", color=None, width=1.5, label="", 
     return c
 
 
-def elbow_connector(slide, pts, *, style="solid", color=None, width=1.5, arrow=True, label="", label_c=None):
+def elbow_connector(slide, pts, *, style="solid", color=None, width=1.5, arrow=True, label="", label_c=None,
+                    head="triangle"):
     """A multi-segment ELBOW / U-shaped connector through `pts` (list of (x,y) inch tuples) — the right
     arrow when a STRAIGHT line would be wrong or cross other shapes: a **feedback / repeat loop** that
     drops below a row and returns, a **return path**, or a link between **non-adjacent** nodes. Don't
     default every arrow to straight — straight is for direct adjacent flow; an elbow reads as
     'goes back / around'. Same stroke SEMANTICS as `connector` (solid=required · dashed=optional ·
-    dotted=feedback). Arrowhead on the FINAL segment only. Helper `loop_path(...)` builds a common U.
+    dotted=feedback), and the same `head`='triangle'|'open'|'none' arrowhead choice (open = async/return
+    per UML convention). Arrowhead on the FINAL segment only. Helper `loop_path(...)` builds a common U.
     Example (a repeat-loop under a 4-node row at y≈3.1, dropping to 3.5):
         dk.elbow_connector(s, dk.loop_path(x_last, x_first, 3.1, 3.5), style="dotted", color=CYAN)"""
     col = color if color is not None else MUTE
@@ -3370,9 +3387,10 @@ def elbow_connector(slide, pts, *, style="solid", color=None, width=1.5, arrow=T
             ln = c.line._get_or_add_ln()
             ln.append(parse_xml(f'<a:prstDash {nsdecls("a")} val="{"dash" if style == "dashed" else "sysDot"}"/>'))
         segs.append(c)
-    if arrow and segs:
+    if arrow and segs and head != "none":
         ln = segs[-1].line._get_or_add_ln()
-        ln.append(parse_xml(f'<a:tailEnd {nsdecls("a")} type="triangle" w="med" len="med"/>'))
+        _ht = "arrow" if head == "open" else "triangle"
+        ln.append(parse_xml(f'<a:tailEnd {nsdecls("a")} type="{_ht}" w="med" len="med"/>'))
     if label and len(pts) >= 2:
         mid = pts[len(pts) // 2]
         text(slide, mid[0] - 0.9, mid[1] - 0.16, 1.8, 0.3, [[(label, 9, label_c or col, False, False, MONO)]],

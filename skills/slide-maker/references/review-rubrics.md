@@ -43,7 +43,9 @@ Score each dimension; cite specific slides.
 > narrates. For a **read-alone** deck (leave-behind, pre-read, reference / appendix) or a **fixed
 > surface** (poster, single-slide infographic), denser self-contained slides with fuller prose are
 > *correct, not a flaw* — judge density against the deck's **stated density mode / purpose**, never
-> the talk default; do **not** flag legitimate read-alone density as "wall of text." Likewise, when
+> the talk default; do **not** flag legitimate read-alone density as "wall of text" — though a
+> read-alone reference/cheat-sheet surface earns its density via typed modules with specific data
+> points (`design-by-purpose.md`), not freeform cramming. Likewise, when
 > the interview recorded an explicit user choice of **text-heavy density for a presented deck**,
 > judge density against that stated choice — note the readability risk once, deck-level, as a
 > minor, never a major or per-slide findings. Set the
@@ -292,7 +294,10 @@ Score each dimension; cite specific slides.
    → everything animated) instead of moving the criticised dial one deliberate step in the content
    layer (`references/handoff-and-iteration.md` "Move the dial") — when the round record carries a
    `user-dials:` line, cite it as the check's evidence: the user's verbatim words fix which dial was
-   named and in which direction, so overshoot is judged against their words, not a reconstruction;
+   named and in which direction, so overshoot is judged against their words, not a reconstruction —
+   and judge intensity moves against the mood dial in `references/design-by-purpose.md`: a punchier
+   ask moves saturation/contrast/hue-count within the same preset (and within its guard); a
+   reassigned semantic hue or bold chrome on a statement/full-bleed hero skeleton is an overshoot;
    **template-with-extra-steps (the taste tell)** — every choice on every slide traces to a stock
    component at default settings or a preset default, with no visible choice a template wouldn't
    have made (no bespoke composition, no adapted component, no content-born device, no deliberate
@@ -301,7 +306,12 @@ Score each dimension; cite specific slides.
    **evenness** — a slide where every element shares one visual weight with no clear first-read **fails
    the squint test**, because nothing was chosen to win ("balanced" is not "even"); **missing
    semantic-colour ledger** — one accent hue used for everything, or colour that is decorative rather
-   than *bound* to a nameable meaning that shifts across the argument's beats; **weak rhythm / variation**
+   than *bound* to a nameable meaning that shifts across the argument's beats; **REGISTER BREAK
+   (preset guard)** — audit the deck against the declared preset's `guard` string(s) on the contract
+   card: any violation (a second red in `swiss`, a soft shadow in `brutalist`/`risograph`, a large
+   gold fill in `editorial_paper`/`museum_memorial`) is a register break, major — unless recorded as
+   a named deviation or explicit user request, which makes it a taste call (the
+   stylized-illustration precedent), not a register break; **weak rhythm / variation**
    — few true visual events, or **fewer than 4 distinct visual protagonists** on a deck of 6+ content
    slides (adjacent slides not differing on density / colour mode / protagonist); and a **WOW that isn't
    memorable** — a hero beat that is merely a *large* element, not one that contrasts with its neighbours
@@ -650,7 +660,11 @@ seconds, then read deeper if hooked. Judge the **whole canvas as one composition
 - **Weight heavily:** a clear **reading path** through regions (title → takeaway → method → results →
   conclusion); **one focal result** sized to dominate; **self-contained completeness** (no speaker to
   narrate); readability at **arm's-length / print** (generous type, high contrast); the title states
-  the finding, not the topic.
+  the finding, not the topic; on a reference/cheat-sheet surface, **typed, specific, data-carrying
+  modules — not freeform cramming** (the module *types* are an open, per-domain list — selection
+  array · spec scale · scenario comparison · pitfalls-with-consequences are examples, not a
+  checklist; judge the principle, not the five names — the fixed-surface note in
+  `design-by-purpose.md`).
 - **Red flags:** a wall of uniform body text; no visual hierarchy between regions; a buried headline;
   type sized for a screen, not a printed A0; the per-slide arc rules applied as if it were a deck.
   (Density relaxes per the fixed-surface mode; results legibility never does.)

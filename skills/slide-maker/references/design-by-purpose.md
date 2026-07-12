@@ -34,6 +34,16 @@ None are mandatory: pick what the *content* needs, and keep it **restrained for 
 | **Read-alone** leave-behind / reference / pre-read *(no speaker)* | match the host purpose's look | **fuller, self-contained text** (NOT few-words), `sources_page` + appendix, `table` for dense reference, scannable headings/titles; judge by **completeness**, not slide count |
 | **Fixed surface** — poster / single-slide infographic | `swiss`/`editorial` (or bold for an event) | one canvas → **multi-region hierarchy** (`columns`/`rows`/`quadrant`), larger headline, designed plots; build at the real size with `blank_deck(w_in, h_in)`. *Icons:* at most small region-header marks to guide the reading path + diagram-entity marks, never competing with the focal result, always text-labelled (no speaker) |
 
+**Typed modules for reference surfaces** (read-alone leave-behind / cheat-sheet / fixed-surface
+one-pager — **NEVER** a presented-live slide): compose the multi-region hierarchy from *named*
+module types, each carrying **specific data points, not generic descriptions** — SUCH AS a **selection
+array** (4–8 items, best choice highlighted) · a **spec scale** (3–5 levels with exact increments) ·
+a **scenario comparison** (3–6 scenarios, one recommendation each) · a **pitfalls zone** (3–5
+pitfalls WITH consequences + 1–2 correct moves, high visual contrast) · a **quick-reference
+table / decision flow**. The list is open — extend per domain: a formula block, a parameter/constant
+table, protocol steps, a decision flow, an error zone. Dense is correct on these surfaces — but
+typed and organized, never freeform cramming.
+
 **Delivery mode flexes density** (`design-principles.md` "Delivery mode"): a **read-alone /
 reference / poster** deck is read without a speaker, so it legitimately carries **more text per
 surface** than a spoken deck — don't thin it to talk-density.
@@ -73,6 +83,24 @@ Don't reuse the previous deck's scheme out of habit.
 > named exemplar** — a *kind* of look (a clean product-doc look, an editorial-newspaper look, a
 > Swiss-poster look) or a specific brand/reference — rather than vague adjectives, so "distinct" is
 > real and checkable. (The web-search step in the build is where you ground it.)
+>
+> **The mood dial, quantified:** *subtle / balanced / bold* are a TRANSFORM over the chosen preset,
+> not a new preset — so "make it punchier/calmer" is a parameter change, not a redesign. **subtle** =
+> desaturate the accents ~20–30%, keep only 1–2 saturated hues in play, hairline rules/strokes, low
+> `tint()` fractions; **balanced** = the preset as shipped; **bold** = +20–30% saturation/contrast on
+> the accents, 3–4 hues, heavier rules/stroke weights, stronger tints. The dial's stroke moves land
+> on *content* elements (diagram edges, chart emphasis) — chrome weight stays per the chrome budget
+> at every setting, and subtle's "hairline rules" likewise refers to content strokes. The floors
+> still bind at every
+> setting: contrast ≥ 4.5:1, the legibility floors for the venue, statement/full-bleed hero
+> skeletons don't take bold chrome, and the transform never reassigns the semantic colour
+> contract's hue assignments — identity is preserved, only intensity moves. **The preset's `guard`
+> binds at every dial setting** — bold on a one-accent register raises weight, scale, rule
+> thickness on CONTENT elements and tint of the ONE accent, never the hue count; on a named-palette
+> register (传统色) bold never re-saturates the named hues. And on a §0 **LOCKED** look
+> (`agents/slide-design.md`) the dial moves only the unlocked dials — imagery strength, stroke/rule
+> weights, density, tint fractions within the locked palette; a saturation transform of a locked
+> palette is a re-litigation and goes back to the user.
 
 **Non-Latin decks:** the font names below are Latin. For Chinese/Japanese/Korean, pick
 the script-appropriate equivalent and set `deckkit.EAFONT` — sans (modern/corporate/

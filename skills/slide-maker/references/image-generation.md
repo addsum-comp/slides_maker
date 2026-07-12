@@ -53,6 +53,14 @@ could sit on *any* slide) is decoration that *makes no sense* against the conten
 name, in one phrase, what the image shows about THIS slide's point.** If you can't — or if the same
 image could drop onto an unrelated slide without anyone noticing — it's not topical; use a real asset,
 a native diagram/chart, or plain whitespace instead. Put the slide's actual subject into the prompt.
+And when the slide's title or source language is **figurative** (a metaphor, an idiom, a rhetorical
+image), the default is to **resolve it to the UNDERLYING concept first** — this resolution happens
+BEFORE the referent classification below, and the resolved concept gets a *native* visualization of
+the idea (an image only if the resolved concept is generic-concrete per the referent table) — a
+"电锯切西瓜"-style phrase gets a visualization of the disproportionate-tool-for-the-task idea, not a
+chainsaw and a watermelon. A literal rendering of the metaphor is legitimate only as a recorded
+named deviation or an explicit user request (a visual-pun/comic register). The referent rule's
+stylized escape applies to real subjects the slide is ABOUT, not to metaphor vehicles.
 
 Use the agent's native image generation skill when a slide would benefit from:
 

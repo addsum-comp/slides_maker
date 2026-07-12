@@ -257,7 +257,10 @@ short "first move" concept list in `slide-design.md` step 2 and the compact conc
 `form-selection.md` are *pointers into this table* — when a concept needs its full use/avoid/failure-mode
 detail, resolve it here, then pick the concrete form/component in `form-selection.md` and `design-gallery.md`.
 
-Read the content's *underlying shape* (what the units collectively mean and how they relate), match a row,
+Read the content's *underlying shape* (what the units collectively mean and how they relate — this also
+applies to figurative source language: resolve a metaphor/idiom to its underlying concept, never render
+it literally; literal is fine when the resolved concept's row itself names that visual language — an
+iceberg for hidden-depth content is the row's choice, not the idiom's), match a row,
 then choose among its **strong visual languages** using the **Use when / Avoid when** columns. The **Common
 AI failure** column names the specific slop this concept degrades into — that's the thing to *not* ship.
 Every row is domain-neutral: "Flow" is as true of a lab protocol as of a delivery pipeline; "Growth" fits
@@ -288,6 +291,7 @@ a learning curve, an adoption chart, or a compounding argument.
 | **Bottleneck** | narrow pipe, hourglass, blocked flow, queue | One constraint slows the system | Multiple unrelated problems | Three problem cards |
 | **Tradeoff** | balance scale, tension diagram, frontier curve | Two objectives conflict | Only one objective | Two columns without tension |
 | **Causality** | evidence tree, causal chain, fishbone, domino path | Cause-effect is central | Items are merely descriptive | Flat bullets / cards |
+| **Hidden vs visible / depth** | iceberg, waterline split, layered cross-section | A small visible symptom rests on larger unseen causes and the visibility asymmetry (not the causal links) is the point — otherwise the Causality row | All factors are equally visible | Two stacked cards labelled surface/deep |
 | **Flywheel / compounding** | flywheel, orbit, self-reinforcing loop | Each step strengthens the next | Steps do not feed back | Pretty circle with no compounding |
 | **Leakage / churn** | leaking bucket, broken funnel, pipeline leak | Loss occurs across stages | Only one metric is bad | Three warning cards |
 | **Operating model** | system map, RACI grid, layered model, swimlane | Roles / process / metrics interact | Pure narrative | Org chart as decoration |

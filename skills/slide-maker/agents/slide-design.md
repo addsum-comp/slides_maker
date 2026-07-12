@@ -142,7 +142,8 @@ feel art-directed rather than defaulted, and it's yours to set once and hold. Pi
 > `eastern_traditional` · dark fashion/luxury → `luxury_dark` · memorial/exhibition → `museum_memorial`.
 - **Name the bias and beat it** (`design-by-purpose.md`): don't reflex to the safe light/minimal/blue
   default. Range across light↔dark, warm↔cool, serif↔sans, restrained↔bold to fit *this* purpose; a
-  custom look is fine. Record the **palette · type pairing · surface · ONE signature motif** — the
+  custom look is fine. Record the **palette · type pairing · surface · ONE signature motif · the
+  preset's guard line** (honored literally; guards survive the vary-it rule) — the
   *system* (palette, type, spacing, chrome geometry) repeats on every slide (CRAP Repetition); the
   **motif itself is DOSED, not stamped** (chrome budget, next bullet).
 - **Palette ratios are computed at PLAN time, not discovered at lint time.** When you record the
@@ -512,6 +513,8 @@ sections:
 ### Design language
 The chosen **`preset`** (or a custom look), named by *beating the default pull* and anchored to a
 concrete exemplar, with its **palette · type pairing · surface · ONE signature motif** — plus the
+preset's **`guard` line verbatim** (or `custom look — no preset guards`; any deviation from a guard
+is recorded here as a named deviation, naming the guard it overrides), the
 atmosphere/polish moves committed deck-wide (only those that fit the register) and the one deck-wide
 **image art-direction** + the (secondary) transition choice. Include a **Semantic Colour Ledger**
 (`design-intelligence-addendum.md` §6) — a *role | token | used-for | must-not* table binding each accent

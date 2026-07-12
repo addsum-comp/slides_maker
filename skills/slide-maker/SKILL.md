@@ -947,9 +947,12 @@ The helper set, by job:
   `cjk_numeral` (壹·贰·叁 section markers vs Latin "01"). See `references/east-asian-aesthetic.md`.
 - **Diagram kit (general flowcharts):** `node` + `connector` / `flow_chain` (straight links between adjacent nodes) + `elbow_connector` /
   `loop_path` (elbow / U-shaped paths for a feedback/repeat loop, a return, or a link between NON-adjacent
-  nodes) — any architecture from rounded-rect/pill/circle nodes with **stroke semantics** (solid=required
+  nodes) — any architecture from rounded-rect/pill/circle nodes (+ diamond/parallelogram/cylinder when
+  formal flowchart notation applies — see the Standard-notation crib in `design-gallery.md`) with
+  **stroke semantics** (solid=required
   · dashed=optional · dotted=feedback) and **shape semantics** (straight=adjacent flow · elbow/U=loop /
-  return / non-adjacent), exactly one `hub`; `diagram_island` (bright figure panel on a dark slide);
+  return / non-adjacent), exactly one `hub` (hub optional in the system-architecture recipe — the
+  focal path can carry emphasis instead); `diagram_island` (bright figure panel on a dark slide);
   `concentric_rings` (nested framework); `step_list` (numbered process, vertical/horizontal).
   - **This kit draws conceptual BOX-FLOW only — not physical science schematics.** For a
     **labelled science schematic** explaining a principle / mechanism / experiment / definition (a
@@ -1386,7 +1389,7 @@ those here; read its report instead).
 3. **Plan↔code correspondence**: (a) mechanical — diff the design plan's per-slide rows against the slide-function docstrings (icon family included; the classic inline-mode miss); (b) spot-check — each `build:` docstring has matching `Build.step` calls in its function body; (c) **cover carries its promises** — the built cover shows the self-verify-(l) device, the motif's label/legend where the plan said the STRANGER TEST is satisfied by labeling, and the `logo plan:` asset placed as planned (official file untouched; on a single-entity deck a cover with no logo and no recorded `n/a` reason is a ✗).
 4. **Charts native**: every chart is editable-native unless a matplotlib look was deliberately chosen; legends sit off the data.
 5. **Evidence real**: every domain image/figure is the real computed/source artifact — no plausible stand-in; PDF crops checked on all four edges; every SOURCED photo comes from a sanctioned origin (Commons / Openverse / press kit / user file), its subject verified against caption/geotag/category, it is **watermark-free** (a watermark is an unlicensed-preview tell → reject the file; never crop/blur/inpaint the mark away), its license recorded (credit placed where required), and it is palette-treated so mixed sources read as one deck; no generated CONTENT image claims photographic reality for a real-and-specific subject (REFERENT RULE, `references/image-generation.md` — generated-template identity plates and declared stylized illustrations are exempt; a real subject with no findable photo uses a recorded `searched, none found → …` rung).
-6. **Colour keyed**: the semantic-colour ledger's meanings are taught on-slide (key at first use) and no accent appears outside its bound meaning; chrome stays quiet (motif ≤3 appearances).
+6. **Colour keyed**: the semantic-colour ledger's meanings are taught on-slide (key at first use) and no accent appears outside its bound meaning; chrome stays quiet (motif ≤3 appearances) AND the chosen preset's `guard` constraints hold on every slide (quote the guard line in the tick).
 7. **Claims current**: every time-bound ledger row re-verified with as-of = TODAY; the deck carries its "as of" date.
 8. **Language & hygiene**: one language throughout; zero meta-annotations ("placeholder"/"TODO"/"AI-generated"); voice pass done on every line.
 9. **Eye path**: squint each slide — first look lands on the named hero, 3–4 hierarchy levels survive the blur.
@@ -1611,7 +1614,8 @@ Then run the **actor-critic loop** — this is the quality engine, and the criti
      takeaway / role / question / beat table**, the **claim ledger**, the **per-figure
      carrying-element rows**, and the Design plan's **declared contracts** — the skeleton rhythm
      map, the WOW slide(s), the money slide (the slide the deck exists for), the semantic-colour
-     ledger, the type tokens, the motion manifest, the **`logo plan:` line with its evidence
+     ledger, the type tokens, the motion manifest, the **chosen preset name + its `guard` string
+     verbatim** (or `custom look — no preset guards`), the **`logo plan:` line with its evidence
      token**, the **checkpoint motif line** (device + meaning + legibility mode), the **approved
      image opt-in rows with their per-row source tokens** (+ license/credit notes and any declared
      stylized deviation), and — **when a Q4 style example is in play** —

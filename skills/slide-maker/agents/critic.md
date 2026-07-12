@@ -90,7 +90,8 @@ something.
   contracts — the deck memory sentence + emotional-curve line (peak marked), the per-slide
   takeaway/role/question/beat table, the claim ledger, the per-figure carrying-element rows, and
   the Design plan's declared contracts (skeleton rhythm map · WOW slide(s) · money slide ·
-  semantic-colour ledger · type tokens · motion manifest · the `logo plan:` line with its evidence
+  semantic-colour ledger · type tokens · motion manifest · the chosen preset name + its `guard`
+  string verbatim (or `custom look — no preset guards`) · the `logo plan:` line with its evidence
   token · the checkpoint motif line (device + meaning + legibility mode) · the approved image opt-in
   rows with their per-row source tokens (+ license/credit notes and any declared stylized deviation) ·
   the chosen mimic mode A/B + style-brief
@@ -280,6 +281,11 @@ Do not just skim for the first few obvious issues. Run these passes:
        `thumb_first`/`thumb_last` PNGs, or squint the full renders): title legible, hook identifiable.
        A cover that dies at thumbnail is a finding (corroborated by the `TIMID COVER` stats warn); a
        deliberately quiet register may pass via composition rather than scale, but say so.
+       **REGISTER BREAK (preset guard)** — audit the deck against the declared preset's `guard`
+       string(s) on the contract card: any violation (a second red in swiss, a soft shadow in
+       brutalist/risograph, a large gold fill in editorial_paper/museum_memorial) is a register
+       break, major; a guard deviation recorded as a named deviation or explicit user request is a
+       taste call like the stylized-illustration deviation — don't re-flag it per round.
        *(Rubric items 2, 4, 5, 7, 9, 11, 12-motion.)*
 3. **Tick the named-flaw checklist — apply the checks YOUR lens owns** (per Lens A/B above; the sole
    critic does both passes). Reviewers (human or model) miss far more when asked to "judge quality" in
@@ -375,7 +381,9 @@ Do not just skim for the first few obvious issues. Run these passes:
      **stat numeral / label that wraps and collides** with the line below it (give each room or shrink/
      shorten). And a **node/block sitting ON a connector line** (a line passing under/through a box; chips
      dropped on a bar): route links in the **gaps** between nodes — and if a diagram is hard to read,
-     say so and propose a clearer form (a labelled mesh/container, a clean flow), not just a nudge. Also
+     say so and propose a clearer form (a labelled mesh/container, a clean flow), not just a nudge;
+     a dense diagram (8+ edges / time-ordered messages) whose edges are unnumbered is harder to
+     narrate — minor. Also
      an **aggregate drawn buried among its constituents** — a net/resultant/total/centroid drawn *inside*
      the cluster of the parts that produce it (e.g. a net-magnetization arrow overlapping the individual
      spin arrows) so it reads as just another part: it must be **separated into its own zone, linked by an

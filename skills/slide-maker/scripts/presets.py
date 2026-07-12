@@ -22,6 +22,16 @@ sensible defaults to adjust per script — the JP/KR equivalents are in referenc
 `image_prompt` is the prefix to feed the generated-template image route (references/
 generated-template.md) so generated plates match the chosen language. Pair with the Style library
 in references/generated-template.md and the per-purpose guidance in references/design-by-purpose.md.
+
+`guard` = the preset's 1-3 REGISTER-DEFINING constraints (countable/absolute, negatives first).
+Unlike the rest of the preset, guards survive the "vary it" rule: the designer/builder honor them
+literally and the critic flags any violation as a register break. They define the register; they
+are not a straitjacket on palette tuning.
+
+PRECEDENCE: a guard is a register floor for the SKILL'S OWN choices only. An explicit user request
+or a recorded named deviation (the plan line naming the guard it overrides) lifts it, and the
+critic treats a recorded guard deviation like the stylized-illustration deviation — a taste call,
+not a register break.
 """
 from pptx.dml.color import RGBColor
 def C(h): return RGBColor.from_string(h)
@@ -35,6 +45,8 @@ PRESETS = {
         "ea": "Noto Sans CJK SC", "ea_display": "Hiragino Sans GB",
         "surface": "glass_card (tint+sheen+rim) on a BG-filled slide lit by 1-2 glow()s; KPI tiles "
                    "use scorecard(glass_tint=); white headline keyword in the accent.",
+        "guard": "no glass cards on a light base — the dark BG IS the register; max 2 glow()s per "
+                 "slide; ONE accent per headline keyword, never a rainbow.",
         "image_prompt": "dark atmospheric gradient background, deep navy to violet, soft neon color "
                         "glows and subtle bokeh, premium tech mood, no text, calm zone for a title",
         "when": "launches, product/tech talks, dashboards, design-forward decks. NEEDS a dark base.",
@@ -47,6 +59,7 @@ PRESETS = {
         "surface": "strict flush-left columns(), hairline rules, big type-scale ratio, generous "
                    "whitespace; spend the ONE red on the single focal item (accent_one); ghost "
                    "numerals for enumerated grids.",
+        "guard": "ONE red only; no gradients, no rounded cards, no soft shadows.",
         "image_prompt": "minimal swiss graphic, faint grid / graph-paper texture, a single red disc, "
                         "lots of white space, no text",
         "when": "research, design, editorial, defense, any minimal/typographic register.",
@@ -57,8 +70,11 @@ PRESETS = {
         "accents": [C("B58A2E"), C("CBB46A")], "font": "Arial", "display": "Georgia", "mono": "Consolas",
         "ea": "Noto Serif CJK SC", "ea_display": "Songti SC",
         "surface": "editorial_header (caps eyebrow + serif title + hairline); full-bleed photos under "
-                   "scrim_overlay; big italic Georgia numerals (big_numeral); stat_row for figures; "
+                   "scrim_overlay; big italic Georgia numerals (big_numeral; digits via a lining "
+                   "face beside CJK — font-guidance.md); stat_row for figures; "
                    "photos carry all saturation, chrome stays neutral.",
+        "guard": "no saturated chrome — photography carries ALL the colour; gold stays on "
+                 "numerals/kickers/hairlines, never large fills.",
         "image_prompt": "warm, refined editorial photography (architecture / interiors / lifestyle), "
                         "soft natural light, magazine quality, no text",
         "when": "brand, portfolio, award, culture/lifestyle, showcase — tone over data density.",
@@ -73,17 +89,20 @@ PRESETS = {
                    "roman-numeral section dividers; atmospheric orb image ONLY on dividers. "
                    "ICONS: not the device here (dark gravitas + designed charts) — at most one "
                    "restrained monochrome wayfinding mark on dividers; no icon-card grids.",
+        "guard": "ONE red emphasis per slide; no icon-card grids; orb imagery on dividers only.",
         "image_prompt": "a single abstract glowing orb / eclipse on near-black, restrained, mood-shifted "
                         "per chapter, no text — for section dividers only",
         "when": "market/landscape reports, investor/strategy briefings, thought-leadership.",
     },
     "risograph": {
-        "mood": "indie print zine — 2-color riso, halftone, hard offset shadows",
+        "mood": "indie print zine — riso in 2 inks + the navy neutral, halftone, hard offset shadows",
         "bg": C("F3ECD9"), "ink": C("1B2A4A"), "muted": C("6B7280"),
         "accents": [C("FF4D8D"), C("F5B301"), C("1B2A4A")], "font": "Arial", "display": "Arial Black",
         "mono": "Consolas", "ea": "Hiragino Sans GB", "ea_display": "Heiti SC",
         "surface": "offset_shadow 'sticker' cards/numbers/headlines (hard, not soft); mono chrome "
                    "(eyebrows/footers/page-markers); full-bleed duotone halftone illustrations.",
+        "guard": "no soft shadows, no gradients — offset shadows are HARD; hold to the 2 inks + "
+                 "the navy neutral, no extra hues.",
         "image_prompt": "two-color risograph halftone print, navy + fluorescent pink on cream paper, "
                         "grain and slight misregistration, bold flat illustration, no text",
         "when": "culture, marketing, teaching, launch — audiences that reward personality.",
@@ -96,6 +115,7 @@ PRESETS = {
         "ea": "Hiragino Sans GB", "ea_display": "Heiti SC",
         "surface": "cream bg; rounded cards with colored header bands (auto-contrast label); dark "
                    "emphasis bands; scattered Memphis motifs (dots/zigzags/triangles) as margin accents.",
+        "guard": "no motifs behind text — margins only; keep the cream ground on every content slide.",
         "image_prompt": "Memphis / New Wave 80s-90s flat illustration, bold black outlines, squiggles "
                         "zigzags dots triangles, vivid colors on cream, no text, calm title zone",
         "when": "events, festivals, launches, culture decks wanting energy.",
@@ -109,6 +129,7 @@ PRESETS = {
                    "tables with bold borders); ALL-CAPS condensed headlines (Arial Black / Impact); "
                    "Consolas mono for data/labels; the ONE red for a single emphasis; big raw "
                    "numerals; high density, flush-left, NO rounded corners, NO soft shadows.",
+        "guard": "no rounded corners, no soft shadows, no pastels; the ONE red appears once per slide.",
         "image_prompt": "high-contrast black and white halftone / newsprint photo, stark, one red "
                         "overprint, no text",
         "when": "annual report, manifesto, data-journalism with attitude, bold tech/culture decks.",
@@ -122,6 +143,8 @@ PRESETS = {
                    "faint blueprint frame/grid), mono eyebrow chrome; build architecture/pipeline "
                    "diagrams from boxed nodes + arrows; reserve the ONE coral accent for the focal "
                    "path/result. Native tables + typeset equations sit on the dark panels.",
+        "guard": "ONE coral accent, reserved for the focal path/result; line-work stays thin — "
+                 "no filled multi-colour nodes.",
         "image_prompt": "technical blueprint schematic, thin cyan line-work on deep navy, grid, nodes "
                         "and connectors, engineering drawing, no text, calm title zone",
         "when": "technical/method talks, architecture, agents/AI/engineering, paper-reading decks.",
@@ -135,6 +158,8 @@ PRESETS = {
                    "as a chop/seal stamp (deckkit.seal) + CJK numeral section markers (壹贰叁, via "
                    "deckkit.cjk_numeral); hairline rules, generous margins, dark label-chips for "
                    "emphasis, a restrained ink-wash motif. Calm, literary, lots of breathing room.",
+        "guard": "preserve 留白 — no filled corners, no dense grids; ONE seal-red accent (the chop), "
+                 "never a second warm hue.",
         "image_prompt": "minimal Chinese ink-wash (shuimo) painting, soft mountains / a branch, warm "
                         "rice-paper texture, muted, one vermilion seal mark, vast empty space, no text",
         "when": "Chinese cultural / literary / brand / humanities decks; any 中文 editorial register.",
@@ -148,6 +173,8 @@ PRESETS = {
                    "vermilion 朱); KaiTi/Songti display, refined body; colour-name swatches, seal "
                    "stamps (deckkit.seal), vertical-text accents, ink-wash motifs. The colours "
                    "themselves carry the story (e.g. a 传统色 / plant-dye palette).",
+        "guard": "only the named 传统色 hues — no neon, no corporate blue; seal red as CHROME stays "
+                 "a small stamp, never a fill — content colour-swatches exempt.",
         "image_prompt": "traditional East-Asian artwork, warm earth pigments — ochre, sage green, "
                         "vermilion — on aged paper, botanical / landscape motif, muted, no text",
         "when": "traditional-culture, heritage, colour/material, plant-dye, museum/exhibition CN decks.",
@@ -166,6 +193,9 @@ PRESETS = {
                    "step_list roadmaps, quadrant/matrix; a small CONFIDENTIAL footer status_stamp. "
                    "ICONS: heroicons-solid or tabler, sparingly, for the few section/category marks + "
                    "status flags ONLY (not on every KPI tile) — alongside, not on top of, the furniture.",
+        "guard": "no CONTENT-slide title that isn't a full-sentence conclusion (covers/dividers/"
+                 "agenda exempt); semantic hues never reassigned (emerald=good, coral=risk); icons "
+                 "on section/category marks + status flags only.",
         "image_prompt": "clean corporate abstract, soft navy and emerald geometric, lots of white "
                         "space, professional, no text",
         "when": "strategy proposals, board/exec readouts, consulting, business cases.",
@@ -181,6 +211,8 @@ PRESETS = {
                    "master = tick + tracked mono eyebrow + bold H1 + amber->blue gradient_rule; a "
                    "terminal '>_' / mono brand voice; multi-colour SEMANTIC accents (one hue per "
                    "concept) on the node/connector diagram kit; insight callouts with an accent left bar.",
+        "guard": "no diagrams drawn straight on the navy — host them in a diagram_island; one hue "
+                 "per concept, never remixed mid-deck.",
         "image_prompt": "dark engineering schematic ambience, deep navy, faint circuit / node mesh, "
                         "cool glow, no text, calm title zone",
         "when": "AI/ML, infra, agents, developer-tool, eng-blog and safety decks (dark, technical).",
@@ -194,6 +226,8 @@ PRESETS = {
                    "numerals, kickers and hairlines; full-bleed photography spreads supply all colour "
                    "(use duotone/grayscale on stray photos so nothing competes); bilingual_lockup "
                    "covers; thin masthead/issue chrome; generous negative space, restrained, premium.",
+        "guard": "ONE champagne accent FAMILY — accents[1] is its darker shade (hairlines/kickers), "
+                 "never a contrasting hue; stray photos go duotone/grayscale so nothing competes.",
         "image_prompt": "high-end fashion/editorial photography mood, deep shadow, warm champagne "
                         "highlight, luxurious, minimal, no text",
         "when": "fashion, luxury brand, premium product, gallery/awards — tone over data.",
@@ -207,6 +241,8 @@ PRESETS = {
                    "photos as duotone (navy+gold); a thin double-line catalogue_frame inset from edges; "
                    "year_badge chronology; a serif gold 'monument' closing line; quiet, reverent, "
                    "exhibition-catalogue cadence (works in EN or 中文).",
+        "guard": "no full-colour archival photos — duotone (navy+gold) only; brass gold for "
+                 "headings/hairlines, never large fills.",
         "image_prompt": "archival sepia/duotone photograph mood, midnight navy and brass gold, museum "
                         "exhibition lighting, dignified, no text",
         "when": "memorial, history/heritage, museum exhibition, biography, retrospective decks.",

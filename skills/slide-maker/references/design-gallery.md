@@ -13,7 +13,7 @@ helper. The craft rules in `design-principles.md` still govern; this is the cata
 | `editorial_report` | FT/Bloomberg **dark** data | near-black, one red + amber, micro-charts, serif headers |
 | `glassmorphism` | premium SaaS / launch | frosted glass cards on a dark gradient, glow |
 | `memphis` | playful / festival | cream + vivid geometry, terrazzo, Arial Black |
-| `risograph` | zine / DIY | 2-ink halftone, mis-registration `offset_shadow`, hand-cut type |
+| `risograph` | zine / DIY | halftone in 2 inks + the navy neutral, mis-registration `offset_shadow`, hand-cut type |
 | `brutalist` | newspaper / annual report | black/white/red, Arial Black, mono, **heavy rules**, dense grid |
 | `blueprint` | engineering schematic | deep navy, cyan line-art nodes, mono eyebrow, one coral focal |
 | `dark_tech` | AI/infra/eng (dark) | near-black, multi **semantic** accents, **white `diagram_island`s**, mono brand, gradient header |
@@ -24,6 +24,16 @@ helper. The craft rules in `design-principles.md` still govern; this is the cata
 | `museum_memorial` | midnight memorial / exhibition | navy + brass gold, archival `duotone`, `year_badge`, serif gravitas |
 
 Pick the preset to the purpose+mood, then **vary it** — these are starting languages, not locks.
+The one exception: each preset carries a **`guard`** string (its 1–3 register-defining constraints,
+e.g. swiss "ONE red only", luxury_dark "ONE champagne accent") — the designer/builder honor
+`p["guard"]` literally and the critic flags any violation as a register break; guards survive the
+"vary it" rule. **Precedence:** a guard is a register floor for the SKILL'S OWN choices only — an
+explicit user request or a recorded named deviation (the plan line naming the guard it overrides)
+lifts it, and the critic treats a recorded guard deviation like the stylized-illustration
+deviation: a taste call, not a register break. A guard binds only when its preset is the deck's
+**declared register**; a component borrowed into another register (Mode-B mimic, glass variants on
+an image-backed page) obeys the HOST register's guard (and the component's own physical
+legibility rules).
 
 ## Cross-cutting techniques every strong deck uses (the "instantly professional" moves)
 - **Semantic colour contract** — bind ONE hue to each concept (navy=structure, green=good/safe,
@@ -43,12 +53,14 @@ Pick the preset to the purpose+mood, then **vary it** — these are starting lan
   **full-bleed dark divider** carrying a giant numeral + bilingual chapter title; dividers silently
   absorb numbering gaps. Two-mode rhythm structures most long editorial decks.
 - **Gradient brand rule** — a thin two-stop `gradient_rule` (navy→emerald, amber→blue) under titles /
-  along an edge as a signature. Gradient ONLY the hero element, never body text.
+  along an edge as a signature. Gradient ONLY the hero element, never body text (where the preset
+  guard permits — swiss/riso ban it).
 
 ## The component catalogue (reach for these, don't reinvent)
 - **Diagrams (general):** `node` + `connector` (+ `flow_chain`) — rebuild ANY architecture/flowchart
-  from rounded-rect/pill/circle nodes joined by connectors with **stroke semantics** (solid=required ·
-  dashed=optional · dotted=feedback/inferred); promote exactly ONE node to `hub=True`. On a dark deck
+  from rounded-rect/pill/circle nodes (+ diamond/parallelogram/cylinder when formal flowchart
+  notation applies — see the Standard-notation crib) joined by connectors with **stroke semantics**
+  (solid=required · dashed=optional · dotted=feedback/inferred); promote exactly ONE node to `hub=True`. On a dark deck
   host the diagram in a bright `diagram_island` ("Figure N"). `concentric_rings` for nested frameworks
   (CMT 色彩·材质·纹理); `hub_spoke`/`quadrant`/`timeline` for those specific shapes.
 - **Layered-card vocabulary (modern-SaaS polish):** `kpi_card` (hairline card = tinted `icon_chip`
@@ -93,11 +105,45 @@ Pick the preset to the purpose+mood, then **vary it** — these are starting lan
 - **Compose-from-primitives recipes (no dedicated helper):** **team roster** — circular
   `picture(fit="cover", round=…)` headshots on a `columns(n)` grid + name/role/bio, one avatar
   diameter/accent/alignment across all cards. **Org / issue / driver tree** — `node` + `elbow_connector`
-  as a branch bus (parent drop → horizontal bus → even child drops), left-to-right for a driver tree.
+  as a branch bus (parent drop → horizontal bus → even child drops), left-to-right for a driver tree —
+  and default a tree of **5+ levels** to horizontal left-to-right (depth reads better as width)
+  unless the canvas is portrait/width-starved — name the deviation.
+  **System architecture** (the multi-layer system diagram) — (1) classify components into role LAYERS
+  (clients · gateway · services · data · infra); (2) one layer per **column** (left-to-right for data
+  pipelines / request flows — users left, stores right) or per **row** (top-to-bottom for layered
+  stacks — clients top, infra bottom); (3) stack a layer's components with even gaps; (4) dashed `box()`
+  region boundaries around groups sharing infrastructure; (5) arrange the layers so that **most**
+  edges join adjacent layers — a genuine skip edge is kept, routed as a demoted elbow around the
+  layer stack, never deleted or re-terminated to satisfy the layout. Shared middleware = ONE
+  horizontal bus bar (its own semantic colour) with short vertical
+  taps — never N-to-N arrows. Colours bind via the semantic colour contract. On a one-accent
+  preset (blueprint/swiss) encode layers by outline weight/dash + region boundaries, not extra
+  hues; the bus bar takes the base line colour.
+  **Decision flowchart** — the happy path runs straight along ONE spine; at each decision the success
+  branch continues on the spine and the other branch exits to ONE consistent side; branches rejoin via
+  `elbow_connector`; loop-backs route around the far edge via `loop_path`. Outcome labels sit ON the
+  exit arrows near the decision, coloured by the semantic contract (good=proceed · risk=reject);
+  error/exception paths dashed in the risk colour; spine connectors full-strength, branch connectors
+  blended/demoted so the main story reads first.
   **Venn** — 2–3 translucent `glass_card`/`box` circles with labeled overlaps. **Agenda / section
   tracker** — a quiet nav rail of sections with the current one accented (or `step_list(active_idx=…)`
   on an agenda page). **Geographic map** — a license-clear/computed base map as `picture` + native
   markers/labels on top (never bake labels into a generated map). (Recipes routed from `form-selection.md`.)
+- **Standard notation (technical audiences read these literally — draw them correctly):**
+  *Flowchart:* rounded rect = start/end · rect = process · `node(shape="diamond")` = decision ·
+  `node(shape="parallelogram")` = input/output · `node(shape="cylinder")` = data store.
+  *Sequence:* vertical lifelines; solid arrow = sync call · open head (`connector(head="open")`) =
+  async · dashed + open head = return.
+  *State machine:* filled dot = initial · bullseye = final · transitions labelled `event [guard] / action`.
+  *UML / ER (compressed):* solid line + empty triangle = inheritance · filled diamond at the owner
+  end = composition · dashed + open head = dependency · crow's foot = cardinality.
+  This notation binds for **formal flowcharts drawn for technical audiences**; free shapes
+  (rounded-rect/pill/circle) are fine for conceptual box-flow. Stroke semantics are
+  **per-diagram-type** — the solid/dashed/dotted house contract governs box-flow; the
+  sequence/decision recipes override it locally; never mix the two registers in one diagram; note
+  which register the slide uses in the design plan.
+  Caveat: if the source already HAS the UML/ER figure, extract it whole (`design-principles.md`) —
+  don't redraw it.
 - **Photography on-brand:** `image_fx.duotone(img, ink_a, ink_b)` / `grayscale(img)` so a colour photo
   doesn't fight the accent (riso/brutalist/ink/luxury/museum), then `picture(fit="cover")`.
 - **East-Asian:** `seal` (vermilion chop), `cjk_numeral` (壹贰叁), `bilingual_lockup` — see
