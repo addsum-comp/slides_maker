@@ -261,7 +261,18 @@ Score each dimension; cite specific slides.
    a heavy title badge) repeated identically on every slide and competing with content for attention:
    the chrome budget (`agents/slide-design.md` §1) puts saturated colour on content elements and holds
    the signature motif to ~2–3 appearances, so palette-as-ornament stamped per-slide is a finding even
-   when each instance is individually tidy; **pendulum overshoot** *(any round after the first — critic-fix and user-feedback rounds alike)* — a fix
+   when each instance is individually tidy; **opaque motif (fails the STRANGER TEST)** — the deck's
+   signature device encodes a meaning (pillars, phases, engines) that a first-time viewer could not
+   name from the canvas alone: no label at first appearance, not figurative enough to read unaided,
+   and no on-canvas legend (`agents/slide-design.md` §1 STRANGER TEST) — describe what a stranger
+   would call the shape vs what the plan says it means, and require a label/legend at the cover
+   appearance; **logo missing or unevidenced on a single-entity deck** — the deck's subject is one
+   company / product / brand / institution (stakeholder readout, pitch, org report) yet no official
+   logo appears on the cover and the plan's `logo plan:` line carries no evidence token
+   (`official asset — <source>` / `searched, none found → wordmark (flagged)` / `n/a — <reason>`) —
+   the slide-design LOGO PRINCIPLE's situation table is the reference: name which row the deck
+   matches and what the row's default demanded (a typeset wordmark with no recorded search is the
+   documented failure mode, not a pass); **pendulum overshoot** *(any round after the first — critic-fix and user-feedback rounds alike)* — a fix
    for named feedback that swung to the opposite extreme (muted → rainbow chrome, dense → bare, static
    → everything animated) instead of moving the criticised dial one deliberate step in the content
    layer (`references/handoff-and-iteration.md` "Move the dial") — when the round record carries a

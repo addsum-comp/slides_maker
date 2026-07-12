@@ -145,9 +145,13 @@ column carries a concrete SOURCE TRACE, not a vague label** — a locator ("Fig 
 cell, a short verbatim span) — so a watching auto-mode user can catch a per-slide grounding mismatch
 even though the checkpoint is an FYI, not a stop (this is the cheapest fidelity catch on the path
 delegation uses most; the comprehension gate still forbids shipping any unverified claim). Design
-checkpoint = look/palette/type/motif in ~4 lines + the rhythm-map table +
+checkpoint = look/palette/type/motif in ~4 lines (the **motif line states device + meaning + how a
+stranger reads it** — label/legend/figurative, the slide-design STRANGER TEST) + the rhythm-map table +
 the three design musts + a one-line Form-ledger/diversity verdict + the image opt-in list (the
-few proposed generated images, for approval) + logo plan **+ one required `direction gate:` line — on the
+few proposed generated images, for approval) + the **`logo plan:` line with its evidence token**
+(`official asset — <source>` / `searched, none found → wordmark (flagged)` / `n/a — <reason>`; a bare
+"wordmark" with no recorded search on a single-entity deck = incomplete, even as an auto-waiver FYI)
+**+ one required `direction gate:` line — on the
 design-clean branch either `picked A/B/C/D of 3 (html: <path>)` or the named carve
 (e.g. `carve: user said just-go` / `carve: Mode-A mimic`); a design checkpoint on branch (c)
 with no direction-gate line is not ready** (this is the gate artifact that keeps the
@@ -742,9 +746,11 @@ card-overuse guard), the addendum's **deck-level design gates** — a **rhythm m
 ledger**, a passing **block-dependency audit** (no >2 consecutive card slides), and the **minimum
 deck-level variation** (`references/design-intelligence-addendum.md`) — plus, for a **company / product /
 single-entity** deck (its subject IS one org / product / brand / institution, or a talk naming a
-tool/framework/model), a **logo plan**: the real logo if the web search found it, else a
-**designed-wordmark-by-default** the user confirms at the DESIGN checkpoint (skip only for
-multi-org / neutral-academic decks, or where a template already carries the mark) — and the **THREE
+tool/framework/model), a **logo plan WITH EVIDENCE** per the slide-design LOGO PRINCIPLE's situation
+table: the line must read `official asset — <source>`, `searched, none found → designed wordmark
+(flagged)`, or `n/a — <multi-entity | template carries it | user opted out>` — a bare "wordmark"/
+"text only" with no recorded search, or a missing line on a single-entity deck, makes the plan
+**incomplete** (send it back; self-verify (o) owns this) — and the **THREE
 DESIGN MUSTS** addressed (`slide-design.md`'s three design musts) —
 **(1) appear-builds — ONLY if the user opted in** (the interview's presented-deck choice): if IN, a
 motion manifest places builds where they help (build/static *with a reason* per slide) and each built
@@ -766,9 +772,10 @@ SMART about where — plates only for the few slides that genuinely earn one, NE
 when the user has opted into image generation.** The user then approves which (if any) are
 generated. Fold in the user's design edits, then set up the canvas (Step 3).
 > **🔴 CHECKPOINT — DESIGN:** show the Design language + Form ledger + the 3 design musts + the
-> image opt-in list + (for a company/product/single-entity deck) the **logo plan** — the real
-> logo if the search found it, else a **designed wordmark by default** for the user to confirm or
-> override — presented as the compact checkpoint artifact from the 🔴 CHECKPOINT convention block
+> image opt-in list + (for a company/product/single-entity deck) the **`logo plan:` line WITH its
+> evidence token** (`official asset — <source>` / `searched, none found → wordmark (flagged)` /
+> `n/a — <reason>`) + the **motif line stating the device AND its meaning + how it's made legible**
+> (label / legend / figurative — the STRANGER TEST) — presented as the compact checkpoint artifact from the 🔴 CHECKPOINT convention block
 > (same fields, incl. the rhythm-map table and the `direction gate:` line — picked direction or
 > named carve) — and get the user's OK before building.
 
@@ -1362,7 +1369,7 @@ font drama, build presence, layout sameness, CJK ea-font, contrast, footer, over
 those here; read its report instead).
 1. **Speaker notes**: presented deck (screen-shared = presented) → every slide's notes = the plan's **Spoken thread, verbatim**, via `dk.speaker_notes` (deviations — e.g. a split/merged slide — noted in one clause); self-read → prose is ON the slides instead.
 2. **Builds — opted-in? then FULLY staged**: builds appear only if the user opted in; every animated slide reveals ALL its content beats in order (nothing content-bearing pre-shown but the title/frame — no half-animated slide), starting from an empty content area (first beat included), with no spoiling summary/legend in the base.
-3. **Plan↔code correspondence**: (a) mechanical — diff the design plan's per-slide rows against the slide-function docstrings (icon family included; the classic inline-mode miss); (b) spot-check — each `build:` docstring has matching `Build.step` calls in its function body.
+3. **Plan↔code correspondence**: (a) mechanical — diff the design plan's per-slide rows against the slide-function docstrings (icon family included; the classic inline-mode miss); (b) spot-check — each `build:` docstring has matching `Build.step` calls in its function body; (c) **cover carries its promises** — the built cover shows the self-verify-(l) device, the motif's label/legend where the plan said the STRANGER TEST is satisfied by labeling, and the `logo plan:` asset placed as planned (official file untouched; on a single-entity deck a cover with no logo and no recorded `n/a` reason is a ✗).
 4. **Charts native**: every chart is editable-native unless a matplotlib look was deliberately chosen; legends sit off the data.
 5. **Evidence real**: every domain image/figure is the real computed/source artifact — no plausible stand-in; PDF crops checked on all four edges.
 6. **Colour keyed**: the semantic-colour ledger's meanings are taught on-slide (key at first use) and no accent appears outside its bound meaning; chrome stays quiet (motif ≤3 appearances).

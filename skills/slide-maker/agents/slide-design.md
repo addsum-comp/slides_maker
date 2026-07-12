@@ -123,7 +123,7 @@ an order of operations, and you guard it:
   exactly where the art director earns the fee.
 
 **This design intelligence is HOW you design — it runs on EVERY deck / each case, never opt-in per
-deck.** The design self-verify (a–m) and the `references/design-intelligence-addendum.md` gates
+deck.** The design self-verify (a–o) and the `references/design-intelligence-addendum.md` gates
 (concept→viz reasoning, block audit, evenness / one-hero-per-slide, semantic colour where colour is
 used, rhythm, WOW) apply to every deck and **scale down gracefully** — a 4-slide deck still gets one
 hero per slide, no card-grid reflex, semantic colour, and one memorable moment; you just do less of it,
@@ -163,6 +163,17 @@ feel art-directed rather than defaulted, and it's yours to set once and hold. Pi
   *across decks* is the same failure as one template *across slides*. (Skip this cross-deck variation
   when the look is LOCKED per §0 — a registered/provided template the user chose is *meant* to repeat
   across decks; vary only the unlocked foundations, e.g. signature device and per-deck motifs.)
+- **The STRANGER TEST — a motif must be legible, not just topical (user feedback, 2026-07).** Being
+  content-born is necessary but not sufficient: a first-time viewer should be able to say what the
+  motif *means* without the presenter explaining. Abstract encodings (two glows = two strategy
+  pillars; three rails = three phases) fail this silently — the meaning lives only in your design
+  plan. Make every motif self-explanatory by ONE of: (a) **label it at first appearance** — a small
+  caption at/in the device on the cover ("ENGINE 1 · CONSUMPTION"), after which interior echoes may
+  go bare; (b) make it **figurative enough to read unaided** (a taper that visibly funnels, an axis
+  with dates); or (c) tie it to an **on-canvas legend** introduced on the same spread. And the design
+  checkpoint's motif line must state the meaning in words ("twin rails = the two engines"), so the
+  user can veto an opaque device before the build. Self-check: ask what a stranger would call the
+  shape — "two ellipses" instead of "the two engines" = fail; label it.
 - **Declare the TYPE SCALE as a contract — with real drama and a real floor.** Fix the deck's modular
   scale once, as named tokens the builder must use (e.g. on the default 10×5.625in canvas:
   `display 40 · title 22 · body 14 · caption 9.5`), instead of improvising sizes per slide (the
@@ -436,22 +447,34 @@ fall and stage each built slide FULLY (think SMART, not by quota):
   on native blocks), never a generic stand-in; if you lack it, flag it as an open question — **except a
   LOGO on a company/product/single-entity deck, which has a sanctioned default (a designed wordmark) per
   the LOGO PRINCIPLE below**, not merely an open question.
-- **LOGO PRINCIPLE (a real design principle — general, any domain).** It fires for a **company /
-  product / single organisation / brand / institution** deck (pitch, product intro, launch, company or
-  stakeholder readout, an org's report) — and ALSO a research talk naming a tool / framework / model, a
-  teaching deck showing an app, a status deck naming a vendor. A **single-entity** deck (its subject IS
-  one org/product) EXPECTS a **logo as persistent brand chrome** (`deckkit.logo`, fixed corner, every
-  content slide). A multi-org deck (survey / landscape / review) or neutral-academic talk names entities
-  inline — no global logo, and **don't double** a logo a provided/registered template already carries.
-  - **FLOW:** (1) ALWAYS web-search for the entity's REAL logo (+ real brand colours/fonts) — this is
-    part of the content-planner's always-on web research; record *found* (with source) or *not-found*.
-    (2) **Found →** use the real asset. (3) **NOT found → default to DESIGNING a clean typographic
-    WORDMARK / simple monogram** in the deck's own type (default = yes, design it), surfaced at the
-    DESIGN checkpoint for the user to confirm or override. Wordmark recipe: `references/image-generation.md`.
+- **LOGO PRINCIPLE (a real design principle — general, any domain; repeated user feedback, so it is
+  gated, not advisory).** Decide by SITUATION — every deck matches exactly one row, and the row's
+  default fires unless the user overrides it:
+
+  | Situation | Logo default |
+  |---|---|
+  | **Single-entity subject** — the deck is ABOUT or FOR one company / product / brand / institution / government body (pitch, launch, stakeholder or investor readout, org report, company briefing) | Official logo on the **cover** (masthead scale) as the minimum; persistent corner chrome (`deckkit.logo`, every content slide) or a footer wordmark by register; a close-slide echo only where it doesn't fight content |
+  | **Presented BY/FOR the user's org** — affiliation known from the material or registry (thesis, lab talk, course, internal review) | That org's logo per its deck norms (cover + footer), from the registered template when one exists |
+  | **Tool / framework / model / vendor named as content** (research talk, teaching deck, status deck) | The REAL logo **inline at the mention** or on the landscape/ecosystem slide — never global chrome |
+  | **Multi-entity survey / landscape / comparison** | Entities named inline as text; a logo *wall* only when a slide's chosen form IS an ecosystem map — never per-mention chrome |
+  | **User's OWN / new / fictional product with no official mark** | DESIGN a clean typographic wordmark / monogram — flagged as a designer's stand-in |
+  | **Provided / registered template already carries the mark** | Don't double it |
+
+  - **FLOW (evidence required — this is the gate):** (1) ALWAYS web-search for the entity's REAL logo
+    (+ brand colours/fonts) — part of the always-on web research; official press/brand pages and
+    Wikimedia Commons are the usual sources. (2) **Found →** use the official file (SVG/PNG)
+    **untouched**: never redraw, trace, restyle or recolor the mark; on a dark canvas use the official
+    reversed/mono variant if one exists, else secure contrast by placement — an official
+    wordmark-only logotype is a full pass. (3) **Not found →** design a wordmark (recipe:
+    `references/image-generation.md`), flagged. (4) The DESIGN checkpoint's **`logo plan:` line MUST
+    carry the evidence**: `official asset — <source>` · or `searched, none found → designed wordmark
+    (flagged)` · or `n/a — <multi-entity | template carries it | user opted out>`. A bare "wordmark"
+    or "text only" **without a recorded search**, or an omitted line on a single-entity deck, is an
+    INVALID plan — the checkpoint is incomplete (this exact miss shipped: a stakeholder deck went to
+    build with a typeset wordmark and no search; the user had asked for the rule before).
   - **FIDELITY GUARD (critical):** a designed wordmark is a **clearly-labelled designer's stand-in**,
     NEVER a fabricated replica passed off as the entity's official logo. Never invent a fake official
-    logo. For the user's OWN / a new / fictional product with no official logo, designing a mark is fully
-    appropriate. Evidence / real logos of OTHER real entities stay real or are flagged as open questions.
+    logo. Evidence / real logos of OTHER real entities stay real or are flagged as open questions.
 - **One art-direction for the whole deck** (palette, medium, mood, realism, motif, calm space for text)
   that matches the topic AND the preset's register — record it once so every plate reads as one family.
 - **Steer clear of the AI-slop tells** (`design-principles.md`): no full-screen rainbow/mesh washes, no
@@ -522,7 +545,7 @@ Then run the **Block Dependency Audit** (the parallel/unordered/equal-weight/ind
 passes · the non-block alternative considered · keep-or-redesign*. This qualitative gate catches the
 visual sameness the family count misses, so it and the diversity gate both must pass.
 
-### Design self-verify (a–m)
+### Design self-verify (a–o)
 State the plan is **not ready** unless these DISTINCT checks pass — each weighed with judgment
 (considered + applied where it helps, one-clause-justified where a slide legitimately doesn't need it,
 NOT a blanket per-slide quota):
@@ -584,6 +607,14 @@ NOT a blanket per-slide quota):
   frame-fill rule; thin rows merged/enriched or their quiet register named in one clause), and no
   canvas value flip appears exactly once (any flip recurs as a divider family or bookend; on the
   generated-template branch, no canvas flip at all — imagery-strength beats only).
+- **(n) motif passes the STRANGER TEST** — the plan's motif line states the device AND its meaning in
+  words ("twin rails = the two engines"), and names HOW a first-time viewer learns it: labeled at
+  first appearance / figurative enough to read unaided / on-canvas legend (§1 STRANGER TEST). A motif
+  whose meaning appears only in the plan text fails.
+- **(o) logo plan carries evidence** — the `logo plan:` line matches the LOGO PRINCIPLE's situation
+  table AND carries its evidence token (`official asset — <source>` / `searched, none found →
+  wordmark (flagged)` / `n/a — <reason>`). On a single-entity deck a bare "wordmark", "text only",
+  or missing line fails — the search was not run or not recorded.
 Fix any failing check before the DESIGN checkpoint.
 
 ### Design-critic checklist
