@@ -13,7 +13,7 @@
 
 <p align="center"><sub>Free and open source, built by <a href="https://addsum.top/"><strong>Addsum</strong></a></sub></p>
 
-> **The AI deck-maker that reads your actual work, never invents a number, ships fully-editable native PowerPoint — and won't hand it over until an independent critic signs off.**
+> **The slide-maker that reads your actual work, never invents a number, ships fully-editable native PowerPoint, and won't hand it over until an independent critic signs off.**
 
 Chat with it in Codex or Claude Code. It isn't one prompt guessing at slides: a small team of specialized agents reads your paper / repo / doc (or researches the topic when you have none), plans the story, designs each slide around it, builds a real `.pptx`, and puts it through an independent review before you ever see it.
 
@@ -91,7 +91,7 @@ Eight directions, one set in English and one in Chinese. Each is a complete exam
   </tr>
 </table>
 
-<p align="center"><sub>Chinese versions live in <a href="https://slides.addsum.top/templates/decks/">templates/decks/zh/</a>, previewed in the <a href="README_CN.md">Chinese README</a>.</sub></p>
+<p align="center"><sub>Chinese versions live in <a href="https://github.com/addsumtech/slides_maker-site/tree/main/templates/decks/zh">templates/decks/zh/</a>, previewed in the <a href="README_CN.md">Chinese README</a>.</sub></p>
 
 ---
 

@@ -91,7 +91,7 @@
   </tr>
 </table>
 
-<p align="center"><sub>英文版在 <a href="https://slides.addsum.top/templates/decks/">templates/decks/en/</a>，预览见 <a href="README.md">English README</a>。</sub></p>
+<p align="center"><sub>英文版在 <a href="https://github.com/addsumtech/slides_maker-site/tree/main/templates/decks/en">templates/decks/en/</a>，预览见 <a href="README.md">English README</a>。</sub></p>
 
 ---
 
