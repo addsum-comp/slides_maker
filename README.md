@@ -317,12 +317,10 @@ It prints the exact fix for anything missing. If problems persist after installi
 ## Star History
 
 <p align="center">
-  <a href="https://star-history.com/#addsumtech/slides_maker&Date">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://slides.addsum.top/docs/assets/star_history_dark.png" />
       <img alt="Star history for addsumtech/slides_maker" src="https://slides.addsum.top/docs/assets/star_history.png" width="720" />
-    </picture>
-  </a>
+  </picture>
 </p>
 
 ---

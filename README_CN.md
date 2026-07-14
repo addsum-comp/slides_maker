@@ -313,12 +313,10 @@ python3 ~/.claude/skills/slide-maker/scripts/check_env.py
 ## Star 趋势
 
 <p align="center">
-  <a href="https://star-history.com/#addsumtech/slides_maker&Date">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://slides.addsum.top/docs/assets/star_history_dark.png" />
       <img alt="addsumtech/slides_maker 的 Star 趋势" src="https://slides.addsum.top/docs/assets/star_history.png" width="720" />
-    </picture>
-  </a>
+  </picture>
 </p>
 
 ---
