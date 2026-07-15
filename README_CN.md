@@ -310,17 +310,6 @@ python3 ~/.claude/skills/slide-maker/scripts/check_env.py
 
 ---
 
-## Star 趋势
-
-<p align="center">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/addsumtech/slides_maker/main/docs/assets/star_history_dark.png" />
-      <img alt="addsumtech/slides_maker 的 Star 趋势" src="https://raw.githubusercontent.com/addsumtech/slides_maker/main/docs/assets/star_history.png" width="720" />
-  </picture>
-</p>
-
----
-
 ## 开源协议
 
 [MIT](LICENSE)
