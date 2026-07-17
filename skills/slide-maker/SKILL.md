@@ -1252,7 +1252,7 @@ A few rules that matter (see `references/design-principles.md`):
   2. **Give text padding** — inset every label ≥0.1in inside its card (`cx+0.2`, width `cw-0.4`); flush-to-edge reads as a mistake.
   3. **No text-on-text** — one column/stack owns each region; never drop a second text box into the same rectangle.
   4. **If it doesn't fit, resolve it** — `fit_text_size(runs, w, h, start)` gives the largest size that fits; else shorten or grow the box.
-  5. **One line in a *self-contained* block → vertically centre it** — anchor it `MIDDLE` with the card's rect; a lone line top-anchored leaves a lopsided gap (the `OFFCENTER` warn). *Carve:* a one-line reading column that must top-align with a taller sibling column under a shared header stays top-anchored (alignment beats centring) — the warn only fires on a card whose sole content is that line.
+  5. **Text in a *self-contained* block → equal top/bottom padding (vertically centre it)** — anchor it `MIDDLE` over the block's own rect: draw the block, then place the text at that block's exact `(x, y, w, h)` with `anchor=MSO_ANCHOR.MIDDLE` (wrap this as a small deck helper so centring is automatic, not per-call), whether it's one line or several. Placing text at a **hand-picked y-offset inside a fixed-height block** is the recurring "the takeaway text is closer to the top edge than the bottom" bug — the padding must be equal *by construction*, not eyeballed (the `OFFCENTER` warn fires on a lone-line card). *Carve:* a one-line reading column that must top-align with a taller sibling column under a shared header stays top-anchored (alignment beats centring).
   6. **Grid/stack over hand-picked y, and leave a real gap (~`GUTTER`)** — `columns()/rows()` for equal panels, `vstack(…, bottom=…)` for content-height blocks (no overlap, even gaps by construction), `content_band()` for the vertical extent. (On a provided template, the layout's **placeholders** already anchor content — these helpers are the no-template path; fill placeholders where the template gives them.)
   7. **For a diagram, compute all bounding boxes first, then draw into them** — lay out the rects (and reserve arrow channels), *then* place nodes/labels — never eyeball one shape against the previous one.
 - **Colour.** Rotate `deckkit.ACCENTS` so diagrams aren't monotone; reserve magenta
@@ -1263,7 +1263,13 @@ A few rules that matter (see `references/design-principles.md`):
   disabled, not a category — it makes a coloured row look half-finished). **Bind each hue to ONE
   concept deck-wide** (the accent = the proposed method, or "risk", or one product) — a colour that
   means the same thing on every slide is the biggest "this deck is credible" move: see
-  `references/semantic-color-contract.md`. Name the closing slide
+  `references/semantic-color-contract.md`. **🔴 A hue used as TEXT must itself clear ≥4.5:1 on its
+  background** — a vivid gold / coral / lime that looks great as a fill can render at 2–4:1 as small
+  label/kicker/emphasis text on a light surface (invisible-ish), the recurring "the coloured text is
+  too faint" bug. So keep TWO tokens per accent when needed: a **bright fill-only** variant (rules,
+  bars, icon tiles, header bands) and a **darker text-safe** variant (`contrast_ratio(...) ≥ 4.5`)
+  for any run set in that colour — verify each bound hue's *text* value with `deckkit.contrast_ratio`
+  at design time, not just the fill. Name the closing slide
   for its purpose, in the deck's language ("Conclusion" for an English talk; 结论/总结 on a Chinese deck).
 - **Accessibility.** Keep text ≥4.5:1 on its fill (`contrast_ratio`; `chip`/`modbox`
   auto-pick a readable text colour) and never encode meaning by colour alone. Set
@@ -1406,7 +1412,7 @@ those here; read its report instead).
 2. **Builds — opted-in? then FULLY staged**: builds appear only if the user opted in; every animated slide reveals ALL its content beats in order (nothing content-bearing pre-shown but the title/frame — no half-animated slide), starting from an empty content area (first beat included), with no spoiling summary/legend in the base.
 3. **Plan↔code correspondence**: (a) mechanical — diff the design plan's per-slide rows against the slide-function docstrings (icon family included; the classic inline-mode miss); (b) spot-check — each `build:` docstring has matching `Build.step` calls in its function body; (c) **cover carries its promises** — the built cover shows the self-verify-(l) device, the motif's label/legend where the plan said the STRANGER TEST is satisfied by labeling, and the `logo plan:` asset placed as planned (official file untouched; on a single-entity deck a cover with no logo and no recorded `n/a` reason is a ✗).
 4. **Charts native**: every chart is editable-native unless a matplotlib look was deliberately chosen; legends sit off the data. Same bar for math: every 1-D equation is `equation_native`; raster `equation_png` only for genuinely 2-D layout (fractions/matrices), named as such.
-5. **Evidence real**: every domain image/figure is the real computed/source artifact — no plausible stand-in; PDF crops checked on all four edges; every SOURCED photo comes from a sanctioned origin (Commons / Openverse / press kit / user file), its subject verified against caption/geotag/category, it is **watermark-free** (a watermark is an unlicensed-preview tell → reject the file; never crop/blur/inpaint the mark away), its license recorded (credit placed where required), and it is palette-treated so mixed sources read as one deck; no generated CONTENT image claims photographic reality for a real-and-specific subject (REFERENT RULE, `references/image-generation.md` — generated-template identity plates and declared stylized illustrations are exempt; a real subject with no findable photo uses a recorded `searched, none found → …` rung).
+5. **Evidence real**: every domain image/figure is the real computed/source artifact — no plausible stand-in; PDF crops checked on all four edges; every SOURCED photo comes from a sanctioned origin (Commons / Openverse / press kit / user file), its subject verified against caption/geotag/category, it is **watermark-free** (a watermark is an unlicensed-preview tell → reject the file; never crop/blur/inpaint the mark away), its license recorded (credit placed where required), it is **aesthetically vetted** (an ugly / under-construction / blurry / unrepresentative shot is rejected even when the subject is correct → re-source, or generate a declared-stylized illustration via the `searched, found but low-quality → generated, flagged illustrative` rung), and it is palette-treated so mixed sources read as one deck; no generated CONTENT image claims photographic reality for a real-and-specific subject (REFERENT RULE, `references/image-generation.md` — generated-template identity plates and declared stylized illustrations are exempt; a real subject with no findable photo uses a recorded `searched, none found → …` rung). Any **text over a hero/photo/plate** is verified legible against the pixels — no image linework crosses the glyphs (a scrim only dims a bright line; cover it with a near-opaque panel), eyebrow/kicker included, with a clear title↔subtitle gap (render self-check "Text over an image").
 6. **Colour keyed**: the semantic-colour ledger's meanings are taught on-slide (key at first use) and no accent appears outside its bound meaning; chrome stays quiet (motif ≤3 appearances) AND the chosen preset's `guard` constraints hold on every slide (quote the guard line in the tick).
 7. **Claims current**: every time-bound ledger row re-verified with as-of = TODAY; the deck carries its "as of" date.
 8. **Language & hygiene**: one language throughout; zero meta-annotations ("placeholder"/"TODO"/"AI-generated"); voice pass done on every line.
@@ -1592,10 +1598,33 @@ critic round — full rationale in `references/design-principles.md`):
   sits in the sequence as if it were a category** (use `palette()` — it warns on both). A vivid
   block beside a gray one reads as half-finished.
 - **Titles** — a subtitle/definition line has a clear gap below the title's accent rule; the
-  kicker/eyebrow adds a section label, it doesn't echo a word the title already leads with.
+  kicker/eyebrow adds a section label, it doesn't echo a word the title already leads with. **The
+  title CHROME itself is not one fixed template repeated on every slide** — an identical
+  eyebrow + rule-under-the-title on all ~12 content slides is a template tell (creativity is a design
+  metric, not just correctness). Rotate **2–3 title treatments** across the deck (e.g. a classic
+  accent-rule · an eyebrow in a filled tab/pill · a left vertical accent bar · a section ordinal ·
+  a motif mark) so no two adjacent slides share the exact chrome and no single treatment dominates —
+  the eyebrow-ornament analogue of the skeleton-rotation floor (`references/design-intelligence-addendum.md`).
+  This does **not** fight the Repetition principle: the visual SYSTEM stays constant (same palette,
+  type pairing, signature motif on every slide) — you rotate the *chrome treatment*, not the identity.
+  That IS "repeat the system, vary the protagonist" (`references/design-principles.md` C.R.A.P.), not a
+  license to make each title look unrelated.
 - **Images** — the key **subject is whole, not cropped** (`contain` vs `cover`); a generated
   image of real things is **factually right** (relative size/proportion, count, colour); any
-  **labels sit under the feature** they name.
+  **labels sit under the feature** they name. A **sourced photo is aesthetically usable**, not just
+  subject-correct: reject an ugly / under-construction (cranes, scaffolding) / blurry / badly-lit /
+  cluttered / unrepresentative shot — re-source, or generate a **declared-stylized illustration**
+  instead (a beautiful accurate illustration beats an ugly real photo; `references/image-generation.md`
+  aesthetic gate + the `searched, found but low-quality → generated, flagged illustrative` rung).
+- **Text over an image (hero / photo / plate)** — read the title against the pixels behind it: **(a)**
+  no image **line / edge / motif / frame-ornament crosses the glyphs** (a scrim only *dims* a bright
+  Deco line — it stays visible; when the image carries linework where the title lands, cover it with a
+  **near-opaque panel** α ≥ 0.88, a lower-third band or corner card filled to the canvas edge, never
+  bleeding off-canvas); **(b)** every run — including a gold/tint **eyebrow** — clears ≥4.5:1 against
+  what's actually behind it; **(c)** an **unmistakable gap** separates the big title from its
+  subtitle/rule (a subtitle hugging the title's baseline reads as an error). Fix by strengthening the
+  backing, moving the text to an empty region, or re-spacing — treat a title fighting the image as a
+  real defect, like an overflow.
 - **PDF figures cropped precisely** — for every figure pulled from a paper, zoom **each of the four
   edges** close-up (not a glance at the whole) and confirm: (a) none of the figure's own parts is
   clipped **or flush** (flush = cut); (b) no page text bled in (its caption, a neighbour's caption

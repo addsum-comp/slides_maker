@@ -43,7 +43,13 @@ auto-cycle a fixed ink set (blue→pink→ochre→black) per section. Same princ
   neighbouring hue (risk → burnt orange) rather than letting the same red mean "us" on one slide
   and "danger" on the next.
 - Keep it to ≤5 bound concepts; beyond that colour stops being legible as meaning.
-- Verify every bound colour clears ≥4.5:1 on its background (`contrast_ratio`), and never encode meaning
-  by colour ALONE — pair it with a label/icon/shape (accessibility + projection).
+- Verify every bound colour's legibility with `contrast_ratio`, and never encode meaning
+  by colour ALONE — pair it with a label/icon/shape (accessibility + projection). **Split the check by
+  role:** a hue used as **TEXT** (a label, kicker, emphasized run) must clear **≥4.5:1** on its
+  background; a **fill-only** variant (a rule, bar, icon tile, header band, chip behind dark text) may
+  be brighter/lower as text-contrast but should still clear ~3:1 for non-text contrast. So a vivid
+  accent that fails as text is fine as a fill — just keep a **darker text-safe token** of the same hue
+  for any run set in that colour (see SKILL.md "Colour"). Meaning is what's bound; the two tokens are
+  the same concept at two legibility roles.
 - The contract is deck-wide: a one-off recolour that breaks it (a green "risk" cell) is a real flaw the
   critic should flag.

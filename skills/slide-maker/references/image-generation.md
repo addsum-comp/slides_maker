@@ -189,13 +189,27 @@ assets or user-supplied photos.
 1. **Search license-clear sources only**: Wikimedia Commons and Openverse (both keyless APIs,
    CC-licensed, captioned), official press kits / brand pages, or the user's own material. Never
    grab from arbitrary image-search results — provenance and license unknown.
-2. **Verify the subject — and that the file is WATERMARK-FREE**: the file's caption / description /
-   geotag / Commons category must confirm it shows the *claimed* subject — a mislabeled photo is the
-   photographic version of an invented number, and the critic's fidelity lens checks it. View the
-   downloaded file for watermarks, stock-preview overlays, photographer stamps, or site logos: a
-   watermark is a **licensing tell** (it usually marks an unlicensed preview), so a watermarked file
-   is **rejected** — never cropped, blurred, or inpainted to hide the mark (that is license
-   circumvention, not cleanup); find a clean file or fall back to a `searched, none found → …` rung.
+2. **Verify the subject, that the file is WATERMARK-FREE, and that it is AESTHETICALLY USABLE**: the
+   file's caption / description / geotag / Commons category must confirm it shows the *claimed*
+   subject — a mislabeled photo is the photographic version of an invented number, and the critic's
+   fidelity lens checks it. View the downloaded file for watermarks, stock-preview overlays,
+   photographer stamps, or site logos: a watermark is a **licensing tell** (it usually marks an
+   unlicensed preview), so a watermarked file is **rejected** — never cropped, blurred, or inpainted
+   to hide the mark (that is license circumvention, not cleanup); find a clean file or fall back to a
+   `searched, none found → …` rung.
+   **Then VET IT AESTHETICALLY — a subject-correct photo is not automatically a usable one, and you
+   MUST look before you place it.** Reject a file that is *unrepresentative or unflattering*: a
+   landmark **mid-construction / scaffolded / with cranes**, a dish that looks unappetising or is the
+   wrong preparation, or any **blurry / low-res / badly-lit / cluttered / awkwardly-cropped /
+   snapshot-grade** shot, or one whose real subject is buried or tiny in frame. A technically-correct
+   but ugly photo **fails** — it misrepresents the place as much as a wrong caption would, and "it *is*
+   the right subject" is not a defence. Try other candidates first; **if no license-clear photo of
+   sufficient quality exists, GENERATE a declared-stylized illustration of the subject instead** (the
+   `searched, found but low-quality → generated, flagged illustrative` rung below). A beautiful,
+   accurate illustration in the deck's own art-direction beats an ugly real photo, and — unlike a fake
+   *photographic* claim of a real subject — a plainly-declared illustration is on-contract. (A
+   comparison of iconic real objects — building heights, product sizes — is often served best by an
+   exact native chart *plus* a clean generated illustration of the objects, not a generic photo.)
 3. **Record the license**: CC0 / CC BY / CC BY-SA / press-kit terms; attribution-required licenses
    get a credit (small mute caption at the image, or one credits line on the sources page).
 4. **Treat to the palette** so mixed sources read as one deck: duotone/tint to the deck palette,
@@ -209,6 +223,10 @@ assets or user-supplied photos.
    - `searched, none found → generated, flagged illustrative` — the not-found rung: no license-clear
      photo exists (obscure place, private premises, pre-photography history, unreachable sources) →
      generate, clearly framed as illustration, never as photographic evidence;
+   - `searched, found but low-quality → generated, flagged illustrative` — the quality rung: a
+     license-clear photo exists but every candidate is unrepresentative/ugly (construction, poor shot,
+     wrong preparation) → generate a declared-stylized illustration in the deck's art-direction
+     instead (the aesthetic gate in step 2);
    - `searched, none found → native form` — the other sanctioned exit: drop the photo, let a map /
      diagram / native form carry the slide.
    A `searched, none found` rung must NAME the origins tried — write it

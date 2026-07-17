@@ -184,6 +184,27 @@ only adds the divider variant, if wanted, and the 🔴 interior plate below.)*
   where the title will sit. Ask for the **signature motifs** explicitly (e.g. "scattered Memphis
   geometric shapes — zigzags, dots, triangles, squiggles, checkerboard — bold black outlines")
   so you can reproduce them natively later.
+- **🔴 Title-over-hero legibility — prompting a calm zone is NECESSARY but NOT SUFFICIENT; you MUST
+  back the text AND verify.** The model often ignores the calm-zone request and runs a decorative
+  **frame line / ray / motif right through where the title lands** — and the build-time lint can't see
+  it (it only checks text-on-text / off-canvas, never text-on-image-linework). So on EVERY hero/divider
+  that carries text: (1) place a **scrim behind the whole text block** — a gradient (or frosted panel)
+  strong enough that at the glyphs the effective background is dark/quiet enough for ≥4.5:1 (a corner
+  scrim reaching **α ≈ 0.55–0.85** over light text is typical; a token 0.2 wash is not enough over a
+  busy plate); (2) **in the render, look specifically at the title**: no image line/edge/motif crosses
+  the glyphs, and every run (including a low-contrast **eyebrow/kicker** in gold/tint) clears the
+  contrast floor — if a line still cuts the text or the eyebrow washes out, strengthen the scrim,
+  move the text to a genuinely empty region, or lighten the run. Treat a title fighting the image's
+  linework as a real defect, exactly like an overflow.
+  **🔴 A translucent scrim DIMS a bright line but does NOT erase it** — a gold/teal Deco frame-line or
+  a bright edge stays visible through a 0.5–0.7 wash and keeps cutting the glyphs. When the hero
+  carries **framing / linework / high-detail exactly where the title lands** (common with Deco /
+  bordered / ornamented styles), escalate from a scrim to a **near-opaque title panel** (a solid or
+  α ≥ 0.88 block — a lower-third band or a corner card **anchored to and filling to the canvas edge**,
+  never bleeding off-canvas, which the strict lint rejects) that fully COVERS the linework; verify the
+  covered area is clean. And keep an **unmistakable gap between the title and its subtitle** (the rule/
+  subtitle is a separate block, not touching the big title's baseline) — cramped title/subtitle
+  spacing reads as an error even when nothing technically overlaps.
 - Generate **1–2 plates**: a **hero** (cover) and, if the look differs, a **divider** variant.
 - **Generate the interior shallow-background plate too — 🔴 MUST (see the construction model).**
   Alongside the hero, generate **one extra low-contrast background plate**: a **text-free, faint,
