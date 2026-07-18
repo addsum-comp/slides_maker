@@ -9,6 +9,26 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-07-18
+
+### Added
+- **Long-source mode** — the content-planner (`agents/content-planner.md` §1) now handles a **book
+  or very long PDF** without faking a linear read (which either overflows context or, worse, fits
+  and goes shallow, then fabricates plausible-but-absent points). The method: anchor on the deck's
+  purpose first (importance is purpose-relative) → **map** the structure → read chapter-by-chapter
+  into page-tagged notes (map-reduce; fan out the *reading*, synthesise as one mind) → **deep-read
+  verbatim only the load-bearing ~20%** for slide-bound claims → trace every claim to a real page (a
+  chapter note is corroboration, not a source). The plan gains a required **Source-coverage map**
+  (each chapter → built-around / summarised / cut) so the SELECTION is explicit — the coverage gate
+  at book scale — and it is confirmed at the CONTENT checkpoint (surfaced even under the auto-waiver,
+  since the wrong-slice risk is the biggest one on a book). Honest limits are named: a scanned /
+  image-only or DRM-locked PDF yields no text → ask for a text version / OCR / specific chapters.
+- `scripts/extract_pdf.py` gains two long-source commands: **`map`** (structural skeleton — page/word/
+  token estimate + the embedded TOC/bookmarks + a binned word-density strip, no body text) and
+  **`text`** (dump a 1-indexed inclusive page range with PAGE markers, for chunked reading).
+- SKILL.md wiring: a long-source case in Step 1, the Source-coverage/SELECTION gate on the CONTENT
+  checkpoint, and nav-table + Files rows pointing at the mode and its tooling.
+
 ## [3.2.0] - 2026-07-18
 
 ### Added

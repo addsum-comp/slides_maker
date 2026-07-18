@@ -38,6 +38,13 @@ Quick start (manual fallback):
     python extract_pdf.py crop paper.pdf 4 fig.png 0.1 0.12 0.95 0.55 --frac
     python extract_pdf.py images paper.pdf 4 figdir/          # embedded images -> figdir/
 
+LONG-SOURCE MODE (a book / very long PDF — map before you read, then read the parts that matter):
+    python extract_pdf.py map  book.pdf                       # structural skeleton: TOC + word-density
+    python extract_pdf.py text book.pdf 40 72 ch3.txt        # dump pages 40-72 for a chunked read
+`map` dumps NO body text (it is triage: page/word/token estimate + the author's own TOC/bookmarks +
+a binned density strip); `text` dumps a 1-indexed inclusive page range, keeping PAGE markers so
+every claim traces back to a real page. See the content-planner's long-source method.
+
 To find a manual crop box: render the page once, open the PNG, read off the figure's pixel
 box with `crop_helper.py grid`, divide by the render scale (dpi/72) to get points — or use
 --frac and eyeball fractions. Importable: from extract_pdf import find_figures, render_figure.
@@ -70,6 +77,78 @@ def info(pdf):
               f"({r.width/72:.2f} x {r.height/72:.2f} in)"
               f"  images={len(page.get_images())}")
     doc.close()
+
+
+def outline_map(pdf, bins=30):
+    """STRUCTURAL SKELETON for long-source mode — the cheap 'map before you read' pass.
+    Prints page/word/token estimates, the embedded TOC/bookmarks (the author's own
+    hierarchy = the first prioritisation signal), and a binned word-density strip showing
+    where prose BULK sits — a SHAPE signal (front/back-matter, figure/reference pages),
+    NOT an importance signal (the TOC + the deck's purpose drive what matters). Dumps NO
+    body text — this is triage; pull the chapters that matter with `text` afterwards."""
+    doc = _open(pdf)
+    wpp = [len(page.get_text("text").split()) for page in doc]
+    total = sum(wpp)
+    pc = doc.page_count
+    print(f"{pdf}: {pc} pages · ~{total:,} words · ~{total * 4 // 3:,} tokens est.")
+    # scanned / image-only / DRM guard — get_text() returns "" on image-only pages, so a
+    # scanned book would otherwise print a normal-looking (but empty) skeleton.
+    empty = sum(1 for w in wpp if w == 0)
+    if total == 0 or empty >= max(1, int(0.9 * pc)):
+        print(f"\n⚠ NO extractable text (~{total} words across {pc} pages · {empty} empty): this PDF "
+              "is almost certainly SCANNED / image-only or DRM-locked. `map`/`text` cannot read it — "
+              "request a text-based PDF, run OCR, or ask the user for the specific chapters. Do NOT "
+              "infer contents from the skeleton below.")
+    toc = doc.get_toc(simple=True)          # [[level, title, page], ...]
+    if toc:
+        print(f"\nTABLE OF CONTENTS / BOOKMARKS ({len(toc)} entries):")
+        for lvl, title, pg in toc:
+            print(f"  {'  ' * max(lvl - 1, 0)}p{pg:<5} {title}")
+    else:
+        print("\n(no embedded TOC/bookmarks — reconstruct a skeleton with `text`: scan for heading "
+              "lines / chapter titles, or fall back to fixed-size page windows; triage costs more here)")
+    print("\nWORD DENSITY (binned — text-dense vs sparse regions; a SHAPE cue, not importance):")
+    nb = min(pc, bins)
+    step = -(-pc // nb)                      # ceil division
+    peak = max((sum(wpp[b:b + step]) for b in range(0, pc, step)), default=1) or 1
+    for b in range(0, pc, step):
+        w = sum(wpp[b:b + step])
+        bar = "#" * int(round(24 * w / peak))
+        print(f"  p{b + 1:>4}-{min(b + step, pc):<4} {w:>6}  {bar}")
+    doc.close()
+
+
+def dump_text(pdf, start, end, out=None):
+    """Dump plain text of a 1-indexed INCLUSIVE page range — the chunked-read primitive for
+    long-source mode. Read a chapter at a time and keep the PAGE markers, so every claim you
+    later put on a slide traces back to a real page (the comprehension brief's hard rule).
+    Returns 0 on success, 1 on an unusable range (so the caller can fail loudly)."""
+    doc = _open(pdf)
+    pc = doc.page_count
+    if start > pc or start > end:
+        doc.close()
+        print(f"error: requested pages {start}-{end} but PDF has {pc} pages — nothing to dump")
+        return 1
+    start = max(1, start)
+    end = min(end, pc)
+    parts = []
+    body_words = 0                           # count BODY only, never the PAGE markers
+    for p in range(start, end + 1):
+        t = doc[p - 1].get_text("text")
+        body_words += len(t.split())
+        parts.append(f"\n===== PAGE {p} =====\n" + t)
+    doc.close()
+    text = "".join(parts)
+    if body_words == 0:
+        print(f"⚠ pages {start}-{end} contain NO extractable text (0 words) — likely "
+              "scanned / image-only; this range needs OCR, don't infer its contents.")
+    if out:
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(text)
+        print(f"wrote pages {start}-{end} -> {out} ({body_words:,} words)")
+    else:
+        print(text)
+    return 0
 
 
 def render_page(pdf, page_no, out, dpi=300):
@@ -649,6 +728,10 @@ def _main(argv):
             pos.append(a[i]); i += 1
     if cmd == "info":
         info(pos[0])
+    elif cmd == "map":                            # long-source: structural skeleton (TOC + density)
+        outline_map(pos[0])
+    elif cmd == "text":                           # long-source: dump a page range for chunked reading
+        return dump_text(pos[0], int(pos[1]), int(pos[2]), pos[3] if len(pos) > 3 else None)
     elif cmd == "page":
         render_page(pos[0], int(pos[1]), pos[2], dpi=flags.get("dpi", 300))
     elif cmd == "crop":

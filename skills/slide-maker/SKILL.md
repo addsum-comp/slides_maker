@@ -146,7 +146,8 @@ delegation must never produce. Content checkpoint = the deck
 memory sentence + a 2-line brief/ledger DIGEST (the comprehension brief's one-sentence message +
 a claim-ledger tally, e.g. `ledger: 14 claims · 14 verified · 0 open` — full brief + ledger stay
 in the plan, posted on request or on any digest anomaly) + emotional-curve line + pace check +
-ONE table (`# | 角色 | 记忆句(takeaway) |
+**(long source only) a 1-line Source-coverage DIGEST** (`source: 320 pp · built-around 4 ch ·
+summarised 3 · cut 5` + the chosen slice — full per-chapter map in the plan) + ONE table (`# | 角色 | 记忆句(takeaway) |
 承载证据 | units`) — the `units` column is the count of content units the row carries (the
 distribution pass's output): a `1` on a standalone content slide or a `6+` on a spoken beat is
 visible at a glance, so an about-to-be-empty or about-to-be-dense page gets caught at the
@@ -210,6 +211,7 @@ every **🔴 CHECKPOINT** is a hard stop.
 | The craft / the "why" (contrast · hierarchy · C.R.A.P. · layout safety) | `references/design-principles.md` |
 | Per-purpose look (defense vs exec vs lecture …) | `references/design-by-purpose.md` |
 | Content — deep read + per-slide message (Step 1) | `agents/content-planner.md` |
+| Long source (book / very long PDF) — map → triage → deep-read the load-bearing 20% + coverage map | `agents/content-planner.md` §1 (long-source mode) · `scripts/extract_pdf.py map`/`text` |
 | Look / form / layout / rhythm / icons / motion (Step 2) | `agents/slide-design.md` |
 | Independent review + JSON schema | `agents/critic.md` · `agents/arbiter.md` · `references/review-rubrics.md` |
 | Which visual FORM a slide takes (avoid the card-grid default) | `references/form-selection.md` |
@@ -695,6 +697,21 @@ inventing — it's fidelity to what's *true now*.
   approves it — a no-source deck is gated the same as any other: once at the CONTENT
   checkpoint (Step 1), then again at the DESIGN checkpoint (Step 2).
 
+- **A long source (a book / very long PDF / large corpus)** — one you can't read faithfully in a
+  single pass — is NOT read front-to-back: a faked linear read either overflows or, worse, *fits*
+  and goes shallow, then invents plausible-but-absent points. Run the planner's **Long-source mode**
+  (`agents/content-planner.md` §1): (1) anchor on the deck's purpose/audience FIRST (importance is
+  purpose-relative), (2) **map the structure** — `python scripts/extract_pdf.py map <book.pdf>` (TOC
+  + word-density, no body text), (3) read chapter-by-chapter — `extract_pdf.py text <pdf> <start>
+  <end>` — into page-tagged chapter notes (map-reduce; fan out the *reading*, synthesise as one
+  mind), (4) **deep-read *verbatim* only the load-bearing ~20%** for the claims that land on slides,
+  (5) trace every slide-bound claim to a real page (a chapter note is corroboration, not a source).
+  The plan then carries a **Source-coverage map** (each chapter → built-around / summarised / cut)
+  so the SELECTION is explicit — on a book the biggest risk is building around the *wrong slice*, not
+  misreading one figure. A **scanned / image-only or DRM-locked** PDF yields no extractable text
+  (`map`/`text` come back empty) — say so and ask for a text version, OCR, or the specific chapters,
+  never hallucinate the contents.
+
 **End Step 1 at the 🔴 CONTENT checkpoint — pace-check first, then approve the story.** The
 Content plan is the cheapest place to fix a misread or a wrong emphasis, so present it *before any
 design begins*: the **comprehension brief + claim ledger** FIRST (so the user can spot a misread
@@ -706,19 +723,31 @@ as a loose anchor (short talk/status ~6–9, lecture/thesis defense/job talk ~10
 animated/build slide *once*; compute `slide_count ÷ time_minutes` and, if it runs well over ~1/min,
 cut slides or get more time and flag it. A *read-alone / poster* deck has no talking-minute budget —
 its scope is set by content completeness, and deliberate density is fine, not a defect. **Confirm
-the resulting slide count** with the user (never ship a length they never saw). **Precondition —
+the resulting slide count** with the user (never ship a length they never saw). **For a long source
+(book / very long PDF), the checkpoint ALSO carries a DIGEST of the Source-coverage map** (the chosen
+slice + a built-around/summarised/cut tally; the full per-chapter map stays in the plan) **and
+confirms the SELECTION.** Ordering matters: the verbatim deep-read that produces the verified ledger
+happens *inside* Step 1, so the wrong-slice must be caught earlier — the planner surfaces the coverage
+map as a **cheap selection FYI right after mapping+triage, before sinking the verbatim deep-read**,
+and it is re-confirmed here **before DESIGN and BUILD (Step 2+) commit.** The wrong-slice risk is the
+biggest one at book scale, so it is surfaced even under the auto-waiver (as an FYI). **Precondition —
 the comprehension gate:** before showing the plan, confirm it carries a *complete* comprehension
 brief (every field filled + traced) and claim ledger (no shipped `verified?=N` rows), **a
 Takeaway spine that reads as one argument** (an incoherent spine is "not ready" — send it back to
-the planner), and a `scripts/plan_wordcount.py` pass over the per-slide table (advisory — but an
-over-budget row with no recorded "over budget → notes/split" resolution goes back too); an
+the planner), a `scripts/plan_wordcount.py` pass over the per-slide table (advisory — but an
+over-budget row with no recorded "over budget → notes/split" resolution goes back too), **and — for
+an over-threshold long source — a complete Source-coverage map** (a disposition for every `map` TOC
+chapter + the verbatim-vs-skimmed line; a missing/partial map is "not ready"); an
 empty/hedged/untraced brief is **not ready** — send it back to the planner. Fold in the user's
 edits to the story, then move to design (Step 2).
 > **🔴 CHECKPOINT — CONTENT:** show the comprehension brief + claim ledger + narrative arc + the
 > per-slide takeaways/content, and confirm the pace/slide-count, before any design work begins —
 > rendered as the compact ≤~25-line checkpoint artifact defined under the 🔴 CHECKPOINT convention
 > (the brief + ledger appear as its 2-line digest; post the full versions on request or on any
-> digest anomaly — unverified rows, open questions).
+> digest anomaly — unverified rows, open questions). **For a long source (book / very long PDF), the
+> artifact also carries a DIGEST of the Source-coverage map** (chosen slice + a built-around/
+> summarised/cut tally; full per-chapter map in the plan) **and the SELECTION is confirmed here** —
+> the coverage gate at book scale (also surfaced earlier as a cheap FYI, before the verbatim deep-read).
 
 ## Step 2 — Design the deck (use the slide-design agent)
 With the **Content plan approved**, first build the **Evidence manifest** — so the art director
@@ -2055,8 +2084,10 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
 - `image_fx.py` — `duotone(img, ink_a, ink_b)` / `grayscale(img)` — preprocess a colour photo to the
   deck's ink so it doesn't fight the accent (riso/brutalist/ink/luxury/museum). See `design-gallery.md`.
 - `extract_pdf.py` (crop a figure from a PDF — `figures`/`figure`/`autofig` auto-detect, `page`/`crop`
-  manual) · `crop_helper.py` (crop/trim/panel **by looking, not guessing**) · `extract_deck.py` (pull
-  content out of an existing deck — the redesign path).
+  manual; **plus the long-source pair `map` (TOC + word-density skeleton) and `text` (page-range dump
+  for chunked reading)** — the tooling for the content-planner's long-source mode) · `crop_helper.py`
+  (crop/trim/panel **by looking, not guessing**) · `extract_deck.py` (pull content out of an existing
+  deck — the redesign path).
 **Agents** (`agents/`): `content-planner.md` (Step-1 CONTENT deep-understand + claim ledger + per-slide message; the content checkpoint) · `slide-design.md` (the art director — Step-2 design language + per-slide form/layout/rhythm + icons + appear-animation + the Form ledger; the design checkpoint) · `critic.md` (independent critic brief — the two review lenses + JSON schema) · `arbiter.md` (high-stakes finding cross-validation + fix-verification; no-op low-stakes) · `asset-prep.md` (execution-only asset materializer — crops/equations/plates/icons after the design plan is approved; zero design decisions) · `openai.yaml` (Codex display metadata).
 
 **References** (`references/`, loaded on demand): `canvas-formats.md` (per-surface layout DNA for the non-16:9 formats — square/rednote/story/A4 — + the repurpose/batch pattern; pairs `scripts/formats.py`) · `design-principles.md` (the craft / the "why"; incl. the **C.R.A.P. framework** — Contrast · Repetition · Alignment · Proximity) · `design-gallery.md` (style+component catalogue mined from 21 pro decks — pick a preset, reach for the right component) · `semantic-color-contract.md` (bind a hue to a concept deck-wide) · `review-rubrics.md` (universal + per-purpose review criteria) · `design-by-purpose.md` (per-purpose look for "design a clean one") · `form-selection.md` (**content-shape → candidate FORMS** — the single design-decision map; generate a set, pick deliberately) · `schematic-diagrams.md` (**HOW to draw a labelled SCIENCE schematic** — force/ray/circuit/apparatus/vector/wave; matplotlib/domain-lib recipes for precise/label-critical ones, OR the image tool for complex/stylized/template-matched ones with labels overlaid native; + the domain-accuracy fidelity gate) · `data-viz.md` (pick the chart type; editable-native vs raster) · `image-generation.md` (when/how; topical, text-free, consistently placed) · `icons.md` (one coherent open-licensed icon family, recolored, restrained) · `generated-template.md` (Q1's image-tool template branch) · `style-analysis.md` (mimic a style example, Q4) · `font-guidance.md` (portable fonts, tofu recovery) · `multilingual.md` (non-Latin / CJK / RTL) · `east-asian-aesthetic.md` (Chinese ink / traditional looks — paper · seal · CJK numerals · `ink_wash`/`eastern_traditional`) · `animation.md` (when/why + `anim.py`) · `large-deck-orchestration.md` (section fan-out; default is single-author) · `collaborative-mode.md` (direction→outline→draft gates) · `redesign-existing-deck.md` (diagnose-then-rebuild) · `handoff-and-iteration.md` (delivery + iterate without clobbering edits) · `design-intelligence-addendum.md` (the deck-level design gates Step 2 measures against — rhythm map · block-dependency audit · Concept→Visualization table · semantic-colour ledger · variation floors) · `troubleshooting-faq.md` (**symptom → cause → fix for every error surface** — env · build exceptions · both lints · render · images · CJK — plus the FAQ; consult on any failure, and report findings to the user in its plain-language form) · `user-taste.md` (the registry-root `taste.md` — schema · read protocol · dial-ledger promotion + consented-look write-back) · `examples/` (`build_example_generic.py`, `style_example.py`, `section_example.py`).
