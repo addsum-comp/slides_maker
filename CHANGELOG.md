@@ -9,6 +9,21 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+### Added — overflow-proof components (by construction, not by lint)
+- **`meter_bar`** measures the value label's real width, clamps the value box to it, and shortens
+  the BAR when the footprint would leave the canvas (printed note; impossible fits raise) — the
+  recurring right-edge `OFF_CANVAS` bug is now unrepresentable.
+- **`scorecard`** measures the caption's wrapped height (instead of assuming 0.40in) and adapts —
+  value shrinks first, then the caption steps down to an 8.5pt floor — so captions no longer run
+  past the card bottom.
+- **`insight_banner`** measures its body: a too-long body drops one size step, then the bar GROWS
+  to hold it — text never escapes the shape.
+- **`stat_row`** never wraps a figure mid-number (over-wide figures scale down, floor 15pt),
+  measures caption heights, and returns the real bottom y.
+- All four are **byte-identical on fitting calls** — only an overflowing call is adjusted; the four
+  real-world failure shapes from this week's decks are now a permanent smoke-test case
+  (`smoke_deckkit.py` "overflow-proof components"), verified clean at build-time AND render-time lint.
+
 ### Added — free-win deliverables & speed (multi-platform: identical on Claude Code / Codex / Windows)
 - **PDF as a first-class deliverable** — the render pipeline already produces a PDF as its first
   step; `render_deck.py` now parks it beside the `.pptx` (`<deck>.pdf`) instead of burying it in

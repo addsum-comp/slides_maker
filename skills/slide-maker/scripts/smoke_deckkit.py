@@ -426,5 +426,30 @@ def _icon_guard():
 ok("icon_tile auto-guards low glyph/tile contrast (infers ink, nudges tile)", _icon_guard)
 
 prs.save(os.path.join(TMP, "_smoke_deck.pptx"))
+
+# --- overflow-proof components: the four real-world overflow shapes self-heal, lint-clean ---
+def _overflow_proof():
+    # (1) meter_bar near the right edge with the roomy default value_w -> bar auto-shortens
+    p = dk.blank_deck(); s = dk.add_slide(p)
+    dk.meter_bar(s, 4.6, 2.0, 4.7, 0.95, value="15.2%", accent=dk.MAGENTA)
+    # (2) scorecard with a long wrapping caption in a short 4-up tile -> caption fits by measure
+    dk.scorecard(s, 0.7, 1.8, 1.99, 1.9, "UNEMPLOYMENT", "5.9%", delta="-0.1pp",
+                 caption="EU rate, May 2026 - near its all-time low across the whole series")
+    # (3) insight_banner whose body wraps to 2 lines -> bar grows/font steps down, text contained
+    dk.insight_banner(s, 0.7, 4.1, 8.6,
+        "A body long enough to wrap onto a second line in this width, which used to overflow the bar.")
+    # (4) stat_row long figure in a third-width column -> figure scales, never wraps mid-number
+    s2 = dk.add_slide(p)
+    dk.stat_row(s2, 0.7, 2.0, 8.6,
+                [("-0.9 million", "working-age people lost per year, on average (projection)"),
+                 ("2029", "the peak year"), ("10.9%", "slack, trending down")], fig_size=30)
+    dk.lint_layout(p, strict=True)
+    # and a FIT call stays byte-identical in spirit: no faults, no adjustment needed
+    p2 = dk.blank_deck(); s3 = dk.add_slide(p2)
+    dk.meter_bar(s3, 0.7, 2.0, 5.0, 0.6, value="60%", value_w=0.9)
+    dk.scorecard(s3, 0.7, 3.0, 2.2, 1.9, "REVENUE", "42%", caption="short caption")
+    dk.lint_layout(p2, strict=True)
+ok("overflow-proof components (meter_bar/scorecard/insight_banner/stat_row self-heal, lint-clean)", _overflow_proof)
+
 print(f"\nsmoke_deckkit: {len(fails)} failure(s)" + ("" if not fails else " — " + "; ".join(n for n, _ in fails)))
 sys.exit(1 if fails else 0)

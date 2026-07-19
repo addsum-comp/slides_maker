@@ -1105,7 +1105,8 @@ The helper set, by job:
 - **Micro-viz:** `dot_meter` (●●○), `tradeoff_list` (+/−), `segmented_bar` (cumulative 100%), `meter_bar`
   (a single percentile/share/progress row — track + accent fill + a value label **vertically centered on
   the bar**; use this instead of hand-building "track box + fill box + number", which is how value labels
-  end up floating off the bar's centerline).
+  end up floating off the bar's centerline; canvas-safe by construction — an overflowing value
+  auto-shortens the bar instead of leaving the slide).
 - **Photo on-brand (`scripts/image_fx.py`):** `duotone` / `grayscale` so a colour photo doesn't fight
   the accent (riso/brutalist/ink/luxury/museum), then `picture(fit="cover")`.
 

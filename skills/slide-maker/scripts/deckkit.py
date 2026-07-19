@@ -673,16 +673,27 @@ def scorecard(slide, x, y, w, h, label, value, *, delta=None, caption=None, good
     if nat > (w - 0.5):
         vsz = max(16, vsz * (w - 0.5) / nat)
     delta_h = 0.30 if delta else 0.0
-    cap_h = 0.40 if caption else 0.0
+    # caption height is MEASURED, not assumed (the recurring "caption runs past the card
+    # bottom" bug): wrap-count the real text at its size, and adapt until it fits.
+    cap_size = 10.5
+    cap_h = (measure_text([(str(caption), False)], w - 0.5, cap_size, pad=0.12)
+             if caption else 0.0)
     # shrink the value (down to 14pt) so label + value + delta + caption ALL fit the card height —
     # a short 4-up tile can't hold a 33pt value AND a delta AND a caption without them colliding.
-    while vsz > 14 and (0.5 + vsz / 72.0 * 1.2 + 0.08 + delta_h + cap_h) > (h - 0.04):
+    while vsz > 14 and (0.5 + vsz / 72.0 * 1.2 + 0.08 + delta_h + cap_h) > (h - 0.10):
         vsz -= 1.0
+    # still tight? shrink the caption itself (floor 8.5pt) before letting anything escape the card
+    while caption and cap_size > 8.5 and (0.5 + vsz / 72.0 * 1.2 + 0.08 + delta_h + cap_h) > (h - 0.10):
+        cap_size -= 0.5
+        cap_h = measure_text([(str(caption), False)], w - 0.5, cap_size, pad=0.12)
+    if caption and (0.5 + vsz / 72.0 * 1.2 + 0.08 + delta_h + cap_h) > (h - 0.02):
+        print("[deckkit] scorecard: caption doesn't fit the tile even at 8.5pt — shorten the "
+              "caption or grow the card (h)")
     tbv = text(slide, px, y + 0.5, w - 0.5, 0.8, [[(str(value), vsz, val_c, True, False)]], space_after=0)
     tbv.text_frame.word_wrap = False                                      # never char-break the number
     cy = max(y + 1.32, y + 0.5 + vsz / 72.0 * 1.2 + 0.08)                 # airy floor when there's room
     if cy + delta_h + cap_h > y + h - 0.04:                              # ...compressed only when tight
-        cy = max(y + 0.5 + vsz / 72.0 * 1.2 + 0.08, y + h - 0.04 - delta_h - cap_h)
+        cy = max(y + 0.5 + vsz / 72.0 * 1.2 + 0.08, y + h - 0.10 - delta_h - cap_h)
     if delta:
         d = str(delta).strip()
         up = not d.startswith(("-", "▼"))            # unsigned / '+' = increase; sign required for a decrease
@@ -690,7 +701,7 @@ def scorecard(slide, x, y, w, h, label, value, *, delta=None, caption=None, good
         text(slide, px, cy, w - 0.5, 0.28, [[(("▲ " if up else "▼ ") + d.lstrip("+-▲▼ "), 12, dc, True, False)]], space_after=0)
         cy += delta_h
     if caption:
-        text(slide, px, cy, w - 0.5, cap_h, [[(caption, 10.5, cap_c, False, False)]], space_after=0)
+        text(slide, px, cy, w - 0.5, cap_h, [[(caption, cap_size, cap_c, False, False)]], space_after=0)
 
 
 def leaderboard(slide, x, y, w, rows, *, row_h=0.5, gap=0.1, ink=DEEP):
@@ -773,23 +784,32 @@ def big_numeral(slide, x, y, n, *, mode="marker", color=MAGENTA, size=None, w=No
 def stat_row(slide, x, y, w, items, *, ink=DEEP, accent=MAGENTA, serif=None, dividers=True,
              fig_size=34, label_c=MUTE):
     """Editorial big-number row: items = [(figure, unit, label), ...] in 2-4 equal columns with
-    optional vertical hairline dividers. For 2-4 standout numbers with no trend to plot."""
+    optional vertical hairline dividers. For 2-4 standout numbers with no trend to plot.
+    BY CONSTRUCTION: a figure never wraps mid-number (an over-wide one scales down, floor 15pt)
+    and caption height is measured — returns the real bottom y."""
     if not items:
         return y
     n = len(items); gap = 0.4; cw = (w - (n - 1) * gap) / n
+    bottom = y + 1.1
     for i, item in enumerate(items):
         fig, unit, label = item if len(item) == 3 else (item[0], "", item[1])  # unit is optional
         cx = x + i * (cw + gap)
-        runs = [(str(fig), fig_size, ink, True, False, serif)]
+        fsz = fig_size
+        mruns = [(str(fig), True)] + ([(" " + str(unit), True)] if unit else [])
+        nat = _natural_width_in(mruns, fsz, serif)
+        if nat > cw:                              # the "-0.9 million" mid-number split bug
+            fsz = max(15.0, fig_size * cw / nat * 0.98)
+        runs = [(str(fig), fsz, ink, True, False, serif)]
         if unit:
-            runs.append((" " + str(unit), fig_size * 0.42, accent, True, False, serif))
-        text(slide, cx, y, cw, 0.7, [runs], space_after=0)
-        text(slide, cx, y + 0.66, cw, 0.4, [[(str(label), 12, label_c, False, False)]], space_after=0)
+            runs.append((" " + str(unit), fsz * 0.42, accent, True, False, serif))
+        tb = text(slide, cx, y, cw, 0.7, [runs], space_after=0)
+        tb.text_frame.word_wrap = False
+        cap_h = max(0.4, measure_text([(str(label), False)], cw, 12, pad=0.04))
+        text(slide, cx, y + 0.66, cw, cap_h, [[(str(label), 12, label_c, False, False)]], space_after=0)
+        bottom = max(bottom, y + 0.66 + cap_h + 0.04)
         if dividers and i > 0:
             box(slide, cx - gap / 2, y + 0.06, 0.014, 0.9, fill=RGBColor(0xDD, 0xDD, 0xDD))
-    return y + 1.1
-
-
+    return bottom
 def _set_baseline(run, pct):
     """Raise (or lower, if negative) a run by `pct` percent of its font size via the OOXML baseline
     shift — used to vertically centre a small run beside a much larger one WITHOUT splitting them
@@ -3712,9 +3732,21 @@ def insight_banner(slide, x, y, w, body, *, label="INSIGHT", fill=None, accent=N
     f = fill if fill is not None else DEEP
     acc = accent if accent is not None else GOLD
     tc = tcolor if tcolor is not None else WHITE
+    # BY-CONSTRUCTION fit (the recurring "banner body cramped/overflowing its bar" bug): measure
+    # the real wrapped height; a too-long body first drops one size step, then the BAR GROWS to
+    # hold it — text never escapes the shape. A fitting call is byte-identical.
+    body_size = 13.5
+    need = measure_text([(label + "   ", True), (str(body), False)], w - 0.5, body_size, pad=0.24)
+    if need > h:
+        body_size = 12.5
+        need = measure_text([(label + "   ", True), (str(body), False)], w - 0.5, body_size, pad=0.24)
+    if need > h:
+        print(f"[deckkit] insight_banner: grew {need - h:.2f}in to hold the body (shorten it to "
+              "keep the compact bar)")
+        h = need
     box(slide, x, y, w, h, fill=f, round=True)
     box(slide, x, y + 0.1, 0.06, h - 0.2, fill=acc)
-    runs = [(label + "   ", 11, acc, True, False), (body, 13.5, tc, False, False)]
+    runs = [(label + "   ", 11, acc, True, False), (body, body_size, tc, False, False)]
     text(slide, x + 0.28, y, w - 0.5, h, [runs], anchor=MSO_ANCHOR.MIDDLE, space_after=0)
     return y + h
 
@@ -4295,12 +4327,33 @@ def meter_bar(slide, x, y, w, frac, *, label=None, value=None, value_unit=None,
 
     Colours default to deckkit's light palette; on a DARK deck pass ``track=`` your panel
     colour, ``ink=`` your body colour, ``label_c=`` your muted colour, and ``accent=``.
-    Returns the bar's BOTTOM y (so a caller can stack rows)."""
+    CANVAS-SAFE BY CONSTRUCTION: the value's real width is measured, the value box clamps to
+    it, and if the footprint would leave the canvas the BAR shortens (with a printed note) —
+    a fitting call is unchanged; an impossible one raises. Returns the bar's BOTTOM y."""
     acc = accent if accent is not None else BLUE
     tr = track if track is not None else RGBColor(0xE6, 0xE9, 0xEE)
     vink = ink if ink is not None else DEEP
     lc = label_c if label_c is not None else MUTE
     f = max(0.0, min(1.0, frac))
+    # BY-CONSTRUCTION canvas guard (the recurring OFF_CANVAS bug this kills: a right-side value
+    # label pushed past the slide edge by the roomy default value_w). Measure the value's REAL
+    # one-line width, clamp the value box to it, and if the footprint still leaves the canvas,
+    # shorten the BAR — a correct call is byte-identical; only an overflowing one is adjusted.
+    vw = value_w
+    if value is not None:
+        vruns = [(str(value), True)]
+        if value_unit:
+            vruns.append((" " + str(value_unit), True))
+        natural = _natural_width_in(vruns, value_size, value_font or font) + 0.10
+        vw = min(value_w, max(0.45, natural))
+        sw, _sh = _slide_size(slide)
+        overhang = (x + w + value_pad + vw) - (sw - 0.06)   # worst case: value_pos="right"
+        if overhang > 0:
+            if w - overhang < 0.5:
+                raise ValueError(
+                    "meter_bar(): no room for the value label on-canvas — reduce x, w, or value_size")
+            print(f"[deckkit] meter_bar: bar shortened {overhang:.2f}in so the value stays on-canvas")
+            w -= overhang
     yt = y + (gap_above if label else 0.0)
     if label:
         text(slide, x, y, w, gap_above, [[(str(label), label_size, lc, False, False, font)]],
@@ -4314,7 +4367,8 @@ def meter_bar(slide, x, y, w, frac, *, label=None, value=None, value_unit=None,
         if value_unit:
             runs.append((" " + str(value_unit), unit_size, lc, True, False, value_font or font))
         # value box shares the bar's y/h with MIDDLE anchor → text on the bar's centerline
-        text(slide, vx, yt, value_w, h, [runs], anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+        tbv = text(slide, vx, yt, vw, h, [runs], anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+        tbv.text_frame.word_wrap = False           # a value never wraps mid-number
     return yt + h
 
 
