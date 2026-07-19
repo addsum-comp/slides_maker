@@ -6,9 +6,9 @@ treatment + image-prompt style, so a deck's look is consistent from the first sl
 These are *starting languages*, not straitjackets — the model still tunes to the brand/purpose and
 the user's references always win. Apply one like:
 
-    from presets # NOTE: CJK faces use 'Hiragino Sans GB', NOT 'PingFang SC' — the macOS LibreOffice
-# render loop substitutes a handwriting face for PingFang (see deckkit.EAFONT comment).
-import preset
+    from presets import preset
+    # NOTE: CJK faces use 'Hiragino Sans GB', NOT 'PingFang SC' — the macOS LibreOffice
+    # render loop substitutes a handwriting face for PingFang (see deckkit.EAFONT comment).
     p = preset("glassmorphism")
     deckkit.FONT = p["font"]; deckkit.DISPLAY = p["display"]; deckkit.MONO = p["mono"]
     INK = p["ink"]; ACCENTS = p["accents"]; BG = p["bg"]
@@ -33,8 +33,14 @@ or a recorded named deviation (the plan line naming the guard it overrides) lift
 critic treats a recorded guard deviation like the stylized-illustration deviation — a taste call,
 not a register break.
 """
+import sys as _sys
 from pptx.dml.color import RGBColor
 def C(h): return RGBColor.from_string(h)
+
+# The calligraphic 楷体 family ships under DIFFERENT names per platform: macOS has 'Kaiti SC'
+# (no family named plain 'KaiTi' exists there), Windows has 'KaiTi'. Resolve at import so the
+# ink presets' signature titles never ride an uncontrolled font substitution in the build loop.
+_KAITI = "Kaiti SC" if _sys.platform == "darwin" else "KaiTi"
 
 PRESETS = {
     "glassmorphism": {
@@ -152,8 +158,8 @@ PRESETS = {
     "ink_wash": {
         "mood": "Chinese ink editorial (藏拙) — warm paper, ink black, one seal red, KaiTi serif",
         "bg": C("F5F1E8"), "ink": C("1A1A1A"), "muted": C("8B8680"),
-        "accents": [C("A52A2A"), C("5C5852")], "font": "Hiragino Sans GB", "display": "KaiTi", "mono": "Consolas",
-        "ea": "Hiragino Sans GB", "ea_display": "KaiTi",
+        "accents": [C("A52A2A"), C("5C5852")], "font": "Hiragino Sans GB", "display": _KAITI, "mono": "Consolas",
+        "ea": "Hiragino Sans GB", "ea_display": _KAITI,
         "surface": "warm-paper bg, large KaiTi/Songti CJK display, ink-black body; ONE seal-red accent "
                    "as a chop/seal stamp (deckkit.seal) + CJK numeral section markers (壹贰叁, via "
                    "deckkit.cjk_numeral); hairline rules, generous margins, dark label-chips for "
@@ -167,8 +173,8 @@ PRESETS = {
     "eastern_traditional": {
         "mood": "Eastern traditional-colour narrative — warm paper, ochre-gold + sage, KaiTi",
         "bg": C("F7F2E8"), "ink": C("3A3530"), "muted": C("7A7068"),
-        "accents": [C("C99E62"), C("6F8F75"), C("A52A2A")], "font": "Hiragino Sans GB", "display": "KaiTi", "mono": "Consolas",
-        "ea": "Hiragino Sans GB", "ea_display": "KaiTi",
+        "accents": [C("C99E62"), C("6F8F75"), C("A52A2A")], "font": "Hiragino Sans GB", "display": _KAITI, "mono": "Consolas",
+        "ea": "Hiragino Sans GB", "ea_display": _KAITI,
         "surface": "warm-paper bg with a TRADITIONAL Chinese colour palette (ochre-gold 赭 + sage 竹青 + "
                    "vermilion 朱); KaiTi/Songti display, refined body; colour-name swatches, seal "
                    "stamps (deckkit.seal), vertical-text accents, ink-wash motifs. The colours "

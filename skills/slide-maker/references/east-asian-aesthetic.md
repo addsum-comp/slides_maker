@@ -25,10 +25,14 @@ vast breathing room. Reach for it on 中文 cultural / 文化 / 人文 / 传统 
   一·二·三 (`style="simple"`) instead of Latin "01 / 02 / 03". Set them in the seal-red or ink, large,
   as wayfinding (TOC, dividers, enumerated columns). This single swap is what most makes a CJK deck
   stop looking like a translated Western template.
-- **Brush / serif CJK display.** Set `deckkit.EADISPLAY = "KaiTi"` (楷体) or `"Songti SC"` (宋体) for
-  titles — a calligraphic/serif face carries the register; PingFang/Heiti (sans) for body. (Flag the
-  font dependency at hand-off — KaiTi ships on macOS; on Windows use 楷体/STKaiti, and a render machine
-  without it falls back, though the `.pptx` still tags it. See `font-guidance.md` / `multilingual.md`.)
+- **Brush / serif CJK display.** Set `deckkit.EADISPLAY = "Kaiti SC"` (楷体 — the macOS family name;
+  on Windows the same face is named `"KaiTi"`; `presets.py`'s `_KAITI` resolves this per platform) or
+  `"Songti SC"` (宋体) for titles — a calligraphic/serif face carries the register. For body use
+  **Hiragino Sans GB** (render-loop-safe) or Heiti — **PingFang SC is final-deck-only**: the macOS
+  LibreOffice render loop substitutes it with a handwriting face, blinding the render self-check (the
+  render-loop trap in `multilingual.md`; the ink presets ship `ea="Hiragino Sans GB"` for this reason).
+  (Flag the font dependency at hand-off — a render machine without the face falls back, though the
+  `.pptx` still tags it. See `font-guidance.md` / `multilingual.md`.)
 - **Generous emptiness (留白).** Negative space is a *positive* element here — a near-empty slide with
   one line of large type and a seal reads as confident and literary. Resist filling it (this is the one
   register where the "no large empty region" rule yields to deliberate 留白 — keep ONE focal element).

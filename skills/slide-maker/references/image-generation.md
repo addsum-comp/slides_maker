@@ -134,7 +134,7 @@ where a fabricated product render never is. Source it in order, stopping at the 
 3. **NEVER a fabricated fake of a real entity's official logo** — an invented mark passed off as the
    real thing is a fidelity violation (it misstates a real thing) and reads as fake instantly.
 
-**Minimal wordmark recipe — keep it restrained:** set the entity's **name in the deck's DISPLAY face**,
+**Minimal wordmark recipe — keep it restrained:** set the entity's **name in the deck's DISPLAY face** (a CJK name automatically takes the EA display face — `deckkit.wordmark` is CJK-aware, so a Chinese entity name never ships as tofu),
 optionally with a **simple monogram** (its initial in a disc / square) or a thin rule / dot separator, in
 the **deck palette** — nothing more. A wordmark is type done well, not an illustration.
 

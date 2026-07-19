@@ -241,6 +241,7 @@ ok("axis_scale (linear map + degenerate span + draw_axis)", _axis_scale)
 
 # --- dot_strip: value-mapped dots with anti-collision labels, lint-clean ---
 def _dot_strip():
+    dk.EAFONT = dk.EAFONT or "Hiragino Sans GB"    # CJK labels need the EA slot (CJK_NO_EA gate)
     p = dk.blank_deck(10, 5.625); s2 = dk.add_slide(p)
     dk.dot_strip(s2, 0.6, 2.0, 8.0, [("博后", 70), ("学术", 100), ("工业", 180)],
                  60, 190, highlight=2, unit="k")

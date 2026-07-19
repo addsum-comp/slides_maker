@@ -2589,6 +2589,20 @@ def _theme_chart(ch, series, *, palette, dark, font, highlight, legend, value_fm
                 ser.format.fill.solid(); ser.format.fill.fore_color.rgb = col
             except Exception:
                 pass
+    # python-pptx writes font names into <a:latin> only, but PowerPoint renders CJK glyphs
+    # (category/series labels like 一月/营收) from the <a:ea> slot — without this, a Chinese
+    # deck's chart labels fall back to the theme's uncontrolled EA default font.
+    try:
+        for defrpr in ch._chartSpace.iter(qn('a:defRPr')):
+            if defrpr.find(qn('a:ea')) is None:
+                ea = defrpr.makeelement(qn('a:ea'), {'typeface': fname})
+                latin = defrpr.find(qn('a:latin'))
+                if latin is not None:
+                    latin.addnext(ea)
+                else:
+                    defrpr.insert(0, ea)
+    except Exception:
+        pass
     return ch
 
 
@@ -3246,10 +3260,23 @@ def wordmark(text, out_path, *, font=None, color=None, size=180, rule=False, mon
     `pad` is transparent margin as a fraction of `size`. Keep it restrained: a wordmark, not a
     logo redraw."""
     from PIL import Image, ImageDraw, ImageFont
-    fam = font or DISPLAY or FONT
     ink = _as_rgb(color) if color is not None else DEEP
     ink_rgba = tuple(int(v) for v in ink) + (255,)
-    fp = _font_file(fam) or _font_file(FONT)
+    # CJK-aware: a Chinese/Japanese/Korean entity name must take an EA-capable face, or PIL
+    # resolves a Latin face with no CJK cmap and the deck's logo stand-in ships as tofu chrome.
+    if _has_cjk(str(text)):
+        chosen = font or EADISPLAY or EAFONT
+        fp = _font_file(chosen) if chosen else None
+        if fp is None:                           # no usable EA face chosen — pick a CJK-capable one
+            for cand in ("Hiragino Sans GB", "PingFang SC", "Microsoft YaHei",
+                         "Noto Sans CJK SC", "SimHei"):
+                fp = _font_file(cand)
+                if fp:
+                    break
+        fp = fp or _font_file(DISPLAY or FONT) or _font_file(FONT)
+    else:
+        fam = font or DISPLAY or FONT
+        fp = _font_file(fam) or _font_file(FONT)
     try:
         f = ImageFont.truetype(fp, int(size))
     except Exception:
@@ -4566,6 +4593,28 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
             st = str(getattr(sh, "shape_type", ""))
             r = _ink_rect(sh, bb) if (_is_text(sh) and not _is_watermark(sh)) else None
             info.append((sh, bb, st, (r[0] if r else None), r))
+        # CJK runs with no <a:ea> font — fully detectable from the in-memory pptx, so fail at
+        # BUILD time instead of after the expensive render round-trip (lint_deck re-checks as the
+        # backstop): without the EA slot, PowerPoint/LibreOffice pick an uncontrolled fallback
+        # font and kinsoku (避头尾) never engages.
+        bad_ea = []
+        for sh in slide.shapes:
+            if not getattr(sh, "has_text_frame", False):
+                continue
+            for para in sh.text_frame.paragraphs:
+                for run in para.runs:
+                    try:
+                        if _has_cjk(run.text):
+                            rPr = run._r.find(qn("a:rPr"))
+                            if rPr is None or rPr.find(qn("a:ea")) is None:
+                                bad_ea.append(run.text.strip()[:12])
+                    except Exception:
+                        pass
+        if bad_ea:
+            findings.append((n, "CRITICAL", "CJK_NO_EA",
+                             f"{len(bad_ea)} CJK run(s) carry no <a:ea> font (e.g. '{bad_ea[0]}') — set "
+                             "deckkit.EAFONT (e.g. 'Hiragino Sans GB') before building so CJK renders "
+                             "with a controlled font and 避头尾 engages"))
         # candidate CARD/PANEL/CHIP containers a label should sit inside: filled, boxy auto-shapes —
         # wide AND tall enough to be a panel (so thin accent rails, icon tiles and badges are excluded),
         # and not a full-bleed background. Chip/node-sized boxes count, so their labels get escape-checked.

@@ -80,6 +80,7 @@ it refuses to save while criticals exist. Codes, in plain words:
 | `OFFCENTER` • | A single text line sits noticeably high or low inside its tall box — looks like a spacing bug | Cheapest: `anchor=MSO_ANCHOR.MIDDLE` on the textbox at the card's exact x/y/w/h; else shrink the box to the text or move its y; harmless on deliberately top-anchored chips |
 | `SLIVER_GAP` • | Two blocks almost touch (a hair-thin gap) — reads as a rendering accident | Open the gap to ≥ ~0.13 in — derive the pitch from `rows()`/`vstack()`, never `block_h + ε` (touching edges are their own flaw — "one merged block"; deliberately-jointed zones are a named exception, not the default fix) |
 | `FOOTER` • | Content dips into the reserved footer band at the bottom | Keep content above the band (the card/panel variant of the message gives the exact y-line; the text variant quotes the colliding block — move it up) |
+| `CJK_NO_EA` ✗ | CJK text with no `<a:ea>` font — PowerPoint/LibreOffice would pick an uncontrolled fallback and 避头尾 never engages | Set `deckkit.EAFONT = "Hiragino Sans GB"` (macOS; Microsoft YaHei on Windows, Noto Sans CJK SC on Linux) before building — `references/multilingual.md` has the pairing table |
 
 A build that ends `0 critical, N warning(s)` **saves fine** — warnings are judgment calls; the two
 you most often accept deliberately are `OFFCENTER` on chip labels and `ESCAPES_CARD` on
@@ -164,10 +165,11 @@ deliberate choice, not a miss" — silence reads as "didn't notice".
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| CJK lines nearly touching (cramped) — or too airy | `line_spacing` set as if it were an em-multiple — **python-pptx floats are multiples of SINGLE spacing (~1.2× font size)**, so 1.28 actually renders ≈1.54× | Leave `line_spacing=None` (deckkit resolves per-script defaults), or stay within ~1.08–1.21 for CJK body (deckkit's default `CJK_LS = 1.12` ≈ 1.34× font size; never below ≈1.04 even on a dense deck — `references/multilingual.md` owns the ladder) |
+| `CJK TIGHT LEADING` warn / CJK lines nearly touching (cramped) — or too airy | `line_spacing` set as if it were an em-multiple — **python-pptx floats are multiples of SINGLE spacing (~1.2× font size)**, so 1.28 actually renders ≈1.54× | Leave `line_spacing=None` (deckkit resolves per-script defaults), or stay within ~1.08–1.21 for CJK body (deckkit's default `CJK_LS = 1.12` ≈ 1.34× font size; never below ≈1.04 even on a dense deck — `references/multilingual.md` owns the ladder) |
 | `CJK-LATIN SPACING` warn | Mixed `中文 Latin` spaced *and* unspaced in the same deck | Pick one convention (spaced is house style) and apply it everywhere — `pangu()` normalizes |
 | CJK text much wider than planned | CJK glyphs are ~1.7–2× the width of Latin at equal pt | Budget CJK strings at that multiplier when sizing boxes (the width contract in `references/multilingual.md`) |
 | Font renders as serif/wrong style for 中文 | EA font not set per-run; PowerPoint fell back | Set `dk.EAFONT` before building (§2) |
+| `PINGFANG ON MACOS` warn | The macOS LibreOffice render loop substitutes PingFang SC with a handwriting-style face — the QC loop then judges pixels PowerPoint will never show | Switch `dk.EAFONT` to `"Hiragino Sans GB"` for the build/render loop (PingFang SC is final-deck-only) — the render-loop trap in `references/multilingual.md` |
 
 ## 10 · FAQ one-liners
 

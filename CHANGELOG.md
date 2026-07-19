@@ -9,6 +9,32 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+### Fixed — ZH/EN system consistency (from a 2-round bilingual audit incl. a live CJK build test)
+- **`presets.py` KaiTi platform bug** — `ink_wash`/`eastern_traditional` hardcoded `"KaiTi"`, a family
+  name that does not exist on macOS (it's `"Kaiti SC"`); the ink presets' calligraphic titles rode an
+  uncontrolled font substitution. Now resolved per platform via `_KAITI`; `east-asian-aesthetic.md`
+  corrected (it claimed the reverse of `multilingual.md`'s correct table) and its PingFang body
+  recommendation now carries the render-loop-trap caveat. Also repaired a docstring line that had
+  split `from presets import preset` in half.
+- **`wordmark()` CJK tofu** — a Chinese entity name resolved to a Latin face with no CJK cmap and the
+  deck's sanctioned logo stand-in shipped as tofu chrome (verified). Now CJK-aware:
+  font → EADISPLAY → EAFONT → a CJK-capable system face; documented in `multilingual.md` +
+  `image-generation.md`.
+- **`native_chart` CJK labels uncontrolled** — python-pptx writes font names into `<a:latin>` only,
+  so chart category/series labels (一月/营收) fell back to the theme's EA default. `_theme_chart` now
+  writes `<a:ea>` into every chartSpace `defRPr` (verified in the XML).
+- **New build-time gate `CJK_NO_EA`** — CJK runs with no `<a:ea>` font now fail `lint_layout`
+  (CRITICAL) at build time instead of only after the render round-trip; `lint_deck` stays as the
+  backstop. FAQ §4 row added; SKILL.md's lint classifications updated.
+- **`extract_pdf._load` aligned byte-for-byte with `lint_deck._text_load`** — CJK punctuation
+  handling, ASCII-punctuation splits and rounding had drifted (~19% heavier on Chinese prose), so
+  Chinese PDFs crossed long-source thresholds earlier than equivalent English ones (verified equal
+  on mixed samples now).
+- Checkpoint-table headers: documented that they follow the conversation language (the 中文 column
+  names in SKILL.md are not fixed for English decks). FAQ: added the `PINGFANG ON MACOS` row and
+  named `CJK TIGHT LEADING` in its row. README EN/CN micro-drifts aligned (fraction/matrix fallback
+  wording, 独立复核, structured analysis, interview tab labels).
+
 ## [3.4.0] - 2026-07-19
 
 ### Added — multi-format source ingestion (Word · Excel · image · audio · video · cloud)

@@ -83,7 +83,8 @@ section of `font-guidance.md`). Use a CJK **display** face for titles and a CJK 
 text, plus a clean **Latin** face for the numbers/English inside CJK runs:
 - `deckkit.EADISPLAY` = CJK title face (e.g. **Hiragino Sans GB**), `deckkit.EAFONT` = CJK body face
   (e.g. **Hiragino Sans GB** / **Noto Sans CJK SC**) — `title_bar`/`editorial_header` then set
-  titles in EADISPLAY and body in EAFONT automatically.
+  titles in EADISPLAY and body in EAFONT automatically. `wordmark()` is CJK-aware too — a CJK
+  entity name resolves EADISPLAY→EAFONT→a CJK-capable system face, never a Latin-only font.
 - `deckkit.DISPLAY`/`deckkit.FONT` = the Latin faces for those same roles, so digits/units/English
   (e.g. "≈40%", "1/5–1/7") render in a crisp Latin face, not the CJK fallback.
 

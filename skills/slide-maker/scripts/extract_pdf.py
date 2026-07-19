@@ -78,16 +78,18 @@ def _open(pdf):
     return doc
 
 
-_CJK = re.compile(r"[㐀-鿿豈-﫿぀-ヿ가-힯]")
+# byte-for-byte the same formula as lint_deck._text_load / plan_wordcount, so the `source size:`
+# trigger and per-page triage use the SAME budget currency as the plan/render lints (a drifted
+# counter made Chinese PDFs read ~19% heavier than the equivalent English ones).
+_CJK_RANGES = ((0x3040, 0x30FF), (0x3400, 0x4DBF), (0x4E00, 0x9FFF), (0xAC00, 0xD7AF), (0xF900, 0xFAFF))
 
 
 def _load(s):
-    """Reading load = latin words + CJK chars / 2 (matches the skill's lint/plan counter, so the
-    `source size:` trigger is correct for Chinese/Japanese/Korean, where whitespace-splitting would
-    undercount 10-30x)."""
-    cjk = len(_CJK.findall(s))
-    latin = len(_CJK.sub(" ", s).split())
-    return latin + cjk // 2
+    """Reading load = latin words + CJK chars / 2 (identical to the skill's lint/plan counter —
+    CJK punctuation excluded from both streams, ASCII-punctuation splits, round-half-up)."""
+    cjk = sum(1 for ch in s if any(a <= ord(ch) <= b for a, b in _CJK_RANGES))
+    latin = len([w for w in "".join(ch if (ch.isalnum() and ord(ch) < 0x2E80) else " " for ch in s).split() if w])
+    return latin + (cjk + 1) // 2
 
 
 def info(pdf):

@@ -149,7 +149,9 @@ in the plan, posted on request or on any digest anomaly) + emotional-curve line 
 **(long source only) a 1-line Source-coverage DIGEST** (`source: 320 pp · built-around 4 ch ·
 summarised 3 · cut 5` + the chosen slice — full per-chapter map in the plan) + **(video source only)
 the transcript-status line** (supplied locator, or "visual-only — spoken content is a GAP") + ONE table (`# | 角色 | 记忆句(takeaway) |
-承载证据 | units`) — the `units` column is the count of content units the row carries (the
+承载证据 | units` — **headers follow the conversation language**: on an English-conversation deck use
+`# | role | takeaway | carrying evidence | units`; the column MEANINGS are fixed, the header language
+is not) — the `units` column is the count of content units the row carries (the
 distribution pass's output): a `1` on a standalone content slide or a `6+` on a spoken beat is
 visible at a glance, so an about-to-be-empty or about-to-be-dense page gets caught at the
 checkpoint, not at the render. The table's takeaway column, read top to bottom, IS the Takeaway spine: append only
@@ -1345,9 +1347,11 @@ A few rules that matter (see `references/design-principles.md`):
   the mechanical layout faults: it runs in-process in milliseconds, *before* the slow render +
   visual-critic round, and walks **every** shape — however it was placed, the grid helpers or raw
   coordinates — reasoning about each label's **ink** rectangle (where the glyphs actually land), so it
-  stays quiet on the generously-sized frames real builds use. It **hard-fails (CRITICAL)** on three
+  stays quiet on the generously-sized frames real builds use. It **hard-fails (CRITICAL)** on four
   things: content (text ink / a card / a non-bleed image) **off-canvas**, text **overflowing** a visible
-  box, and **text-on-text** overlap; it **warns** on a label/figure **escaping its card**, a **single
+  box, **text-on-text** overlap, and **CJK runs with no `<a:ea>` font** (`CJK_NO_EA` — set
+  `deckkit.EAFONT` before building; catching it here saves the render round-trip lint_deck previously
+  needed); it **warns** on a label/figure **escaping its card**, a **single
   line left off-centre** in a card, content **reaching the footer**, and **two panels nearly
   touching** (`SLIVER_GAP` — a 0.005–0.10in seam between panels, or a panel and a picture: the
   hand-picked-pitch bug). (Each code's plain-language meaning + first fix:
@@ -2098,7 +2102,7 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
 - `lint_deck.py` — deterministic **render-time** layout lint and complement to deckkit's build-time
   `lint_layout`: re-checks geometry on the final file (off-slide overflow · block/image collision
   [containment excluded] · footer-zone intrusion · text-past-card · uneven rows) AND adds the
-  render/parse-only faults (CJK kinsoku/widow · missing EA font · whole-page-image · orphan slides);
+  render/parse-only faults (CJK kinsoku/widow · whole-page-image · orphan slides — plus missing EA font as the render-time BACKSTOP; `lint_layout` now catches it at build time as `CJK_NO_EA`);
   run after render, before critic; non-zero on findings. `smoke_deckkit.py` — regression guard for the helpers.
 - `plan_wordcount.py` — advisory per-slide word-budget pass over the Content plan's table (the Step-1
   comprehension-gate check; write the table to a scratch path, never the deliverable folder).
