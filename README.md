@@ -11,6 +11,7 @@
   <img alt="Output: editable PPTX" src="https://img.shields.io/badge/output-native_editable_PPTX-0f766e">
   <a href="https://skillhub.cloud.tencent.com/skills/slides-maker"><img alt="Tencent SkillHub" src="https://img.shields.io/badge/Tencent_SkillHub-get_it-2f6feb"></a>
   <a href="https://xiaping.coze.com/skill/c0136d99-50d0-4f05-909a-f78fa4be7104"><img alt="Coze" src="https://img.shields.io/badge/Coze-get_it-6653f5"></a>
+  <a href="https://clawhub.ai/dong845/skills/slide-maker"><img alt="ClawHub" src="https://img.shields.io/badge/ClawHub-install_via_OpenClaw-e8590c"></a>
   <a href="https://chatgpt.com/g/g-6a5b41f0a33881918be69e8b10f8b4ff-slide-maker-gpt"><img alt="ChatGPT GPT Store" src="https://img.shields.io/badge/GPT_Store-slide--maker_GPT-10a37f"></a>
 </p>
 
@@ -203,8 +204,10 @@ To be plain about it: it does not promise a perfect deck in one shot. It promise
 > Zero setup; the local install below stays the full-power path.
 >
 > **Prefer a marketplace? slide-maker is also published on
-> [Tencent SkillHub](https://skillhub.cloud.tencent.com/skills/slides-maker) and
-> [Coze 小瓶智能体](https://xiaping.coze.com/skill/c0136d99-50d0-4f05-909a-f78fa4be7104)** —
+> [Tencent SkillHub](https://skillhub.cloud.tencent.com/skills/slides-maker),
+> [Coze 小瓶智能体](https://xiaping.coze.com/skill/c0136d99-50d0-4f05-909a-f78fa4be7104), and
+> [ClawHub](https://clawhub.ai/dong845/skills/slide-maker) — the last one installs straight into
+> [OpenClaw](https://openclaw.ai), so OpenClaw users get slide-maker too** —
 > grab it there by following each page's install instructions, then come back for the runtime
 > dependencies below (they apply however you install).
 
