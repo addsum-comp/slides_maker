@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://clawhub.ai/dong845/skills/slide-maker"><img alt="ClawHub" src="https://img.shields.io/badge/ClawHub-via_OpenClaw-e8590c.svg"></a>
+  <a href="https://clawhub.ai/dong845/skills/slide-maker"><img alt="ClawHub" src="docs/badges/clawhub.svg"></a>
   <a href="https://chatgpt.com/g/g-6a5b41f0a33881918be69e8b10f8b4ff-slide-maker-gpt"><img alt="ChatGPT GPT Store" src="https://img.shields.io/badge/GPT_Store-slide--maker_GPT-10a37f"></a>
 </p>
 
