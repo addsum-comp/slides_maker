@@ -2007,8 +2007,9 @@ user the exact output folder path (`~/Downloads/<deck-name>/`, or wherever they
 chose) and ask them to open it and check the `.pptx`** — the rendered PNGs verify
 layout, but they should confirm the editable deck itself opens cleanly on their
 machine. **Then OFFER the two reserved deliverables rather than shipping them unasked** — a
-**`.pdf`** (submission / email / print) and a self-contained **`viewer.html`** flip-through preview
-(one `file://` link, any browser, any OS, no PowerPoint needed). They are deliberately not generated
+**`.pdf`** (submission / email / print) and a **`viewer.html`** flip-through preview
+(one `file://` link, any browser, any OS, no PowerPoint needed). It is zero-dependency, not
+self-contained: it references the `render/` PNGs by relative path, so move the two together. They are deliberately not generated
 during the build, because a deck still being edited makes them stale immediately. Ask in one line
 ("want a PDF and a browser preview?"); on a yes — or once the user confirms this is the final
 version — run `bash scripts/render_deck.sh <deck.pptx> --deliverables` (or

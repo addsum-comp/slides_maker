@@ -608,6 +608,18 @@ def _oldstyle_figures():
             dk.kpi_card(s, 3.2, 3.6, 2.2, 1.2, "USERS", "1,634")
             dk.ghost_numeral(s, 6.0, 3.6, 3.0, 1.4, "07")
         assert not _lint_prs(_numerals), "preset %s must survive its own numeral components" % _nm
+    # A PROVIDED template can make the BODY face Georgia (SKILL.md tells the builder to set
+    # deckkit.FONT to the template's font). The preset loop above cannot catch that, because every
+    # shipped preset uses a sans body face - scorecard/kpi_card/change_stat inherit FONT for their
+    # figures and hard-failed on their own output in exactly that configuration.
+    dk.DISPLAY = dk.FONT = "Georgia"
+    def _figures(s):
+        dk.scorecard(s, 0.6, 1.0, 2.4, 1.3, "REVENUE", "596,513")
+        dk.kpi_card(s, 3.2, 1.0, 2.6, 1.3, "USERS", "1,634")
+        dk.change_stat(s, 0.6, 2.6, 5.0, 0.9, "4,461", "4,509")
+        dk.stat_row(s, 0.6, 3.8, 8.6, [("596,513", "", "returns")])
+        dk.big_numeral(s, 0.6, 4.8, "03")
+    assert not _lint_prs(_figures), "figure components must survive a Georgia BODY face"
     dk.DISPLAY, dk.FONT = _saved
 
     # The digit-share metric must not invert on CJK: a year inside a Chinese heading is a heading.

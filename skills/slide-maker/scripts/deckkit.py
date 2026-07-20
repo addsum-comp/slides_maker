@@ -240,7 +240,11 @@ DISPLAY = None            # optional DISPLAY/title font (Latin) — when set, ti
 # (digit top-spread 2/100pt), which would have force-substituted a deliberately chosen face and
 # hard-failed a hero numeral for a defect that does not exist.
 _OLDSTYLE_FIGURE_FACES = {
-    "Georgia", "Book Antiqua", "Constantia", "Hoefler Text", "Calluna", "Candara",
+    # Kept: measured old-style here (Georgia, Hoefler Text) or old-style by design (Constantia,
+    # Candara, Calluna). Deliberately NOT listed: Palatino / Palatino Linotype / Baskerville /
+    # Book Antiqua — Palatino and Baskerville measure as LINING on this platform and Book Antiqua
+    # is metric-compatible with Palatino, so listing them blocks a face that has no defect.
+    "Georgia", "Constantia", "Hoefler Text", "Calluna", "Candara",
 }
 _FIGURE_STYLE_CACHE = {}
 
@@ -295,7 +299,7 @@ def has_oldstyle_figures(face):
 NUMERAL_SERIF = "Times New Roman"
 
 
-def numeral_face(preferred=None):
+def numeral_face(preferred=None, fallback=None):
     """Face for a run that is ENTIRELY digits (big_numeral, stat_row figures).
 
     Honours the deck's own display face when it has lining figures, so the design is not
@@ -304,7 +308,7 @@ def numeral_face(preferred=None):
     deliberately no opt-in, because lint_layout would reject the result anyway, and a helper that
     renders nothing but digits has no legitimate use for old-style figures.
     """
-    cand = preferred or DISPLAY or FONT
+    cand = preferred or fallback or DISPLAY or FONT
     if cand and not has_oldstyle_figures(cand):
         return cand
     return NUMERAL_SERIF
@@ -771,7 +775,10 @@ def scorecard(slide, x, y, w, h, label, value, *, delta=None, caption=None, good
     if caption and (0.5 + vsz / 72.0 * 1.2 + 0.08 + delta_h + cap_h) > (h - 0.02):
         print("[deckkit] scorecard: caption doesn't fit the tile even at 8.5pt — shorten the "
               "caption or grow the card (h)")
-    tbv = text(slide, px, y + 0.5, w - 0.5, 0.8, [[(str(value), vsz, val_c, True, False)]], space_after=0)
+    # the value is a FIGURE: resolve a lining face rather than inheriting a body font whose
+    # digits sit at mixed heights (a Georgia body face made this tile fail its own build gate)
+    tbv = text(slide, px, y + 0.5, w - 0.5, 0.8,
+               [[(str(value), vsz, val_c, True, False, numeral_face(fallback=FONT))]], space_after=0)
     tbv.text_frame.word_wrap = False                                      # never char-break the number
     cy = max(y + 1.32, y + 0.5 + vsz / 72.0 * 1.2 + 0.08)                 # airy floor when there's room
     if cy + delta_h + cap_h > y + h - 0.04:                              # ...compressed only when tight
@@ -859,7 +866,8 @@ def big_numeral(slide, x, y, n, *, mode="marker", color=MAGENTA, size=None, w=No
         sw, _ = _slide_size(slide)
         w = min(len(str(n)) * s / 72.0 * 1.0 + 0.5, sw - x - 0.1)   # wide enough to stay one line, but on-canvas
     tb = text(slide, x, y, w, s / 72.0 * 1.35,
-              [[(str(n), s, c, True, italic, numeral_face(serif))]], space_after=0)
+              [[(str(n), s, c, True, italic, numeral_face(serif, fallback=NUMERAL_SERIF))]],
+              space_after=0)
     tb.text_frame.word_wrap = False
     if mode != "marker":
         tb.name = WATERMARK_TAG        # near-bg decoration, not a figure anyone reads
@@ -881,7 +889,7 @@ def stat_row(slide, x, y, w, items, *, ink=DEEP, accent=MAGENTA, serif=None, div
         cx = x + i * (cw + gap)
         fsz = fig_size
         mruns = [(str(fig), True)] + ([(" " + str(unit), True)] if unit else [])
-        _nface = numeral_face(serif)      # digits-only figure: guarantee lining, keep the register
+        _nface = numeral_face(serif, fallback=FONT)   # keep stat_row's body-font default
         nat = _natural_width_in(mruns, fsz, _nface)
         if nat > cw:                              # the "-0.9 million" mid-number split bug
             fsz = max(15.0, fig_size * cw / nat * 0.98)
@@ -912,8 +920,10 @@ def change_stat(slide, x, y, w, h, before, after, *, accent=MAGENTA, ink=DEEP, b
     sinking the small prefix/arrow below the big number). Returns the textbox."""
     al = align if align is not None else PP_ALIGN.LEFT
     tb = text(slide, x, y, w, h,
-              [[(f"{before} {arrow} ", before_size, ink, False, False, font),
-                (str(after), after_size, accent, True, False, font)]],
+              [[(f"{before} {arrow} ", before_size, ink, False, False,
+                 numeral_face(font, fallback=FONT)),
+                (str(after), after_size, accent, True, False,
+                 numeral_face(font, fallback=FONT))]],
               align=al, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
     pct = max(0.0, 0.36 * (after_size - before_size) / max(1, before_size) * 100)  # centre small on big
     runs = tb.text_frame.paragraphs[0].runs
@@ -4106,7 +4116,8 @@ def kpi_card(slide, x, y, w, h, label, value, *, unit="", delta=None, delta_colo
         text(slide, x + w - dw - 0.16, y + 0.21, dw, 0.3,
              [[(str(delta), 10, dc, True, False, font)]],
              align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
-    vparts = [(str(value), value_size, acc, True, False, value_font or font)]
+    _vface = numeral_face(value_font or font, fallback=FONT)   # the value is a figure
+    vparts = [(str(value), value_size, acc, True, False, _vface)]
     if unit:
         vparts.append((" " + unit, int(value_size * 0.5), acc, True, False, value_font or font))
     text(slide, x + 0.2, y + 0.5, w - 0.4, value_size / 72.0 + 0.2, [vparts],

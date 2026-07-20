@@ -9,6 +9,20 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+### Changed — numeral faces resolve from the deck's design (visible change)
+- **`big_numeral`'s default face changed.** It was hard-coded `serif="Georgia"`; it now resolves
+  through `deckkit.numeral_face()`, which keeps a lining SERIF (Times New Roman) by default. The
+  register is preserved — an oversized italic serif figure, as before — but the digits no longer
+  sit at mixed heights. **A deck rebuilt from an older build script will render its marker numerals
+  in a different face.** `serif=` still overrides, except that an old-style face is substituted
+  (lint_layout would reject it).
+- `stat_row`, `scorecard`, `kpi_card` and `change_stat` route their FIGURE runs through the same
+  resolver, keeping each component's own default (body font) while guaranteeing lining digits.
+  Previously these inherited a body/display face and could hard-fail their own output on a deck
+  whose font is Georgia.
+- Which faces count as old-style is **measured from the installed font** rather than read off a
+  list; the curated set is only a fallback for fonts the machine does not have.
+
 ## [3.6.0] — 2026-07-20
 
 ### Added — `OLDSTYLE_FIGURES`: a documented rule becomes a deterministic gate
