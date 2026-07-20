@@ -82,27 +82,62 @@ def _tail(text, limit=4000):
     return "...<truncated>...\n" + text[-limit:]
 
 
-def _slide_fingerprints(pptx):
-    """One content hash per slide, in deck order.
+def _rels_targets(xml_bytes, base_dir):
+    """Parse a .rels part -> {rId: normalized package path}.
 
-    Covers the slide's own XML, its rels, and the BYTES of every media part it references —
-    so a re-cropped photo or a swapped plate counts as a change even when the XML is identical.
-    Returns (list_of_hashes, uses_slidenum_field).
+    Parsed as XML, not by regex: OOXML allows the Id/Target attributes in either order, and a
+    Target may be absolute ("/ppt/slides/slide1.xml"). Getting this wrong is not a cosmetic bug —
+    a rId that fails to resolve silently drops a slide from the deck order, which shifts every
+    index after it and writes real slides into the wrong PNG filenames.
+    """
+    import posixpath
+    import xml.etree.ElementTree as ET
+    out = {}
+    try:
+        root = ET.fromstring(xml_bytes)
+    except ET.ParseError:
+        return out
+    for rel in root:
+        rid = rel.get("Id")
+        tgt = rel.get("Target")
+        if not rid or not tgt or (rel.get("TargetMode") or "") == "External":
+            continue
+        if tgt.startswith("/"):
+            out[rid] = tgt.lstrip("/")
+        else:
+            out[rid] = posixpath.normpath(posixpath.join(base_dir, tgt))
+    return out
+
+
+def _slide_fingerprints(pptx):
+    """One content hash per slide, in deck order, plus any reason the deck cannot be diffed.
+
+    Each slide's hash covers its own XML, its rels, the BYTES of every media part it references,
+    and a DECK-GLOBAL digest (presentation.xml, theme, masters, layouts and the media those
+    reference) — so a re-cropped photo, a swapped plate, a new theme or a different canvas size all
+    count as changes.
+
+    Returns (hashes, blockers). `blockers` is a list of human-readable reasons the caller must fall
+    back to a full render; it is never a soft signal. Anything that makes the slide->page mapping
+    uncertain belongs here, because a wrong mapping writes a real slide into another slide's PNG.
     """
     import hashlib
-    import re
     import zipfile
+    blockers = []
     with zipfile.ZipFile(pptx) as z:
         names = set(z.namelist())
-        # DECK-GLOBAL digest, mixed into EVERY slide hash. A change to the slide size, theme,
-        # master or a layout re-renders every slide while touching no slide's own XML — without
-        # this, --fast would report "no slide changed" and leave a deck's worth of stale PNGs
-        # (verified: flipping 16:9 -> 4:3 slipped through before this was added).
+        pres_rels = _rels_targets(z.read("ppt/_rels/presentation.xml.rels"), "ppt") \
+            if "ppt/_rels/presentation.xml.rels" in names else {}
+
+        # ---- deck-global digest -------------------------------------------------------
         # docProps/* is excluded on purpose: core.xml carries a modified-timestamp that changes on
         # every save, which would force a full render every time and delete the feature.
-        # ppt/media and ppt/notesSlides are excluded too — media is already covered per-slide via
-        # each slide's rels, and notes never reach a rendered pixel.
+        # ppt/media and ppt/notesSlides are excluded here — slide media is covered per-slide below,
+        # and notes never reach a rendered pixel. But media referenced by a LAYOUT, MASTER or THEME
+        # is deck-global and IS folded in: swapping a master's background image in place changes no
+        # slide's XML, so without this the whole deck would render stale under "no slide changed".
         gh = hashlib.sha256()
+        global_media = set()
         for n in sorted(names):
             if not n.startswith("ppt/"):
                 continue
@@ -110,33 +145,63 @@ def _slide_fingerprints(pptx):
                 continue
             gh.update(n.encode())
             gh.update(z.read(n))
+            if n.startswith(("ppt/slideLayouts/_rels/", "ppt/slideMasters/_rels/", "ppt/theme/_rels/")):
+                base = n.rsplit("/_rels/", 1)[0]
+                for tgt in _rels_targets(z.read(n), base).values():
+                    if "/media/" in "/" + tgt:
+                        global_media.add(tgt)
+        for m in sorted(global_media):
+            if m in names:
+                gh.update(m.encode())
+                gh.update(z.read(m))
         global_digest = gh.digest()
-        # deck order comes from presentation.xml + its rels, not from filename sorting
-        pres = z.read("ppt/presentation.xml").decode("utf-8", "replace")
-        rels = z.read("ppt/_rels/presentation.xml.rels").decode("utf-8", "replace")
-        rid_to_target = dict(re.findall(r'Id="([^"]+)"[^>]*Target="([^"]+)"', rels))
-        order = [rid_to_target.get(r, "") for r in re.findall(r'<p:sldId[^>]*r:id="([^"]+)"', pres)]
-        order = ["ppt/" + t.replace("../", "") for t in order if t]
 
-        fps, slidenum = [], False
+        # ---- deck order ---------------------------------------------------------------
+        import re
+        pres = z.read("ppt/presentation.xml").decode("utf-8", "replace")
+        rids = re.findall(r'<p:sldId[^>]*r:id="([^"]+)"', pres)
+        order = [pres_rels.get(r) for r in rids]
+        if any(t is None for t in order):
+            blockers.append("a slide reference could not be resolved in presentation.xml.rels")
+            order = [t for t in order if t]
+
+        fps = []
         for sname in order:
+            if sname not in names:
+                # Never hash a missing part as b"" — every affected slide would collapse to the
+                # same constant and real edits would stop registering, forever.
+                blockers.append("slide part missing from the package: {}".format(sname))
+                continue
             h = hashlib.sha256()
             h.update(global_digest)
-            body = z.read(sname) if sname in names else b""
+            body = z.read(sname)
             h.update(body)
             if b'type="slidenum"' in body:
-                slidenum = True
+                # An auto slide-number field renumbers itself inside a subset.
+                blockers.append("deck uses auto slide-number fields")
+            if re.search(rb'<p:sld\b[^>]*\bshow="0"', body):
+                # LibreOffice DROPS hidden slides from the PDF, so PDF page N is no longer deck
+                # slide N — on the full path too. Verified with a 4-slide deck: one hidden slide
+                # produced a 3-page PDF.
+                blockers.append("deck has hidden slides")
             rname = sname.replace("slides/", "slides/_rels/") + ".rels"
-            rel_xml = z.read(rname).decode("utf-8", "replace") if rname in names else ""
-            h.update(rel_xml.encode())
-            for tgt in re.findall(r'Target="([^"]+)"', rel_xml):
-                if "media/" not in tgt:
-                    continue
-                media = "ppt/" + tgt.replace("../", "")
-                if media in names:
-                    h.update(z.read(media))
+            rel_bytes = z.read(rname) if rname in names else b""
+            h.update(rel_bytes)
+            for tgt in sorted(_rels_targets(rel_bytes, "ppt/slides").values()):
+                if "/media/" in "/" + tgt and tgt in names:
+                    h.update(tgt.encode())
+                    h.update(z.read(tgt))
             fps.append(h.hexdigest())
-    return fps, slidenum
+
+        if len(fps) != len(rids):
+            blockers.append("deck order could not be fully resolved ({} of {} slides)".format(
+                len(fps), len(rids)))
+    # de-dup, order-stable
+    seen, uniq = set(), []
+    for b in blockers:
+        if b not in seen:
+            seen.add(b); uniq.append(b)
+    return fps, uniq
 
 
 def _subset_pptx(src, keep_idx, dest):
@@ -194,6 +259,12 @@ def main(argv):
         while flag in argv:
             argv.remove(flag)
             deliverables = True
+    if fast and deliverables:
+        # Decided here, not after LibreOffice has already run: --deliverables needs a whole-deck
+        # PDF, which a subset render cannot produce. Failing late meant either an exit-1 after a
+        # successful render, or (with nothing changed) a silent exit-0 that produced no PDF and no
+        # viewer.html at the exact moment the hand-off contract required them.
+        die("--deliverables needs a full-deck render — drop --fast for the hand-off run")
     if not argv:
         die("usage: python render_deck.py /path/to/deck.pptx [out_dir] [--fast] [--deliverables]")
     pptx = argv[0]
@@ -216,19 +287,22 @@ def main(argv):
 
     # Decide full vs incremental BEFORE spending anything on LibreOffice.
     cache_path = os.path.join(out, ".render-cache.json")
-    fps, has_slidenum = _slide_fingerprints(pptx)
+    fps, blockers = _slide_fingerprints(pptx)
     changed, skip_reason = None, None
     if fast:
         prev = None
         try:
             with open(cache_path, encoding="utf-8") as f:
-                prev = json.load(f).get("fingerprints")
-        except (OSError, ValueError):
+                cached = json.load(f)
+            prev = cached.get("fingerprints") if isinstance(cached, dict) else None
+            if not (isinstance(prev, list) and all(isinstance(x, str) for x in prev)):
+                prev = None                     # a JSON list/garbage must not crash the tool
+        except Exception:
             prev = None
-        if has_slidenum:
-            # An auto slide-number FIELD renumbers itself in a subset, so a subset render would
-            # print the wrong page number. Correctness beats speed: fall back to a full render.
-            skip_reason = "deck uses auto slide-number fields"
+        if blockers:
+            # Correctness beats speed: anything that makes the slide->page mapping uncertain
+            # forces a full render.
+            skip_reason = blockers[0]
         elif not prev:
             skip_reason = "no previous render cache"
         elif len(prev) != len(fps):
@@ -237,9 +311,23 @@ def main(argv):
             skip_reason = "slide count changed ({} -> {})".format(len(prev), len(fps))
         else:
             changed = [i for i, h in enumerate(fps) if h != prev[i]]
-            missing = [i for i in range(len(fps))
-                       if not os.path.isfile(os.path.join(out, "slide{:02d}.png".format(i + 1)))]
-            changed = sorted(set(changed) | set(missing))
+
+            def _usable(name):                  # a 0-byte file from a killed rasterize is NOT a render
+                p = os.path.join(out, name)
+                try:
+                    return os.path.getsize(p) > 0
+                except OSError:
+                    return False
+
+            missing = [i for i in range(len(fps)) if not _usable("slide{:02d}.png".format(i + 1))]
+            # thumbnails are regenerated only when a bookend slide is re-rendered, so a missing
+            # thumb must pull its bookend into the changed set or the critic's poster test runs
+            # on a stale or absent image while the run prints success
+            if not _usable("thumb_first.png"):
+                missing.append(0)
+            if not _usable("thumb_last.png"):
+                missing.append(len(fps) - 1)
+            changed = sorted(set(changed) | set(i for i in missing if 0 <= i < len(fps)))
 
     incremental = fast and changed is not None and 0 < len(changed) < len(fps)
     if fast and changed is not None and len(changed) == len(fps) and len(fps):
@@ -282,14 +370,18 @@ def main(argv):
     # and lets the render work even while the user has the LibreOffice GUI open.
     # Without this, concurrent/coexisting soffice calls silently produce no PDF.
     src_pptx, keep = pptx, None
-    tmp_subset = None
+    tmp_subset = tmp_dir = None
     if incremental:
         keep = changed
-        tmp_subset = os.path.join(tempfile.mkdtemp(prefix="lo_subset_"), "subset.pptx")
+        tmp_dir = tempfile.mkdtemp(prefix="lo_subset_")
+        tmp_subset = os.path.join(tmp_dir, "subset.pptx")
         _subset_pptx(pptx, set(keep), tmp_subset)
         src_pptx = tmp_subset
 
-    pdf, result, cmd = _render_pdf(soffice, src_pptx, out)
+    # A subset renders into its OWN temp dir. Writing out/subset.pdf would collide between two
+    # concurrent runs sharing a render dir (which the per-invocation LibreOffice profile above
+    # exists to allow), and a crashed run would leave a file that breaks the render-only cleanup.
+    pdf, result, cmd = _render_pdf(soffice, src_pptx, tmp_dir if incremental else out)
     if not os.path.isfile(pdf):
         detail = [
             "LibreOffice produced no PDF from {}.".format(pptx),
@@ -315,6 +407,7 @@ def main(argv):
             os.path.basename(sys.executable) or "python"))
 
     doc = fitz.open(pdf)
+    skip_cache = False
     if incremental:
         # PDF page k corresponds to deck slide keep[k] — write ONLY those PNGs and leave the
         # rest of render/ untouched.
@@ -344,22 +437,57 @@ def main(argv):
                 zoom = 240.0 / max(1.0, page.rect.width)
                 page.get_pixmap(matrix=fitz.Matrix(zoom, zoom)).save(os.path.join(out, name + ".png"))
         n_pages = doc.page_count
+        if n_pages != len(fps) and fps:
+            # LibreOffice emitted a different number of pages than the deck has slides (hidden
+            # slides are the known cause). slideNN.png no longer means deck slide NN, so no cache
+            # may claim this render — and the user must be told rather than quietly trusting it.
+            print("WARNING: {} slides in the deck but {} PDF page(s) rendered — slideNN.png may "
+                  "not correspond to deck slide NN. Not caching fingerprints; --fast is disabled "
+                  "until this is resolved.".format(len(fps), n_pages), file=sys.stderr)
+            skip_cache = True
     doc.close()
-    if tmp_subset:
-        shutil.rmtree(os.path.dirname(tmp_subset), ignore_errors=True)
-        try:                                   # the subset PDF is not the deck's PDF — never keep it
-            os.remove(pdf)
+    if incremental:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        pdf = None                              # a subset PDF is not the deck's PDF
+        stale_pdf = os.path.join(out, os.path.splitext(os.path.basename(pptx))[0] + ".pdf")
+        try:                                    # a full render's PDF is now older than the PNGs
+            os.remove(stale_pdf)
         except OSError:
             pass
-        pdf = None
 
     # Record fingerprints so the NEXT run can diff against them. Written only after the PNGs
     # actually landed, so a crashed render never leaves a cache claiming work that did not happen.
-    try:
-        with open(cache_path, "w", encoding="utf-8") as f:
-            json.dump({"fingerprints": fps}, f)
-    except OSError:
-        pass
+    # Two guards: (1) if the .pptx changed WHILE we rendered, the fingerprints we hold describe
+    # state that was never rasterized — caching them would freeze that slide stale forever;
+    # (2) a failed write must DELETE the cache, because a cache older than the PNGs is exactly the
+    # "no slide changed" lie this whole path must not tell.
+    if not skip_cache:
+        try:
+            now_fps, _ = _slide_fingerprints(pptx)
+        except Exception:
+            now_fps = None
+        if now_fps != fps:
+            skip_cache = True
+            print("note: the .pptx changed during the render — not caching fingerprints",
+                  file=sys.stderr)
+    if skip_cache:
+        try:
+            os.remove(cache_path)
+        except OSError:
+            pass
+    else:
+        try:
+            tmp_cache = cache_path + ".tmp"
+            with open(tmp_cache, "w", encoding="utf-8") as f:
+                json.dump({"fingerprints": fps}, f)
+            os.replace(tmp_cache, cache_path)
+        except OSError:
+            try:
+                os.remove(cache_path)
+            except OSError:
+                pass
+            print("note: could not write the render cache — the next --fast will do a full render",
+                  file=sys.stderr)
 
     # The PDF is an INTERMEDIATE of this render (pptx -> PDF -> PNG), so it always exists. Whether
     # it is promoted to a deliverable beside the .pptx is the user's call at hand-off.
@@ -399,6 +527,15 @@ def main(argv):
     if incremental:
         print("fast render: {} of {} slides re-rendered ({}) -> {}".format(
             len(keep), len(fps), ", ".join(str(i + 1) for i in keep), out))
+        # If a hand-off already produced the deck-root pair, they now lag the deck. Say so loudly:
+        # a stale PDF someone opens and reviews is the failure this whole path is built to avoid.
+        deck_dir_now = os.path.dirname(os.path.abspath(pptx)) or "."
+        stale = [f for f in (os.path.splitext(os.path.basename(pptx))[0] + ".pdf", "viewer.html")
+                 if os.path.isfile(os.path.join(deck_dir_now, f))]
+        if stale:
+            print("WARNING: {} at the deck root {} now STALE — re-run without --fast and with "
+                  "--deliverables before handing the deck over".format(
+                      " and ".join(stale), "is" if len(stale) == 1 else "are"), file=sys.stderr)
     else:
         print("rendered {} slides -> {}".format(n_pages, out))
         if fast and skip_reason:

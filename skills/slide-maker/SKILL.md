@@ -1587,7 +1587,9 @@ PNGs. Measured on an 18-slide deck: a full render is ~12s, a one-slide change is
 where nothing changed is **0.07s**. Output is byte-identical to a full render (verified), so the
 critic and the render-time lint see exactly what they would have seen anyway. It falls back to a full
 render — and says why — whenever the mapping could be wrong: slide count changed, every slide changed,
-the deck uses auto slide-number fields, or there is no cache. **Use it for the actor-critic fix rounds
+no cache, or the deck contains **auto slide-number fields** or **hidden slides** (LibreOffice drops
+hidden slides from the PDF, so page N stops being slide N — a full render now warns loudly and
+refuses to cache when the page count and slide count disagree). **Use it for the actor-critic fix rounds
 and for post-delivery tweaks** ("change slide 7 to a chart"); use a plain full render for the first
 render of a deck and whenever you pass `--deliverables`.
 
