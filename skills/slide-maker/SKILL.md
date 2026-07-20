@@ -1369,8 +1369,9 @@ A few rules that matter (see `references/design-principles.md`):
   `deckkit.EAFONT` before building; catching it here saves the render round-trip lint_deck previously
   needed), and **display numerals in an OLD-STYLE figure face** (`OLDSTYLE_FIGURES` — Georgia,
   Palatino, Baskerville, Constantia… set digits at mixed heights so a big number visibly bobs; route
-  runs containing digits to a lining face. Fires at ≥20pt only, so old-style figures inside running
-  prose — where they are correct — stay quiet); it **warns** on a label/figure **escaping its card**, a **single
+  the numeral run to a lining face. Scoped so it only fails the real defect: the run must be ≥20pt
+  **and mostly digits**. Running prose stays quiet, and a heading that merely contains a year
+  ("2026 Roadmap") gets a WARN, not a build failure); it **warns** on a label/figure **escaping its card**, a **single
   line left off-centre** in a card, content **reaching the footer**, and **two panels nearly
   touching** (`SLIVER_GAP` — a 0.005–0.10in seam between panels, or a panel and a picture: the
   hand-picked-pitch bug). (Each code's plain-language meaning + first fix:

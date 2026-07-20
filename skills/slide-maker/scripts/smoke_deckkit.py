@@ -557,9 +557,15 @@ def _oldstyle_figures():
             return False
         except RuntimeError:
             return True
+    # the defect: a big number whose digits visibly bob
     assert _lint("Georgia", 58, "596,513"), "display numeral in Georgia must FAIL"
     assert _lint("Palatino", 34, "2026"), "display numeral in Palatino must FAIL"
+    assert _lint("Georgia", 62, "\u00a54,508,824,075"), "currency hero numeral must FAIL"
+    # NOT the defect: body prose, and headings that merely contain a digit. Blocking these would
+    # hard-fail ordinary decks - a title like "2026 Roadmap" is a normal typographic choice.
     assert not _lint("Georgia", 13, "In 2026 the city grew."), "body prose in Georgia must PASS"
+    assert not _lint("Georgia", 28, "2026 Roadmap"), "heading containing a year must PASS"
+    assert not _lint("Georgia", 28, "Q3 results"), "heading with one digit must PASS"
     assert not _lint("Helvetica Neue", 58, "596,513"), "display numeral in a lining face must PASS"
 ok("OLDSTYLE_FIGURES gate (display numerals in text-figure faces fail; body prose passes)", _oldstyle_figures)
 

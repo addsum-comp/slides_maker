@@ -4743,8 +4743,20 @@ _OLDSTYLE_FIGURE_FACES = {
     "Constantia", "Hoefler Text", "Calluna", "Candara",
 }
 # Below this, old-style figures inside running prose are a legitimate typographic choice;
-# at or above it the run is a display numeral and the wobble is a defect.
+# at or above it a NUMERAL-DOMINANT run is a display number and the wobble is a defect.
 _OLDSTYLE_DISPLAY_PT = 20.0
+# Share of non-space characters that must be digits before a run counts as a DISPLAY NUMERAL.
+# This separates "596,513" / "¥4,508,824,075" (the defect: a big number visibly bobbing) from
+# "2026 Roadmap" (an ordinary title that merely contains a year, where old-style figures are a
+# normal typographic choice). Hard-failing the latter would break perfectly good decks.
+_OLDSTYLE_NUMERAL_SHARE = 0.4
+
+
+def _digit_share(txt):
+    body = [c for c in (txt or "") if not c.isspace()]
+    if not body:
+        return 0.0
+    return sum(c.isdigit() for c in body) / float(len(body))
 
 _LINT_LINE_H = 1.20     # DETECTION line-height factor — the real LibreOffice render height (≈1.2×em).
                         # Deliberately > the 1.12 PLACEMENT estimate the measure_*/vstack helpers use:
@@ -4956,7 +4968,7 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
         # display numeral, where the number visibly bobs up and down and misaligns with adjacent
         # CJK/Latin. This rule was documented in five reference files and still shipped repeatedly —
         # prose is advisory, so it is a deterministic gate now (SKILL.md's enforcement invariant).
-        bad_fig = []
+        bad_fig, soft_fig = [], []
         for sh in slide.shapes:
             if not getattr(sh, "has_text_frame", False):
                 continue
@@ -4969,10 +4981,22 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
                         if not any(ch.isdigit() for ch in (run.text or "")):
                             continue
                         pts = run.font.size.pt if run.font.size is not None else None
-                        if pts is None or pts >= _OLDSTYLE_DISPLAY_PT:
-                            bad_fig.append((nm, run.text.strip()[:18], pts))
+                        if pts is not None and pts < _OLDSTYLE_DISPLAY_PT:
+                            continue                        # body prose — old-style figures are fine
+                        entry = (nm, run.text.strip()[:18], pts)
+                        if _digit_share(run.text) >= _OLDSTYLE_NUMERAL_SHARE:
+                            bad_fig.append(entry)           # a display NUMERAL — the real defect
+                        else:
+                            soft_fig.append(entry)          # a heading that merely contains a digit
                     except Exception:
                         pass
+        if soft_fig and not bad_fig:
+            nm, txt, _p = soft_fig[0]
+            findings.append((n, "WARN", "OLDSTYLE_FIGURES",
+                             f"{len(soft_fig)} large run(s) in {nm}, an old-style figure face, contain "
+                             f"digits (e.g. '{txt}') — mixed-height digits inside a heading are a "
+                             "typographic choice, not a fault; if the NUMBER is the point, set that run "
+                             "in a lining face (references/font-guidance.md)"))
         if bad_fig:
             nm, txt, pts = bad_fig[0]
             sz = f"{pts:.0f}pt" if pts else "unsized"
