@@ -135,7 +135,15 @@ def main(argv):
             "-env:UserInstallation=" + Path(profile).as_uri(),
             "--headless", "--convert-to", "pdf", "--outdir", out, pptx,
         ]
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # Bound the render: a malformed/hostile .pptx (decompression bomb, pathological content) must
+        # not hang the pipeline forever. Every other soffice/ffmpeg call in the skill sets a timeout;
+        # this one now matches. 300s is far above any real deck's render time.
+        try:
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    text=True, timeout=300)
+        except subprocess.TimeoutExpired:
+            die("LibreOffice render exceeded 300s and was killed — the .pptx may be malformed or "
+                "hostile (e.g. a decompression bomb). Nothing was produced from {}.".format(pptx))
     finally:
         shutil.rmtree(profile, ignore_errors=True)
 

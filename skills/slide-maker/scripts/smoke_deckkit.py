@@ -247,6 +247,29 @@ def _connector_in_box():
     assert abs(ey - 2.0) < 1e-6, "edge_point should dock on the block's bottom edge (y=2.0)"
 ok("lint_layout CONNECTOR_IN_BOX (centre-anchor flags; edge-docked/covered silent)", _connector_in_box)
 
+# --- icons.sanitize_svg: strips active/external content, keeps drawing content, and is ReDoS-safe ---
+def _svg_sanitizer():
+    import time as _t
+    import icons as _ic
+    # dangerous vectors removed, legit drawing + internal refs kept
+    dirty = ('<svg onload="x()"><script>fetch("//e")</script>'
+             '<foreignObject><iframe src="file:///etc/passwd"/></foreignObject>'
+             '<image href="http://evil/x"/><style>@import url(http://evil)</style>'
+             '<path d="M0 0h9"/><use href="#g"/></svg>')
+    c = _ic.sanitize_svg(dirty).lower()
+    for probe in ("<script", "foreignobject", "<iframe", "<image", "file://", "http://", "onload="):
+        assert probe not in c, f"sanitize_svg left a {probe!r} vector"
+    assert "<path" in c and "#g" in c, "sanitize_svg stripped legitimate drawing content / internal ref"
+    # ReDoS guard: pathological all-open-tag input must be REJECTED fast, not scanned quadratically
+    t0 = _t.time()
+    try:
+        _ic.sanitize_svg("<foreignObject" * 12000); raise AssertionError("oversize SVG was not rejected")
+    except ValueError:
+        pass
+    dt = _t.time() - t0
+    assert dt < 0.2, f"sanitize_svg took {dt*1000:.0f}ms on a ReDoS payload (must reject in <200ms)"
+ok("icons.sanitize_svg (strips script/foreignObject/external refs; keeps paths; ReDoS-safe)", _svg_sanitizer)
+
 ok("tint mixes toward white", lambda: dk.tint("1B7F5C", 0.14))
 ok("kpi_card (delta + strip, tall enough)", lambda: dk.kpi_card(
     S(), 0.8, 0.8, 3.4, 2.3, "净收入留存 NRR", "108", unit="%", delta="+16pt",

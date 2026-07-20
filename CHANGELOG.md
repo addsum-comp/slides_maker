@@ -9,6 +9,26 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+## [3.5.1] - 2026-07-20
+
+### Security — hardening pass (public-skill audit)
+- **SVG icon rasterizer no longer executes untrusted content (was the one real vuln).** `icon_png()`
+  accepts a local `.svg`, and when `cairosvg`/`rsvg-convert` are absent the headless-Chrome fallback
+  used to render it with JS + `file://` access — an attacker-supplied icon could read local files
+  (exfiltrated into the deck) or run JS/SSRF. Fixed with `sanitize_svg()` (a backend-agnostic control
+  run before every rasterizer): strips `<script>`/`<foreignObject>`/`<iframe>`/`<image>`/`<audio>`/
+  `<video>`/`<set>`/`<animate>` (incl. namespaced forms), `on*` handlers, any non-internal
+  `href`/`xlink:href`/`src`, and external `url(...)` — while preserving paths, `<use href="#..">`, and
+  the gradient refs recolor injects. Chrome also runs `--disable-remote-fonts`. Comments are stripped
+  first (no comment-split reassembly), and the input is size/complexity-bounded (>100KB or >600 elements
+  is refused in ~1ms) so the sanitizer itself can't be turned into a quadratic-time DoS. Verified across
+  all 13 icon libraries: real icons (flat + gradient + duotone) still render; a 16-payload adversarial
+  battery is fully neutralized; a ReDoS regression test guards the bound (`smoke_deckkit.py`).
+- **Icon `name` is validated** (`fetch_svg`) as a strict slug (`[A-Za-z0-9._-]`, no `..`), closing a
+  path-traversal into the icon cache and a CDN-URL traversal to arbitrary jsDelivr/npm packages.
+- **LibreOffice render is now time-bounded** (`render_deck.py`, `timeout=300`) so a malformed/hostile
+  `.pptx` can't hang the pipeline — matching the timeouts every other soffice/ffmpeg call already had.
+
 ## [3.5.0] - 2026-07-20
 
 ### Added — connectors dock on block edges (arrows never emerge from a block's centre)

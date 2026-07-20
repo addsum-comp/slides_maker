@@ -87,6 +87,13 @@ def fetch_svg(spec):
     lib, name = spec.split(":", 1)
     if lib not in LIBRARIES:
         raise ValueError(f"unknown icon library {lib!r}; use one of {sorted(LIBRARIES)}")
+    # `name` is interpolated into BOTH a cache file path and the CDN URL — validate it as a strict
+    # icon slug so a crafted name (e.g. 'x/../../../tmp/pwned' or '../../@evil/pkg@1/payload') can't
+    # traverse out of the icon cache dir or fetch an arbitrary jsDelivr/npm package. Real icon names
+    # are kebab-case; allow a lone dot but never '..' or any path/URL separator.
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", name) or ".." in name:
+        raise ValueError(f"invalid icon name {name!r} in {spec!r} — icon names are kebab-case "
+                         "letters/digits/hyphens (e.g. 'chart-bar'); no slashes or '..'")
     os.makedirs(_CACHE, exist_ok=True)
     cache = os.path.join(_CACHE, f"{lib}__{name}.svg")
     if os.path.exists(cache) and os.path.getsize(cache) > 0:
@@ -202,11 +209,56 @@ def _check_ink(out_png):
     return out_png
 
 
+def sanitize_svg(svg):
+    """Strip ACTIVE and EXTERNAL content from SVG text before it reaches any rasterizer. An icon
+    glyph is pure vector paths, so none of this is ever needed — and all of it is dangerous when the
+    SVG is attacker-supplied (icon_png accepts a local .svg, and third parties share icon/source
+    bundles): a headless-Chrome fallback runs <script> and <foreignObject><iframe src="file://…">
+    (local-file read + SSRF), and cairosvg/rsvg have no JS engine but DO resolve external file:/http:
+    references. So we remove, cross-backend:
+      • <script>/<foreignObject>/<image>/<iframe>/<audio>/<video> elements (with their content),
+      • on* event-handler attributes,
+      • any href/xlink:href/src that is NOT an internal '#fragment' or a 'data:' URI,
+      • <!DOCTYPE>/<!ENTITY> declarations (entity tricks).
+    Internal fragment refs (#gradient / <use href="#..">) and the fills recolor() injects are kept,
+    so recoloring still works. This is the primary control; disabling JS in the Chrome backend is the
+    belt-and-suspenders second layer. See references/icons.md (Security)."""
+    # Bound the input FIRST: the element-removal regexes below can go quadratic on pathological
+    # all-open-tag SVG (many '<tag' with no closing '>'), which would be a DoS since this runs on
+    # attacker-supplied SVG. `.count` is linear and rejects such input in ~1ms, before any regex. A real
+    # icon is a few KB with tens of elements; a genuinely detailed graphic should be exported to PNG
+    # (icon_png passes .png through untouched).
+    if len(svg) > 100_000 or svg.count("<") > 600:
+        raise ValueError("icons: refusing to rasterize — the SVG is larger or more complex than any "
+                         "real icon (>100KB or >600 elements). Export a detailed graphic to PNG and "
+                         "pass the .png instead.")
+    s = re.sub(r"<!--.*?-->", "", svg, flags=re.S)     # strip comments (also blocks comment-split tags)
+    s = re.sub(r"<!DOCTYPE[^>]*>", "", s, flags=re.I)
+    s = re.sub(r"<!ENTITY[^>]*>", "", s, flags=re.I)
+    NS = r"(?:[A-Za-z_][\w.-]*:)?"          # optional namespace prefix (e.g. <svg:script>) — no bypass
+    for tag in ("script", "foreignObject", "image", "iframe", "audio", "video", "set", "animate"):
+        s = re.sub(rf"<{NS}{tag}\b[^>]*?/\s*>", "", s, flags=re.I | re.S)              # self-closing
+        s = re.sub(rf"<{NS}{tag}\b.*?</{NS}{tag}\s*>", "", s, flags=re.I | re.S)       # paired (+content)
+    s = re.sub(r"""\son[a-zA-Z]+\s*=\s*("[^"]*"|'[^']*')""", "", s)           # on* handlers
+    def _strip_ext_ref(m):                    # keep only internal '#frag' / 'data:' refs
+        val = (m.group("d") if m.group("d") is not None else (m.group("s") or "")).strip().lower()
+        return m.group(0) if (val.startswith("#") or val.startswith("data:")) else ""
+    s = re.sub(r"""\s(?:xlink:href|href|src)\s*=\s*(?:"(?P<d>[^"]*)"|'(?P<s>[^']*)')""",
+               _strip_ext_ref, s, flags=re.I)
+    def _strip_ext_url(m):                     # CSS url(...) in <style>/style="": keep #frag & data:
+        inner = m.group(1).strip().strip("\"'").lower()
+        return m.group(0) if (inner.startswith("#") or inner.startswith("data:")) else "none"
+    s = re.sub(r"url\(\s*([^)]*)\)", _strip_ext_url, s, flags=re.I)   # e.g. @import/@font-face/background
+    return s
+
+
 def rasterize(svg, out_png, px=160):
     """Render recolored SVG text to a transparent PNG, `px`×`px`. Tries cairosvg → rsvg-convert
-    → headless Chrome (whichever is present). Sizes the SVG to fill the square."""
+    → headless Chrome (whichever is present). Sizes the SVG to fill the square. The SVG is sanitized
+    (sanitize_svg) first so an attacker-supplied icon can't read local files or run JS/SSRF."""
     out_png = os.path.abspath(out_png)
     os.makedirs(os.path.dirname(out_png) or ".", exist_ok=True)
+    svg = sanitize_svg(svg)          # strip active/external content before ANY backend sees it
     # ensure the <svg> carries width/height so every backend sizes it consistently
     svg2 = re.sub(r"<svg\b", f'<svg width="{px}" height="{px}"', svg, count=1) \
         if not re.search(r"<svg[^>]*\bwidth=", svg) else svg
@@ -224,7 +276,7 @@ def rasterize(svg, out_png, px=160):
             f.write(svg2); src = f.name
         try:
             subprocess.run(["rsvg-convert", "-w", str(px), "-h", str(px), "-o", out_png, src],
-                           check=True, capture_output=True)
+                           check=True, capture_output=True, timeout=60)
             return _check_ink(out_png)
         finally:
             os.unlink(src)
@@ -238,7 +290,13 @@ def rasterize(svg, out_png, px=160):
         with tempfile.NamedTemporaryFile("w", suffix=".html", delete=False) as f:
             f.write(html); src = f.name
         try:
+            # SECURITY: the SVG has already been stripped of <script>/<foreignObject>/<iframe>/<image>/
+            # external refs/event-handlers by sanitize_svg (the backend-agnostic control) before it
+            # reaches here, so no local file can be read and no JS/SSRF can run. --disable-remote-fonts
+            # blocks any web-font egress; we deliberately do NOT pass --blink-settings=scriptEnabled=false
+            # because it silently breaks the headless screenshot on current Chrome (produces no file).
             subprocess.run([chrome, "--headless", "--disable-gpu", f"--screenshot={out_png}",
+                            "--disable-remote-fonts",
                             f"--window-size={px},{px}", "--force-device-scale-factor=3",
                             "--default-background-color=00000000", "--hide-scrollbars",
                             f"file://{src}"], check=True, capture_output=True, timeout=60)

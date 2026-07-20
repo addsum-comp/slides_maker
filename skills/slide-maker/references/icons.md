@@ -77,6 +77,12 @@ dk.icon_card(s, *col, p, "Analytics", "Track what matters", accent=ACC, disc="#E
   present). If none exists it errors clearly — `pip install cairosvg`, or install Chrome/Chromium.
 - **Offline / exact-name unknown:** pass a **local `.svg` path** to `icon_png()` instead of a spec
   (the user can drop an SVG in), or check the library's site for the exact kebab-case name.
+- **Security (untrusted SVG):** `icon_png()` runs every SVG through `sanitize_svg()` before rasterizing —
+  it strips `<script>`/`<foreignObject>`/`<iframe>`/`<image>`/external refs/`on*` handlers/external
+  `url(...)`, so a hostile local or third-party `.svg` can't read local files or run JS/SSRF via the
+  Chrome fallback. `cairosvg`/`rsvg-convert` (tried first) have no JS engine; installing one of them is
+  the most robust path for untrusted SVGs. Icon `name`s are validated as strict slugs (no path/URL
+  traversal). Don't disable the sanitizer.
 
 ## Treatments — VARY how the icon is shown (don't default to a flat monochrome drop)
 A bare recolored glyph is the *baseline*, not the only option — the same icon reads very differently
