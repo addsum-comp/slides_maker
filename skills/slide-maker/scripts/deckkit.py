@@ -5231,6 +5231,12 @@ def _digit_share(txt):
             digits += w
     return (digits / total) if total else 0.0
 
+RULE_MAX_THICK = 0.075   # a shape thinner than this on one axis is a RULE, not a panel
+RULE_MIN_LEN = 0.25      # ...and longer than this on the other, so a dot/marker never qualifies
+RULE_INSIDE_PAD = 0.045  # the rule's centre must clear both ink edges by this, so an underline
+                         # hugging a descender (the legitimate case) never fires
+RULE_MIN_CROSS = 0.25    # and the crossing must be visible along the rule, not a tangent
+
 _LINT_LINE_H = 1.20     # DETECTION line-height factor — the real LibreOffice render height (≈1.2×em).
                         # Deliberately > the 1.12 PLACEMENT estimate the measure_*/vstack helpers use:
                         # the lint models what actually renders (conservative), while those helpers pack
@@ -5544,6 +5550,50 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
                             "block so the block covers the seam"))
                         hit = True; break
                 if hit: break
+        # ---- RULE_THROUGH_TEXT: a thin decorative rule crossing a text block's INK.
+        #      A divider is normally placed at a hand-picked y computed from how long the text
+        #      above it happened to be; when that text is later edited and grows, the rule ends up
+        #      drawn straight through it. The rule must pass BETWEEN blocks, so a crossing is always
+        #      a defect — and the geometry is fully known at build time.
+        #      Deliberately narrow so title underlines and axis lines never fire: the rule's thin
+        #      axis must land strictly INSIDE the ink (RULE_INSIDE_PAD clear of both edges), and the
+        #      crossing must be visible along the rule (>= RULE_MIN_CROSS).
+        for sh_r, bb_r, st_r, ink_r, _r in info:
+            if ink_r is not None or "PICTURE" in st_r:
+                continue                                   # text and pictures are other checks
+            rw, rh = bb_r[2], bb_r[3]
+            thin, long_ = min(rw, rh), max(rw, rh)
+            if thin > RULE_MAX_THICK or long_ < RULE_MIN_LEN:
+                continue                                   # not a rule: a panel, a chip, a dot
+            try:
+                if sh_r.fill.type is None:
+                    continue                               # unfilled outline, draws nothing solid
+            except Exception:
+                pass
+            horiz = rw >= rh
+            for sh_t, bb_t, st_t, ink_t, _t in info:
+                if ink_t is None or sh_t is sh_r:
+                    continue
+                ix0, iy0, iw, ih = ink_t
+                if horiz:
+                    cy = bb_r[1] + rh / 2.0
+                    if not (iy0 + RULE_INSIDE_PAD < cy < iy0 + ih - RULE_INSIDE_PAD):
+                        continue                           # above or below the ink — the normal case
+                    cross = min(bb_r[0] + rw, ix0 + iw) - max(bb_r[0], ix0)
+                else:
+                    cx = bb_r[0] + rw / 2.0
+                    if not (ix0 + RULE_INSIDE_PAD < cx < ix0 + iw - RULE_INSIDE_PAD):
+                        continue
+                    cross = min(bb_r[1] + rh, iy0 + ih) - max(bb_r[1], iy0)
+                if cross >= RULE_MIN_CROSS:
+                    findings.append((n, "CRITICAL", "RULE_THROUGH_TEXT",
+                        'a {} rule crosses the text "{}" ({:.2f}in of it) — derive the rule\'s '
+                        "position from the text block below/above it (its y + measured height), "
+                        "never a hand-picked coordinate".format(
+                            "horizontal" if horiz else "vertical",
+                            _snip(sh_t.text_frame.text, 26), cross)))
+                    break
+
         # ---- SLIVER_GAP: near-touching panels (panel–panel or panel–picture; picture–picture is
         #      skipped). A gap that exists but reads as touching clips rounded corners and looks
         #      cramped even though nothing overlaps; overlap/flush (g <= 0) stays lint_deck's domain.

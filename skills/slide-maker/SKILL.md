@@ -1456,7 +1456,10 @@ A few rules that matter (see `references/design-principles.md`):
   coordinates — reasoning about each label's **ink** rectangle (where the glyphs actually land), so it
   stays quiet on the generously-sized frames real builds use. It **hard-fails (CRITICAL)** on five
   things: content (text ink / a card / a non-bleed image) **off-canvas**, text **overflowing** a visible
-  box, **text-on-text** overlap, a **connector routed through a block** (`CONNECTOR_IN_BOX`), **CJK runs with no `<a:ea>` font** (`CJK_NO_EA` — set
+  box, **text-on-text** overlap, a **connector routed through a block** (`CONNECTOR_IN_BOX`), a **decorative RULE
+  drawn through a text block's ink** (`RULE_THROUGH_TEXT` — a divider/hairline placed at a hand-picked `y`
+  that the text above it later grew into; derive the rule from the block's measured end, never a guessed
+  coordinate), **CJK runs with no `<a:ea>` font** (`CJK_NO_EA` — set
   `deckkit.EAFONT` before building; catching it here saves the render round-trip lint_deck previously
   needed), and **CJK runs with no `<a:ea>` font** (`CJK_NO_EA` — set
   `deckkit.EAFONT` before building; catching it here saves the render round-trip lint_deck previously
@@ -1477,7 +1480,10 @@ A few rules that matter (see `references/design-principles.md`):
   3. **No text-on-text** — one column/stack owns each region; never drop a second text box into the same rectangle.
   4. **If it doesn't fit, resolve it** — `fit_text_size(runs, w, h, start)` gives the largest size that fits; else shorten or grow the box.
   5. **Text in a *self-contained* block → equal top/bottom padding (vertically centre it)** — anchor it `MIDDLE` over the block's own rect: draw the block, then place the text at that block's exact `(x, y, w, h)` with `anchor=MSO_ANCHOR.MIDDLE` (wrap this as a small deck helper so centring is automatic, not per-call), whether it's one line or several. Placing text at a **hand-picked y-offset inside a fixed-height block** is the recurring "the takeaway text is closer to the top edge than the bottom" bug — the padding must be equal *by construction*, not eyeballed (the `OFFCENTER` warn fires on a lone-line card). *Carve:* a one-line reading column that must top-align with a taller sibling column under a shared header stays top-anchored (alignment beats centring).
-  6. **Grid/stack over hand-picked y, and leave a real gap (~`GUTTER`)** — `columns()/rows()` for equal panels, `vstack(…, bottom=…)` for content-height blocks (no overlap, even gaps by construction), `content_band()` for the vertical extent. (On a provided template, the layout's **placeholders** already anchor content — these helpers are the no-template path; fill placeholders where the template gives them.)
+  6. **Grid/stack over hand-picked y, and leave a real gap (~`GUTTER`)** — *and this includes the
+     DIVIDERS between blocks: a hairline at a guessed `y` is crossed by the text above it the moment
+     that text is edited and wraps one line further. Derive it (`rule_y = stack_end + pad`, where
+     `stack_end` comes from the loop that drew the stack), which `RULE_THROUGH_TEXT` now enforces.* — `columns()/rows()` for equal panels, `vstack(…, bottom=…)` for content-height blocks (no overlap, even gaps by construction), `content_band()` for the vertical extent. (On a provided template, the layout's **placeholders** already anchor content — these helpers are the no-template path; fill placeholders where the template gives them.)
   7. **For a diagram, compute all bounding boxes first, then draw into them** — lay out the rects (and reserve arrow channels), *then* place nodes/labels — never eyeball one shape against the previous one.
 - **Colour.** Rotate `deckkit.ACCENTS` so diagrams aren't monotone; reserve magenta
   for emphasis. For a **sequence of blocks** (chips / cards / pipeline stages) give each a
@@ -1807,6 +1813,10 @@ critic round — full rationale in `references/design-principles.md`):
   the slide width, not illegibly shrunk), and **consistent across slides** (same placed height); any
   inline variable/symbol is in **math format** (italic, real sub/superscript), never plain body letters
   or Unicode super/subscripts.
+- **No rule/divider crossing text** — every hairline, divider and accent bar passes BETWEEN blocks,
+  never through one. The build-time `RULE_THROUGH_TEXT` gate catches this deterministically now; if you
+  see one in a render it means the rule was drawn at a hand-picked `y` computed from how long the text
+  happened to be at the time. Fix the *derivation*, not the coordinate.
 - **Footer collision / overlap** — no block crosses into the footer band and no two stacked
   blocks overlap. If one does, the cause is almost always a hand-picked `y` for an auto-growing
   callout/stack — fix it by switching to `bottom_callout()` / `vstack()` / `content_band()`, not

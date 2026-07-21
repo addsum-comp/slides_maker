@@ -726,6 +726,46 @@ def _position_map_hero_binding():
 ok("position_map binds the hero label to its dot (bold + hue + first claim)", _position_map_hero_binding)
 
 
+def _rule_through_text():
+    """RULE_THROUGH_TEXT — a divider at a hand-picked y that the grown text above it now crosses.
+
+    Shipped twice in one delivered deck (slides 5 and 13) and was caught by the USER, not by any
+    lint: a thin box over text is not TEXT_OVERLAP, not an overflow, and not invisible text.
+    Both directions are asserted, because the false-positive surface here is the legitimate
+    title underline — a rule sitting just BELOW the ink, which must stay silent.
+    """
+    def codes(build):
+        p = dk.blank_deck(); sl = dk.add_slide(p)
+        build(sl)
+        return {f[2] for f in dk.lint_layout(p, verbose=False)}
+
+    def crossing(sl):
+        dk.text(sl, 1.0, 1.0, 3.0, 1.4, [[("of voting members who backed the new agreement, signed "
+                                           "by all parties on 20 July and ratified.", 12,
+                                           dk.RGBColor(0, 0, 0), False, False, "Arial")]])
+        dk.box(sl, 1.0, 1.55, 2.8, 0.02, fill="999999")
+    assert "RULE_THROUGH_TEXT" in codes(crossing), "a rule drawn through text did not fire"
+
+    def underline(sl):                     # the legitimate case: a rule just below the ink
+        dk.text(sl, 1.0, 1.0, 6.0, 0.4, [[("A slide title", 26, dk.RGBColor(0, 0, 0), True, False, "Arial")]])
+        dk.box(sl, 1.0, 1.52, 0.6, 0.035, fill="D2691E")
+    assert "RULE_THROUGH_TEXT" not in codes(underline), "a title underline must not fire"
+
+    def between(sl):                       # the normal divider, correctly derived
+        dk.text(sl, 1.0, 1.0, 3.0, 0.4, [[("block one", 12, dk.RGBColor(0, 0, 0), False, False, "Arial")]])
+        dk.box(sl, 1.0, 1.6, 2.8, 0.02, fill="999999")
+        dk.text(sl, 1.0, 1.8, 3.0, 0.4, [[("block two", 12, dk.RGBColor(0, 0, 0), False, False, "Arial")]])
+    assert "RULE_THROUGH_TEXT" not in codes(between), "a divider between blocks must not fire"
+
+    def axis(sl):                          # a chart/motif axis under a filled bar's label
+        dk.box(sl, 1.0, 1.0, 4.0, 0.46, fill="FF8A3D")
+        dk.text(sl, 1.1, 1.05, 3.8, 0.36, [[("four years, paid", 11.5, dk.RGBColor(0, 0, 0), True, False, "Arial")]])
+        dk.box(sl, 1.0, 1.56, 6.0, 0.014, fill="999999")
+    assert "RULE_THROUGH_TEXT" not in codes(axis), "a bar's axis line must not fire"
+ok("RULE_THROUGH_TEXT fires on a crossed rule and stays quiet on underlines/dividers/axes",
+   _rule_through_text)
+
+
 def _quiet_region_contract():
     import glob
     from image_fx import quiet_region

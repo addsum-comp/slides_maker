@@ -115,7 +115,7 @@ def _footer(S, page, tag=""):
             f'{t}<span>{page}</span></div>')
 
 
-def _slide_cover(S):
+def _slide_cover(S, deck_title="Deck Title"):
     name = S["name"]
     # Faithful cover: a DARK deck gets a dark cover (its bg + light ink title); a LIGHT deck gets
     # a bold inverted cover (ink panel + light title). Avoids the inverted/low-contrast preview bug.
@@ -133,7 +133,7 @@ def _slide_cover(S):
     return f'''<div class="slide cover cov-{comp}" style="background:{cbg}">
       {bar}{panel}
       <div class="cover-body">
-        <div class="cover-ttl" style="color:{tt}">Deck Title</div>
+        <div class="cover-ttl" style="color:{tt}">{_esc(deck_title)}</div>
         <div class="cover-sub" style="color:{S['accent']}">a one-line subtitle in this direction</div>
       </div>
       <div class="cover-tag" style="color:{tag}">Direction: {_esc(name)}</div>
@@ -277,13 +277,13 @@ def _swatches(S):
     return "".join(out)
 
 
-def _direction_block(S, idx):
+def _direction_block(S, idx, deck_title="Deck Title"):
     letter = chr(ord("A") + idx)
     name = S["name"]
     rat = f' — <span class="rat">{_esc(S["rationale"])}</span>' if S["rationale"] else ""
     fonts = (f'<span class="fmeta">display: {_esc(S["font_display"].split(",")[0])} · '
              f'body: {_esc(S["font_body"].split(",")[0])} · {_esc(S["density"])}</span>')
-    slides = (_slide_cover(S) + _slide_bullets(S) + _slide_diagram(S) + _slide_data(S))
+    slides = (_slide_cover(S, deck_title) + _slide_bullets(S) + _slide_diagram(S) + _slide_data(S))
     # Per-direction font scoping via a wrapper class + inline custom props.
     return f'''<section class="dir" id="dir-{letter}" style="--fd:{S['font_display']};--fb:{S['font_body']}">
       <div class="dir-head">
@@ -474,7 +474,7 @@ def build_directions_html(directions, out_path, deck_title="Your Deck"):
     """Render 2–3 directions into ONE self-contained HTML file. Returns out_path."""
     styles = [_norm(d) for d in directions]
     letters = ", ".join(chr(ord("A") + i) for i in range(len(styles)))
-    blocks = "\n".join(_direction_block(S, i) for i, S in enumerate(styles))
+    blocks = "\n".join(_direction_block(S, i, deck_title) for i, S in enumerate(styles))
     doc = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
