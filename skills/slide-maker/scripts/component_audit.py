@@ -25,6 +25,38 @@ import os
 import re
 import sys
 
+# EMITTERS — components that actually DRAW rect geometry, so their own output could be mistaken
+# for a hand-roll and must suppress a report. This list has been wrong twice in two consecutive
+# edits (columns() returns rects and draws nothing; table() emits a GraphicFrame) and each time it
+# silently killed real detections deck-wide, so it is now DERIVED from deckkit's source instead of
+# hand-kept. A component that only returns geometry, or only adds a table/chart/picture frame, can
+# never be the source of a loose-rect cluster and must never suppress one.
+def _emitting_components():
+    import re
+    try:
+        src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "deckkit.py"),
+                   encoding="utf-8").read()
+    except OSError:
+        return set()
+    out = set()
+    for m in re.finditer(r"^def ([a-z][a-z0-9_]*)\(", src, re.M):
+        name, start = m.group(1), m.start()
+        nxt = re.search(r"^def ", src[start + 4:], re.M)
+        body = src[start: start + 4 + (nxt.start() if nxt else len(src) - start)]
+        if re.search(r"\b(box|_flat|add_shape|node|icon_tile)\s*\(", body):
+            out.add(name)
+    return out
+
+
+_DRAWS_RECTS = _emitting_components()
+
+# EMITTERS must be the intersection of "draws rects" and "is a FORM component". The derivation
+# alone returns 74 names because the PRIMITIVES (box, chip, arrow, bullet, icon_tile) draw rects
+# too — and every deck calls dk.box(), so using the raw set suppressed 29 of 36 real decks, which
+# is worse than the bug it replaced. Calling box() IS the hand-rolling; it can never excuse it.
+# Populated after FORM_GUARANTEE is defined (see below).
+EMITTERS = set()
+
 # form components + the concrete guarantee each one gives that a hand-roll does not
 FORM_GUARANTEE = {
     "native_chart": "a real editable chart; axis derived from the data, non-Latin labels render",
@@ -35,7 +67,6 @@ FORM_GUARANTEE = {
     "timeline": "end markers are inset so the first/last caption stays co-centred with its dot",
     "step_list": "numbered steps with a derived pitch; no stranded gap under the header",
     "tier_stack": "one taper (funnel/pyramid) sized from the values, not clamped by a min-size floor",
-    "waterfall": "increments or a total — never both as peer bars (the double-count bug)",
     "dot_strip": "even spacing with the end dots inset",
     "eval_matrix": "options x criteria with fitted glyph cells",
     "heat_matrix": "one colour scale bound to the value range",
@@ -47,9 +78,30 @@ FORM_GUARANTEE = {
 }
 
 
+EMITTERS = _DRAWS_RECTS & set(FORM_GUARANTEE)
+
 def _script_calls(path):
+    r"""Every deckkit name this script calls, however it reached for it.
+
+    A bare `\bdk\.` regex missed `from deckkit import scorecard` and any alias other than `dk`,
+    so a deck that imported components directly had its OWN component output reported as a
+    hand-roll — the tool punishing exactly the behaviour it exists to encourage.
+    """
     src = open(path, encoding="utf-8", errors="ignore").read()
-    return {m.group(1) for m in re.finditer(r"\bdk\.([a-z][a-z0-9_]*)\s*\(", src)}
+    names = set()
+    aliases = {"dk", "deckkit"}
+    for m in re.finditer(r"^\s*import\s+deckkit\s+as\s+([A-Za-z_]\w*)", src, re.M):
+        aliases.add(m.group(1))
+    for m in re.finditer(r"^\s*from\s+deckkit\s+import\s+([^\n(]+)", src, re.M):
+        for part in m.group(1).split(","):
+            part = part.strip()
+            if not part or part == "*":
+                continue
+            names.add(part.split(" as ")[-1].strip())
+            names.add(part.split(" as ")[0].strip())
+    for a in aliases:
+        names |= {m.group(1) for m in re.finditer(r"\b%s\.([a-z][a-z0-9_]*)\s*\(" % re.escape(a), src)}
+    return names
 
 
 def _shapes(pptx_path):
@@ -70,11 +122,26 @@ def _shapes(pptx_path):
                     txt = sh.text_frame.text.strip()
             except Exception:
                 pass
-            kind = "chart" if getattr(sh, "has_chart", False) else (
-                "table" if getattr(sh, "has_table", False) else (
-                    "pic" if "PICTURE" in str(getattr(sh, "shape_type", "")) else
-                    ("text" if txt else "rect")))
-            out.append({"slide": n, "x": x, "y": y, "w": w, "h": h, "kind": kind, "txt": txt})
+            filled = False
+            try:
+                filled = sh.fill.type is not None and "BACKGROUND" not in str(sh.fill.type)
+            except Exception:
+                pass
+            if getattr(sh, "has_chart", False):
+                kind = "chart"
+            elif getattr(sh, "has_table", False):
+                kind = "table"
+            elif "PICTURE" in str(getattr(sh, "shape_type", "")):
+                kind = "pic"
+            elif filled:
+                # a FILLED shape is rect geometry whether or not it also carries a label. The
+                # earlier "text if txt else rect" test made the MOST COMMON hand-roll — box(...)
+                # with its own text inside — invisible to all four detectors.
+                kind = "rect"
+            else:
+                kind = "text" if txt else "rect"
+            out.append({"slide": n, "x": x, "y": y, "w": w, "h": h, "kind": kind, "txt": txt,
+                        "self_labelled": bool(txt and filled)})
     return out
 
 
@@ -90,8 +157,10 @@ def _clusters(shapes):
         texts = [s for s in shs if s["kind"] == "text"]
 
         def near_text(r, pad=0.55):
-            return [t for t in texts
-                    if abs(t["y"] - r["y"]) < pad and t["x"] > r["x"] - 2.6 and t["x"] < r["x"] + r["w"] + 2.6]
+            own = [r] if r.get("self_labelled") else []
+            return own + [t for t in texts
+                          if abs(t["y"] - r["y"]) < pad and t["x"] > r["x"] - 2.6
+                          and t["x"] < r["x"] + r["w"] + 2.6]
 
         # BAR ROW — same x0 and h, different w, stacked vertically, with digit-bearing labels
         rows = {}
@@ -106,9 +175,7 @@ def _clusters(shapes):
                 hits.append({"slide": n, "pattern": "bar row",
                              "detail": f"{len(group)} rects sharing x={x0}in and h={h}in with varying "
                                        f"width and numeric labels",
-                             "components": ["native_chart", "meter_bar", "segmented_bar",
-                                            "bullet_graph", "range_bars", "dumbbell_board",
-                                            "dot_strip", "waterfall", "leaderboard"]})
+                             "suggest": ["native_chart", "meter_bar", "segmented_bar"]})
 
         # 100% BAND — >=3 rects on one y, abutting (gap ~0), spanning a wide run
         bands = {}
@@ -123,8 +190,7 @@ def _clusters(shapes):
             if span > 3.0 and all(abs(v) < 0.06 for v in gaps):
                 hits.append({"slide": n, "pattern": "abutting 100% band",
                              "detail": f"{len(group)} rects abutting across {span:.1f}in at y={y0}in",
-                             "components": ["segmented_bar", "tier_stack", "native_chart",
-                                            "org_tree", "heat_matrix", "eval_matrix"]})
+                             "suggest": ["segmented_bar"]})
 
         # CARD/TILE ROW — >=3 identical rects evenly spaced on one axis
         for (y0, h), group in bands.items():
@@ -137,9 +203,7 @@ def _clusters(shapes):
             if pitches and max(pitches) - min(pitches) < 0.05 and min(pitches) > g[0]["w"]:
                 hits.append({"slide": n, "pattern": "tile row",
                              "detail": f"{len(group)} identical rects on an even pitch at y={y0}in",
-                             "components": ["scorecard", "stat_row", "columns", "org_tree",
-                                            "step_list", "timeline", "tier_stack",
-                                            "position_map", "eval_matrix", "heat_matrix"]})
+                             "suggest": ["scorecard", "stat_row", "columns"]})
 
         # MARKER ROW — >=3 small same-size shapes evenly spaced with captions under them
         dots = [r for r in rects if r["w"] < 0.4 and r["h"] < 0.4]
@@ -153,30 +217,54 @@ def _clusters(shapes):
                 if len(caps) >= 3:
                     hits.append({"slide": n, "pattern": "marker row with captions",
                                  "detail": f"{len(g)} evenly spaced markers with captions below",
-                                 "components": ["timeline", "spaced_centers", "step_list",
-                                                "dot_strip", "position_map", "org_tree"]})
-    return hits
+                                 "suggest": ["timeline", "spaced_centers", "step_list"]})
+    # one visual row must not be reported twice (a body rect and its own accent rule are two
+    # rows at nearly the same y)
+    seen, dedup = set(), []
+    for h in sorted(hits, key=lambda x: (x["slide"], x["pattern"])):
+        k = (h["slide"], h["pattern"])
+        if k in seen:
+            continue
+        seen.add(k); dedup.append(h)
+    return dedup
 
 
 def audit(script_path, pptx_path=None):
+    if not os.path.isfile(script_path):
+        return {"used_forms": [], "form_total": len(FORM_GUARANTEE), "clusters": [],
+                "actionable": [], "inspected": False,
+                "why": "build script not found: %s" % script_path}
     called = _script_calls(script_path)
     used_forms = sorted(f for f in FORM_GUARANTEE if f in called)
-    hits = []
-    if pptx_path and os.path.isfile(pptx_path):
+    hits, inspected, why = [], True, ""
+    if not pptx_path:
+        inspected, why = False, "no deck inspected — pass the .pptx explicitly"
+    elif not os.path.isfile(pptx_path):
+        inspected, why = False, "deck not found: %s" % pptx_path
+    else:
         try:
             hits = _clusters(_shapes(pptx_path))
         except Exception as e:                                   # noqa: BLE001
-            hits = [{"slide": 0, "pattern": "could not read the deck", "detail": str(e),
-                     "components": []}]
-    # Only report a cluster when NO component that could have EMITTED that geometry was called
-    # anywhere in the script. This is what stops a component's own output being reported as a
-    # hand-roll (org_tree draws a row of identical node rects; in the finished pptx that is
-    # indistinguishable from three hand-placed boxes). Keep every emitting component in each
-    # pattern's list — a short list here means false positives, not sharper detection.
-    # a deck that uses meter_bar elsewhere and hand-rolls one bar has clearly made a choice.
-    actionable = [h for h in hits if h["components"] and not (set(h["components"]) & called)]
+            inspected, why = False, "could not read the deck: %s" % e
+    # TWO LISTS, deliberately not one:
+    #   suggest  — what the report tells you to reach for (may include LAYOUT helpers such as
+    #              columns(), which is the right advice even though it draws nothing);
+    #   emitters — what could have DRAWN this geometry, used ONLY to suppress.
+    # Conflating them silently broke the tool once: columns() went into the suppression list, and
+    # since 12 of 44 real decks call it, a quarter of all tile-row detections were being killed by
+    # a helper that never drew a tile. Suppression is what stops a component's OWN output being
+    # reported as a hand-roll (org_tree's node rects are indistinguishable from hand-placed boxes
+    # in the finished file) — so `emitters` lists every component that DRAWS, and nothing that
+    # merely returns geometry.
+    # Suppress when the deck called ANY component that draws rects: in a finished pptx a
+    # component's own output is indistinguishable from hand-placed boxes. EMITTERS is derived
+    # from deckkit's source, so it cannot drift the way the hand-kept list did (twice).
+    drew = EMITTERS & called
+    actionable = [h for h in hits if h.get("suggest")] if not drew else []
+    suppressed_by = sorted(drew)
     return {"used_forms": used_forms, "form_total": len(FORM_GUARANTEE),
-            "clusters": hits, "actionable": actionable}
+            "clusters": hits, "actionable": actionable, "suppressed_by": suppressed_by,
+            "inspected": inspected, "why": why}
 
 
 def main():
@@ -192,9 +280,23 @@ def main():
         pptx = os.path.join(d, cand[0]) if len(cand) == 1 else None
     r = audit(a.script, pptx)
     if a.as_json:
-        print(json.dumps(r, indent=1)); sys.exit(2 if r["actionable"] else 0)
-    print("[components] this deck calls {} of {} form components: {}".format(
-        len(r["used_forms"]), r["form_total"], ", ".join(r["used_forms"]) or "none"))
+        print(json.dumps(r, indent=1))
+        sys.exit(1 if not r.get("inspected") else (2 if r["actionable"] else 0))
+    # NEVER report clean for a deck that was not opened: a wrong path, an unreadable file, or an
+    # ambiguous directory used to print the success line and exit 0 — a green PRE-FLIGHT tick for
+    # a check that did no work, which is the worst failure a checklist tool can have.
+    if not r.get("inspected"):
+        print("[components] NOT CHECKED — {}".format(r.get("why") or "unknown"))
+        print("[components] rerun with the deck path: component_audit.py <build_*.py> <deck.pptx>")
+        sys.exit(1)
+    print("[components] this deck calls {} of the {} form components this tool can name a "
+          "guarantee for (deckkit's wider form catalogue is ~59): {}".format(
+              len(r["used_forms"]), r["form_total"], ", ".join(r["used_forms"]) or "none"))
+    if r.get("suppressed_by"):
+        print("[components] cluster reporting suppressed — this deck draws with {}, whose own "
+              "output is indistinguishable from hand-placed boxes in a finished file."
+              .format(", ".join(r["suppressed_by"])))
+        sys.exit(0)
     if not r["actionable"]:
         print("[components] no hand-rolled cluster matches an unused component.")
         sys.exit(0)
@@ -202,11 +304,19 @@ def main():
           "This is ADVISORY:".format(len(r["actionable"])))
     print("             a bespoke composition IS the signature move — but a hand-rolled COMMON form")
     print("             re-inherits the geometry bugs the component fixed. Confirm each is deliberate.")
-    for h in r["actionable"]:
+    print("             NOTE: this is about HOW to draw a form you already chose, never about WHETHER")
+    print("             that form is right — form-selection.md owns that, and 'use scorecard' is not")
+    print("             a licence for a card grid.")
+    CAP = 8
+    for h in r["actionable"][:CAP]:
         print(f"  slide {h['slide']:>2}  {h['pattern']}: {h['detail']}")
-        for c in h["components"]:
+        for c in h["suggest"]:
             g = FORM_GUARANTEE.get(c)
             print(f"            deckkit.{c}() — {g}" if g else f"            deckkit.{c}()")
+    if len(r["actionable"]) > CAP:
+        rest = len(r["actionable"]) - CAP
+        pats = sorted({h["pattern"] for h in r["actionable"][CAP:]})
+        print(f"  … and {rest} more ({', '.join(pats)}) — rerun with --json for the full list.")
     sys.exit(2)
 
 

@@ -1663,8 +1663,10 @@ those here; read its report instead).
 12. **Form diversity & frame fill — EMIT THE TALLY**: **first run
     `python scripts/component_audit.py build_<deck>.py <deck>.pptx` and paste its two summary lines
     into the tick** (it takes ~50ms and reads the finished file, so it costs nothing and cannot be
-    guessed). It states one fact — how many of the library's form components this deck actually
-    called — and points at clusters whose geometry matches a component the deck never used.
+    guessed). It states one fact — how many of the form components it can name a guarantee for this
+    deck actually called (deckkit's wider form catalogue is ~59) — and points at clusters whose
+    geometry matches a component the deck never used. **If it prints `NOT CHECKED`, the tick is not
+    done**: a wrong path or an unreadable deck exits 1 and says so, rather than reporting clean.
     **It is ADVISORY BY DESIGN and must never be treated as a blocker:** geometry cannot tell a lazy
     hand-roll from a deliberate bespoke composition, and the deliberate one is the *signature move*.
     So for each cluster, either reach for the component, or write the one clause that makes the
@@ -2283,12 +2285,16 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
   the in-process pre-render net for overflow/off-canvas/text-overlap/card-escape/footer/off-centre — plus
   `fit_text_size`); the build's source of truth. Full signatures in its docstrings.
 - `component_audit.py` — did this deck hand-roll a form the library already implements? Reads the
-  build script (which components were called) + the finished pptx (geometry signatures: bar rows,
-  abutting 100% bands, tile rows, marker rows) and names the component whose guarantee the hand-roll
-  gave up. **Advisory, never a blocker** — a bespoke composition is the signature move; what the tool
-  states as fact is the usage ratio and the specific match. A cluster is suppressed when ANY component
-  that could have emitted that geometry was called (so a component's own output is never reported as
-  a hand-roll). ~50ms. Run it at PRE-FLIGHT 12.
+  build script (every import form: `dk.x()`, an alias, or `from deckkit import x`) + the finished
+  pptx (geometry signatures: bar rows, abutting 100% bands, tile rows, marker rows) and names the
+  component whose guarantee the hand-roll gave up. **Advisory, never a blocker** — a bespoke
+  composition is the signature move; what the tool states as fact is the usage ratio and the specific
+  match. Reporting is suppressed when the deck draws with a FORM component that emits the same
+  geometry (a component's own output must never be reported as a hand-roll); that set is **derived
+  from deckkit's source and intersected with the form catalogue** — it has been wrong twice as a
+  hand-kept list, and a primitive in it would silence the tool forever. Exits 1 and prints
+  `NOT CHECKED` rather than reporting clean when the deck could not be opened. ~50ms. Run it at
+  PRE-FLIGHT 12.
 - `directions_diversity.py` — mechanical divergence check for direction-gate candidates
   (mode · palette distance · type pairing · composition), flagging any pair that matches on ≥3 of 4
   axes. Exit 0 all diverge / 2 flagged / 1 unreadable. Never auto-kills: a flag means REDIVERGE **or**

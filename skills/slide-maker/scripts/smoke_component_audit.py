@@ -48,6 +48,7 @@ def main():
             r = audit(sp, p)
             assert r["actionable"], "a hand-rolled bar row was not reported"
             assert any("bar row" in h["pattern"] for h in r["actionable"])
+            assert all("suggest" in h for h in r["actionable"])
         ok("a hand-rolled bar row is reported", _handrolled_bar_row_fires)
 
         def _component_output_is_not_reported():
@@ -76,6 +77,38 @@ def main():
             sp = os.path.join(d, "build_x.py"); open(sp, "w").write("dk.box(\n")
             r = audit(sp, os.path.join(d, "does-not-exist.pptx"))
             assert r["clusters"] == [] and r["actionable"] == [], "a missing deck must degrade quietly"
+        def _emitters_excludes_primitives():
+            """The suppression set is the single most dangerous thing in this tool: too broad and
+            it silences every real finding. It has been wrong TWICE — columns() (returns geometry),
+            then table() (emits a GraphicFrame) — so it is now DERIVED from deckkit's source and
+            intersected with the FORM catalogue. The primitives draw rects too, and every deck
+            calls box(): if a primitive ever lands in EMITTERS the tool reports nothing, forever."""
+            from component_audit import EMITTERS, FORM_GUARANTEE
+            for prim in ("box", "text", "chip", "arrow", "bullet", "icon_tile", "connector"):
+                assert prim not in EMITTERS, \
+                    "%s is a PRIMITIVE — calling it IS the hand-rolling, it can never suppress" % prim
+            for frame in ("table", "native_chart"):
+                assert frame not in EMITTERS, \
+                    "%s emits a GraphicFrame, never loose rects — it cannot excuse a rect cluster" % frame
+            for ret in ("columns", "spaced_centers"):
+                assert ret not in EMITTERS, "%s returns geometry and draws nothing" % ret
+            assert EMITTERS <= set(FORM_GUARANTEE), "EMITTERS must stay inside the FORM catalogue"
+            assert len(EMITTERS) >= 8, "EMITTERS collapsed to %d — suppression would be useless" % len(EMITTERS)
+        ok("EMITTERS excludes primitives, frames and geometry-returners", _emitters_excludes_primitives)
+
+        def _not_inspected_is_never_clean():
+            """A wrong path, an unreadable file or an ambiguous directory used to print the success
+            line and exit 0 — a green PRE-FLIGHT tick for a check that did no work."""
+            import subprocess
+            for args in (["nosuch_build.py", "x.pptx"],
+                         [os.path.join(HERE, "component_audit.py"), "/nope/deck.pptx"]):
+                p = subprocess.run([sys.executable, os.path.join(HERE, "component_audit.py")] + args,
+                                   capture_output=True, text=True)
+                out = p.stdout + p.stderr
+                assert p.returncode == 1, "a deck that was never opened must not exit 0: %r" % args
+                assert "NOT CHECKED" in out, "it must SAY it did not check: " + out[:120]
+        ok("a deck that was never inspected is never reported clean", _not_inspected_is_never_clean)
+
         ok("a missing/unreadable deck degrades quietly (advisory tools never break a build)",
            _never_raises_on_a_bad_deck)
 
