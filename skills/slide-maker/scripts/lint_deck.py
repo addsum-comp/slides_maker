@@ -44,6 +44,7 @@ Checks (tuned for low false-positives):
   text sitting on a picture/gradient (adversarial percentile — a scrim in the render counts) and
   warns in the 1.5-3.0:1 band; only its hopeless <1.5:1 case (TEXT ON IMAGE) is a HARD finding.
 """
+import json
 import re
 import sys
 from pptx import Presentation
@@ -576,6 +577,26 @@ def _slide_stats(slide, bx, sw, sh):
     # already downweights a short hero numeral (a 2-char "96" barely counts vs a body paragraph), so
     # no run needs dropping — the median lands on the tier the reader actually reads.
     body_tier = _cwmedian([(pt, ch) for pt, ch in sizes if pt > 11.0])
+    # word count of the LARGEST text run — a <=12-word display line at hero scale is a statement,
+    # not an inverted hierarchy (the gate INVERTED TYPE needs to tell the two apart)
+    big_run_words = 0
+    if sizes:
+        big_pt = max(pt for pt, _ch in sizes)
+        for t in bx:
+            if t["text"] and not t["bg"] and abs(t["size"] - big_pt) < 0.6 and t["full"]:
+                big_run_words = max(big_run_words, len(t["full"].split()))
+    # a per-slide DESIGN INTENT declared by the build (deckkit.design_intent tags an empty,
+    # invisible shape) — the channel three lint messages promise ("record the quiet-register
+    # exception") but nothing could read until now
+    intent = {}
+    for sh_ in slide.shapes:
+        nm_ = getattr(sh_, "name", "") or ""
+        if nm_.startswith("deckkit-intent:"):
+            try:
+                intent = json.loads(nm_.split(":", 1)[1])
+            except Exception:
+                intent = {}
+            break
     # lopsided inputs: per-half occupancy of content ink (bg plate + footer chrome excluded)
     halves = _half_occ([s for s in bx if not s["bg"] and s["t"] < footer_y], sw, sh)
     # card-dominance input: how much of the canvas is covered by LARGE solid panels/cards (the
@@ -591,7 +612,8 @@ def _slide_stats(slide, bx, sw, sh):
         pass
     return {
         "title_pt": title_pt, "title_txt": title_txt,
-        "body_tier": body_tier, "halves": halves, "boxy": boxy,
+        "body_tier": body_tier, "big_run_words": big_run_words, "intent": intent,
+        "halves": halves, "boxy": boxy,
         "notes": notes_text,
         "notes_words": _text_load(notes_text),
         "pingfang": pingfang,
@@ -600,6 +622,7 @@ def _slide_stats(slide, bx, sw, sh):
         "load": load,
         "text_cov": _coverage([s for s in bx if s["text"] and not s["bg"]], sw, sh),
         "ink_cov": _coverage([s for s in bx if not s["bg"]], sw, sh),
+        "ink_cov_nopic": _coverage([s for s in bx if not s["bg"] and not s["pic"]], sw, sh),
         "max_pt": max((pt for pt, _ in sizes), default=0.0),
         "sizes": sizes,
         "n_shapes": len([s for s in bx if not s["bg"]]),
@@ -783,8 +806,9 @@ def _print_stats(rows, mode, sw, sh, lums=None, static_ok=False):
             warns.append(f"TEXT WALL: slide {i+1} carries a reading load of ~{r['load']} words "
                          f"({mode} budget ≈{'40' if mode=='presented' else '90'}, warn >{budget}) — move prose "
                          f"to speaker notes or split the slide")
-        if r["ink_cov"] > 0.70:
-            warns.append(f"CROWDED: slide {i+1} occupancy {r['ink_cov']*100:.0f}% — role bands: cover "
+        if (mode not in ("surface", "textheavy") and r["load"] >= 15
+                and r["ink_cov_nopic"] > 0.70):
+            warns.append(f"CROWDED: slide {i+1} occupancy {r['ink_cov_nopic']*100:.0f}% — role bands: cover "
                          f"25-35 · exec/summary 45-60 · technical/dense 55-70; past ~70% the slide reads "
                          f"crowded — subtract or split, don't shrink")
         if mode != "surface" and len(r["size_clusters"]) > 4:
@@ -793,7 +817,11 @@ def _print_stats(rows, mode, sw, sh, lums=None, static_ok=False):
                          f"from the deck's declared type-scale tokens")
         # INVERTED TYPE HIERARCHY: the title isn't even the biggest text tier — reads flat / unranked.
         # Skip slide 1 (a cover/statement legitimately makes a non-title element biggest).
-        if i > 0 and r.get("title_pt", 0) > 0 and r.get("body_tier", 0) > 0 and r["title_pt"] < r["body_tier"]:
+        if (i > 0 and r.get("title_pt", 0) > 0 and r.get("body_tier", 0) > 0
+                and r["title_pt"] < r["body_tier"]
+                and not (0 < r.get("big_run_words", 0) <= 12)):
+            # a <=12-word largest run is a STATEMENT (the slide's hero line), not a broken
+            # hierarchy — only a genuinely long body paragraph outranking its title is inverted
             warns.append(f"INVERTED TYPE HIERARCHY: slide {i+1} title ~{r['title_pt']:.0f}pt is SMALLER than "
                          f"its body tier ~{r['body_tier']:.0f}pt — the title should be the largest text; "
                          f"raise the title or lower the body (type-scale rule)")
@@ -824,8 +852,14 @@ def _print_stats(rows, mode, sw, sh, lums=None, static_ok=False):
         # DEAD BOTTOM: an interior content slide whose content stops well above the footer — the
         # lower third reads as an accidental void even when overall ink% passes (a wide-but-shallow
         # layout). Charts and big fg imagery earn their own whitespace; text/panel slides don't.
+        # Per-slide, only the genuine accident (<0.45). The 0.45-0.62 band that used to warn here
+        # is a legitimate "upper envelope" — a statement/pivot slide with deliberate void below
+        # (slides-to-video's envelope model prescribes ~1/3 of a deck there). Whether the DECK
+        # overuses any one envelope is judged as a distribution, below. A declared intent
+        # (deckkit.design_intent(envelope="upper"/"bleed")) waives even the accident floor.
         if (mode != "surface" and 0 < i < len(rows) - 1 and r["load"] >= 15
-                and r.get("content_bottom", 1.0) < 0.62
+                and r.get("content_bottom", 1.0) < 0.45
+                and r.get("intent", {}).get("envelope") not in ("upper", "bleed")
                 and r["n_chart"] == 0 and not r.get("big_pic_fg", r["n_pic"] > 0)):
             warns.append(f"DEAD BOTTOM: slide {i+1} content stops at {r['content_bottom']*100:.0f}% of the "
                          f"canvas height — the bottom band is a void; enrich the point, pull a supporting "
@@ -871,6 +905,29 @@ def _print_stats(rows, mode, sw, sh, lums=None, static_ok=False):
           f"· type drama {drama:.1f}× · size tokens in use {len(tokens)} (target 4-5 deck-wide) · "
           f"distinct skeletons {n_skel} | "
           f"builds {builds}/{n} · transitions {transd}/{n} · avg occupancy {avg_ink*100:.0f}%")
+    # ── deck-level envelope distribution (the slides-to-video import): the subtler monotony is
+    # every interior slide ending its content on the SAME line. Monoculture, not any single page,
+    # is the defect — a deck needs default-band pages AND some that stop high AND some that ride low.
+    interior = [r for i, r in enumerate(rows)
+                if 0 < i < len(rows) - 1 and r["load"] >= 15
+                and r["n_chart"] == 0 and not r.get("big_pic_fg", r["n_pic"] > 0)]
+    if len(interior) >= 6:
+        bots = sorted(r.get("content_bottom", 1.0) for r in interior)
+        med = bots[len(bots) // 2]
+        share = sum(1 for b in bots if abs(b - med) <= 0.04) / float(len(bots))
+        if share > 0.60:
+            warns.append(f"ENVELOPE MONOCULTURE: {share*100:.0f}% of interior slides end their content "
+                         f"at the same height (~{med*100:.0f}% of the canvas) — the deck reads as one "
+                         f"template even when forms vary. Let a statement slide stop high with real "
+                         f"void, let a grounded slide ride the baseline (aim ~1/3 default / 1/3 upper "
+                         f"/ 1/3 low; declare deliberate ones with deckkit.design_intent)")
+        n_intent = sum(1 for r in interior if r.get("intent"))
+        if n_intent > max(2, len(interior) // 2):
+            warns.append(f"INTENT INFLATION: {n_intent} of {len(interior)} interior slides declare a "
+                         f"design-intent exception — the exception has become the default; design the "
+                         f"distribution instead of waiving the checks")
+
+
     if mode != "surface" and n >= 9 and n_skel < 4:
         warns.append(f"SKELETON VARIETY: only {n_skel} distinct layout skeleton(s) across {n} slides — "
                      f"floor is ≥4 on an 8+-slide deck (design-intelligence-addendum §1.2); rotate the "
@@ -1005,7 +1062,16 @@ def lint(path, mode="presented", json_out=None, renders_dir=None, static_ok=Fals
     # (per-slide, inside the loop) and the stats lum pass (after it)
     pngs = _render_png_paths(path, renders_dir, len(prs.slides))
     titles = []                                          # (slide#, normalized title, display snip)
+    intent_map = {}                                      # si -> declared design intent (see design_intent)
     for si, slide in enumerate(prs.slides):
+        for _sh in slide.shapes:
+            _nm = getattr(_sh, "name", "") or ""
+            if _nm.startswith("deckkit-intent:"):
+                try:
+                    intent_map[si] = json.loads(_nm.split(":", 1)[1])
+                except Exception:
+                    pass
+                break
         bx = _boxes(slide, sw, sh)
         try:
             stats_rows.append(_slide_stats(slide, bx, sw, sh))
@@ -1125,6 +1191,13 @@ def lint(path, mode="presented", json_out=None, renders_dir=None, static_ok=Fals
                     tiny_offset = abs(a["l"] - b["l"]) < 0.18 and abs(a["t"] - b["t"]) < 0.18
                     if same_size and tiny_offset:
                         continue
+                    # a small textless MARKER riding a line/ring/track (a station dot on a loop,
+                    # a data point on an axis, a proportion fill on its track) is COMPOSITION:
+                    # the intersection is a sliver (<0.02in²) and at least one party is a small
+                    # decoration with no text. A real card-on-card collision is orders bigger.
+                    marker = any(not sh_["text"] and sh_["w"] * sh_["h"] < 0.35 for sh_ in (a, b))
+                    if marker and ix * iy < 0.02:
+                        continue
                     finds.append(f"OVERLAP {round(ix,2)}x{round(iy,2)}in  {a['st']}'{a['txt']}' x {b['st']}'{b['txt']}'"
                                  f" — move/shrink one so they separate (≥0.12in gap) or nest one fully inside the other")
         # 3) footer-zone reservation: the bottom footer band is deck chrome — NO content block (solid
@@ -1136,16 +1209,25 @@ def lint(path, mode="presented", json_out=None, renders_dir=None, static_ok=Fals
         if footers:
             fid = {id(f) for f in footers}
             fb_top = min(f["t"] for f in footers) - 0.08      # keep content above this line
+            env_ = (intent_map.get(si, {}) or {}).get("envelope")
             for s in bx:
                 if s["bg"] or id(s) in fid or not (s["solid"] or s["text"]) or s["h"] <= 0.2:
                     continue
-                if s["t"] < fb_top - 0.04 and s["b"] > fb_top:    # starts in the content area, dips into the footer zone
+                if env_ in ("lower", "bleed"):
+                    continue          # the build DECLARED a baseline/bleed register for this slide
+                if not s["text"] and s["w"] <= 0.6 and s["h"] <= 0.35:
+                    continue          # a small textless mark (page ring, tick) is footer chrome
+                # For PURE TEXT, judge the rendered ink bottom (alignment/anchor-aware), not the
+                # declared frame: one 20pt line top-anchored in a generous 1.9in box had its ink
+                # ~1.5in clear of the footer and still hard-failed on the frame's bottom edge.
+                eff_b = (_rbox(s)[3] + 0.04) if (s["text"] and not s["solid"]) else s["b"]
+                if s["t"] < fb_top - 0.04 and eff_b > fb_top:
                     covers = [f for f in footers if _inter(s, f)[0] > TOL and _inter(s, f)[1] > TOL]
                     if covers:
                         finds.append(f"FOOTER collision  {s['st']}'{s['txt']}' overlaps footer '{covers[0]['txt']}' "
                                      f"— keep content above {round(fb_top,2)}in (content_band()/bottom_callout())")
                     else:
-                        finds.append(f"FOOTER-ZONE intrusion  {s['st']}'{s['txt']}' (bottom {round(s['b'],2)}in) "
+                        finds.append(f"FOOTER-ZONE intrusion  {s['st']}'{s['txt']}' (ink bottom {round(eff_b,2)}in) "
                                      f"dips into the reserved footer band — keep content above {round(fb_top,2)}in")
         # 4) editability: a slide that is ~one whole-page image with no native text/objects
         bigpic = next((s for s in bx if s["st"] == "PICTURE" and s["w"] * s["h"] >= 0.85 * sw * sh), None)
@@ -1360,7 +1442,6 @@ def lint(path, mode="presented", json_out=None, renders_dir=None, static_ok=Fals
     if deck_stats.get("warns"):
         print("  [stats] lines are advisory — which to act on vs accept: references/troubleshooting-faq.md §7")
     if json_out:
-        import json
         per_slide = [{"slide": i + 1, "load": r["load"], "text_cov": round(r["text_cov"], 3),
                       "ink_cov": round(r["ink_cov"], 3), "max_pt": r["max_pt"],
                       "n_shapes": r["n_shapes"], "n_pic": r["n_pic"], "n_chart": r["n_chart"],

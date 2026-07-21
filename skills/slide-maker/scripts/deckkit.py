@@ -3624,6 +3624,46 @@ def logo(slide, path, *, corner="tr", h=0.42, margin=0.3, w_in=None, h_in=None, 
 
 
 # ===================================================================== notes
+def design_intent(slide, *, envelope=None, rhyme=None, reason=""):
+    """Declare a slide's DELIBERATE design register so the render-time lint can tell intent
+    from accident (three of its messages say "record the quiet-register exception" — this is
+    where it gets recorded).
+
+    envelope: "upper" — content stops high ON PURPOSE, real void below (a statement/pivot beat);
+              "lower" — content rides the baseline; "bleed" — content deliberately reaches the edge.
+    rhyme:    an int group id — consecutive slides sharing it are an intentional visual rhyme
+              (a Speed/Cost/Risk triptych), not layout sameness.
+    reason:   one clause, for the human reading the lint output later.
+
+    Implemented as an invisible zero-ink tag shape (name="deckkit-intent:{json}") so the intent
+    travels INSIDE the .pptx to the render-time lint — no side-channel file to lose. Abuse is
+    audited: lint warns INTENT INFLATION when most slides declare exceptions.
+    """
+    import json as _json
+    payload = {k: v for k, v in (("envelope", envelope), ("rhyme", rhyme), ("reason", reason)) if v}
+    tag = slide.shapes.add_textbox(Inches(0), Inches(0), Inches(0.01), Inches(0.01))
+    tag.name = "deckkit-intent:" + _json.dumps(payload, ensure_ascii=False)
+    tag.text_frame.word_wrap = False
+    return tag
+
+
+def pic_alpha(picture, pct):
+    """Set a picture's OWN opacity (0-100), via <a:alphaModFix> on its blip.
+
+    The native way to make a faint interior plate: the image keeps its own hues (a scrim overlay
+    tints everything toward the scrim colour — the A/B is unambiguous), there is no second
+    full-bleed shape, and the result is editable in PowerPoint. python-pptx has no API for this;
+    the element is one line of DrawingML.
+    """
+    blip = picture._element.blipFill.find(qn("a:blip"))
+    if blip is None:
+        raise ValueError("pic_alpha(): shape has no image fill")
+    for old in blip.findall(qn("a:alphaModFix")):
+        blip.remove(old)
+    blip.append(blip.makeelement(qn("a:alphaModFix"), {"amt": str(int(pct * 1000))}))
+    return picture
+
+
 def speaker_notes(slide, notes):
     """Attach speaker notes — the SPOKEN script — to a slide, off the visible canvas.
     The slide should show the phrase; the full sentences the presenter says live here.

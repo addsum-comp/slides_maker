@@ -624,5 +624,43 @@ def _no_inherited_effect():
     assert "INHERITED_EFFECT" not in codes
 ok("no shape carries the inherited theme shadow (<p:style>)", _no_inherited_effect)
 
+
+# --- design_intent: the declared-register channel round-trips through the saved file ---
+def _design_intent():
+    import json as _json
+    from pptx import Presentation as _P
+    p = dk.blank_deck(); s = dk.add_slide(p)
+    dk.design_intent(s, envelope="upper", rhyme=2, reason="pivot beat")
+    import os, tempfile
+    f = os.path.join(tempfile.mkdtemp(), "t.pptx"); p.save(f)
+    sl = list(_P(f).slides)[0]
+    tags = [sh.name for sh in sl.shapes if (sh.name or "").startswith("deckkit-intent:")]
+    assert len(tags) == 1, "intent tag must survive save"
+    payload = _json.loads(tags[0].split(":", 1)[1])
+    assert payload == {"envelope": "upper", "rhyme": 2, "reason": "pivot beat"}
+    # and the tag must not trip the geometry lint
+    dk.lint_layout(p, verbose=False, strict=True)
+ok("design_intent tag round-trips and is lint-invisible", _design_intent)
+
+
+# --- pic_alpha: native picture opacity, no overlay shape ---
+def _pic_alpha():
+    from pptx.oxml.ns import qn as _qn
+    p = dk.blank_deck(); s = dk.add_slide(p)
+    import glob
+    img = glob.glob(os.path.expanduser(
+        "~/Downloads/slides_skill_test/tokyo-first-timers/assets/opt/*.jpg"))
+    if not img:
+        return                       # fixture machine only; the A/B render proved the visual
+    pic = dk.picture(s, img[0], 1, 1, 4, 3, fit="cover", alt="")
+    dk.pic_alpha(pic, 14)
+    blip = pic._element.blipFill.find(_qn("a:blip"))
+    fixes = blip.findall(_qn("a:alphaModFix"))
+    assert len(fixes) == 1 and fixes[0].get("amt") == "14000"
+    dk.pic_alpha(pic, 30)            # idempotent: replaces, never stacks
+    fixes = blip.findall(_qn("a:alphaModFix"))
+    assert len(fixes) == 1 and fixes[0].get("amt") == "30000"
+ok("pic_alpha sets native picture opacity idempotently", _pic_alpha)
+
 print(f"\nsmoke_deckkit: {len(fails)} failure(s)" + ("" if not fails else " — " + "; ".join(n for n, _ in fails)))
 sys.exit(1 if fails else 0)
