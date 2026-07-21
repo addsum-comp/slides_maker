@@ -1215,6 +1215,15 @@ def lint(path, mode="presented", json_out=None, renders_dir=None, static_ok=Fals
                     marker = any(not sh_["text"] and sh_["w"] * sh_["h"] < 0.35 for sh_ in (a, b))
                     if marker and ix * iy < 0.02:
                         continue
+                    # two TEXTLESS FREEFORM polygons that overlap are the faces of ONE vector
+                    # drawing (an isometric solid's top/right/left faces, or any hand-composed
+                    # freeform illustration), not a card-on-card collision — lint_deck cannot
+                    # reason about vector art (same reason it skips groups), and a real content
+                    # collision always involves a card/picture/table/text, never two bare polygons.
+                    both_freeform = (a["st"].startswith("FREEFORM") and b["st"].startswith("FREEFORM")
+                                     and not a["text"] and not b["text"])
+                    if both_freeform:
+                        continue
                     finds.append(f"OVERLAP {round(ix,2)}x{round(iy,2)}in  {a['st']}'{a['txt']}' x {b['st']}'{b['txt']}'"
                                  f" — move/shrink one so they separate (≥0.12in gap) or nest one fully inside the other")
         # 3) footer-zone reservation: the bottom footer band is deck chrome — NO content block (solid

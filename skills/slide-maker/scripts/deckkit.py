@@ -5847,7 +5847,9 @@ def iso_prism(slide, ox, oy, w, d, h, base, *, line=None):
     sits at the bottom of the drawn shape. w/d/h are width/depth/height IN INCHES of projected
     space (h is the extrusion — for a bar, h encodes the value). Draws three visible faces
     (top, right, left) in the fixed shading ratios so it reads as lit from the upper front.
-    Returns the top-face centre (x, y) in inches, so a caller can place a flat label above it.
+    Returns (cx, y) — the horizontal centre and a y ABOVE THE ENTIRE TOP FACE (cleared of the
+    rhombus), so a flat label seated at this point sits above the block, never on it. (Placing a
+    label at the face *centre* lands it on the top face — muted text there is invisible.)
     """
     def P(x, y, z):
         return _iso_pt(x, y, z, ox, oy)
@@ -5858,12 +5860,17 @@ def iso_prism(slide, ox, oy, w, d, h, base, *, line=None):
     _iso_poly(slide, right, _iso_shade(base, 0.80), line=line)
     _iso_poly(slide, top, base, line=line)
     cx = ox + (w - d) * _ISO_COS30 / 2.0
-    cy = oy + (w + d) * _ISO_SIN30 / 2.0 - h
-    return (cx, cy)
+    # the top face's HIGHEST screen point is its far-back corner P(0,d,h); a label must clear THAT,
+    # not the face centre — returning the centre and saying "put a label above it" lands text ON
+    # the rhombus (measured 1.33:1, invisible). Return the cleared apex.
+    apex_y = oy + 0.0 * _ISO_SIN30 - h                 # near-top corner P(0,0,h) screen y
+    far_top_y = oy - d * _ISO_COS30 * 0.0 + d * _ISO_SIN30 - h   # not used; keep the math explicit
+    top_hi = min(P(0, 0, h)[1], P(0, d, h)[1], P(w, 0, h)[1], P(w, d, h)[1])
+    return (cx, top_hi - 0.06)
 
 
 def iso_bars(slide, x, y, w, h, values, *, labels=None, base=None, highlight=None,
-             depth=0.42, gap=0.30, font=None, label_size=11, value_fmt="{:g}"):
+             hi_color=None, depth=0.42, gap=0.30, font=None, label_size=11, value_fmt="{:g}"):
     """A FAITHFUL isometric bar chart — bar height is linear in the value and zero-based, so the
     2.5D never distorts the data (that is why perspective is refused above).
 
@@ -5872,7 +5879,9 @@ def iso_bars(slide, x, y, w, h, values, *, labels=None, base=None, highlight=Non
     one z-scale; (x, y, w, h) is the footprint the whole chart is fitted into. Value labels sit
     ABOVE each bar's top face in flat type (text cannot be sheared onto a face)."""
     base = _as_rgb(base) if base is not None else BLUE
-    hi = _as_rgb(MAGENTA)
+    # highlight uses the caller's BOUND emphasis hue when given, so a deck whose semantic accent
+    # isn't MAGENTA is respected; MAGENTA (re-themed by set_palette) is only the default.
+    hi = _as_rgb(hi_color) if hi_color is not None else _as_rgb(MAGENTA)
     n = len(values)
     if n == 0:
         raise ValueError("iso_bars needs at least one value")
@@ -5926,7 +5935,8 @@ def iso_stack(slide, x, y, w, h, layers, *, base=None, accents=None, slab=0.14, 
         raise ValueError("iso_stack reads clearly up to ~6 layers; %d slabs overflow the canvas and "
                          "blur together. Group them, or use a flat step_list / tier_stack." % n)
     cols = ([_as_rgb(base)] * n if base is not None
-            else (accents or palette(n, ACCENTS)))
+            else [_as_rgb(c) for c in accents] if accents
+            else palette(n, ACCENTS))
     sw = min(w * 0.30, 1.7)               # slab footprint width in projected inches
     sd = sw * 0.64
     pitch = slab + max(gap, 0.58)         # vertical screen gap between slab tops (fits two lines)
@@ -5936,21 +5946,23 @@ def iso_stack(slide, x, y, w, h, layers, *, base=None, accents=None, slab=0.14, 
     far = (sw + sd) * _ISO_SIN30
     total = (n - 1) * pitch + far + slab            # full stack screen height
     ox = x + sd * _ISO_COS30 + 0.25
-    oy_top = y + max(0.15, (h - total) / 2.0) + slab   # top slab's near corner
-    lx = ox + sw * _ISO_COS30 + 0.5
+    oy_top = y + max(0.4, (h - total) / 2.0) + slab    # top slab (min top margin for a label)'s near corner
+    lx = ox + sw * _ISO_COS30 + 0.28        # tighter to the slabs so a label can't drift to a neighbour
     for i in range(n):
-        idx = n - 1 - i                   # draw TOP-first? no — front (lower) slabs must overpaint,
-        # so draw from the top slab DOWN, each lower slab painting over the one above it
+        idx = n - 1 - i                     # top slab first; lower (front) slabs overpaint
         label, sub = items[idx]
         oy = oy_top + i * pitch
-        cx, cy = iso_prism(slide, ox, oy, sw, sd, slab, _as_rgb(cols[idx]))
-        # ANCHOR the label to the top-face centre the prism itself reports — no re-derivation
+        iso_prism(slide, ox, oy, sw, sd, slab, _as_rgb(cols[idx]))
+        # a slab's OWN visible band (before the next slab overpaints it) is only ~one pitch tall,
+        # centred a bit above oy. Seat BOTH label lines inside that band so the sub-caption never
+        # falls into the trough beside the NEXT slab (the decodability bug the review found).
+        band_mid = oy - slab - (sw + sd) * _ISO_SIN30 * 0.12
         two = 0.30 if sub else 0.0
-        text(slide, lx, cy - 0.13 - two / 2, w - (lx - x) - 0.15, 0.3,
+        text(slide, lx, band_mid - 0.02 - two / 2, w - (lx - x) - 0.15, 0.3,
              [[(label, label_size, _as_rgb(DEEP), True, False, font or FONT)]],
              space_after=0, wrap=False)
         if sub:
-            text(slide, lx, cy + 0.14, w - (lx - x) - 0.15, 0.3,
+            text(slide, lx, band_mid + 0.20, w - (lx - x) - 0.15, 0.28,
                  [[(sub, label_size - 2.5, _as_rgb(MUTE), False, False, font or FONT)]],
                  space_after=0, wrap=False)
     return y + h

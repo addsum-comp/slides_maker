@@ -148,6 +148,13 @@ def _shapes(pptx_path):
     return out
 
 
+# NOTE — deliberate LIMITATION, not a silent gap: there is no cluster detector for a hand-rolled
+# ISOMETRIC chart (multiple overlapping freeform faces per solid). Two reasons: hand-rolling iso from
+# raw freeforms is rare and laborious (nobody reaches for it by accident the way they reach for a
+# box+text bar row), and any detector broad enough to catch it would misflag every legitimate freeform
+# ILLUSTRATION as "should be iso_bars". iso_bars/iso_stack/iso_prism are still in FORM_GUARANTEE (so
+# they count in the usage ratio) and in EMITTERS (so a deck that legitimately uses them is not flagged);
+# only the reverse — catching a from-scratch iso hand-roll — is intentionally out of scope.
 def _clusters(shapes):
     """Geometry signatures that a deckkit component already implements."""
     hits = []

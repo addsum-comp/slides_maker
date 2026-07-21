@@ -93,6 +93,22 @@ exact **component** in `design-gallery.md`; place safely with the `deckkit` help
 - **Figure walkthrough** → `deckkit.annotated_figure` (numbered markers + caption rail + inset).
 - **Hierarchy** → `deckkit.org_tree` (tidy centroid layout; auto-raises when unfittable).
 
+## 2.5D isometric — a PRESENCE choice, scenario-gated (adversarially reviewed)
+`iso_bars` · `iso_stack` · `iso_prism` add native depth. They trade **precision for presence**, so
+they are gated by content shape AND audience — not a default. The one rule that governs all three:
+**dose like generated imagery — ONE 2.5D moment per deck, and only where depth adds meaning, never
+"for depth".** Labels sit BESIDE the geometry (text cannot be sheared onto a face).
+
+| form | USE it when | AVOID it when (use instead) |
+|---|---|---|
+| **`iso_bars`** | ONE hero magnitude chart on a **pitch / launch / keynote / exec** deck; **≤~6 non-negative** values; you want **one bar to pop** and exact ratios need not be read | a **research / methods / ablation / defense** results comparison (a flat `native_chart(column)` is more credible), or **close values** (88 vs 91 — the constant top-face pedestal **compresses ratios: an 8× reads ~4.8×**), or signed/before-after data → `native_chart` / `waterfall` (iso_bars raises on negatives & >9) |
+| **`iso_stack`** | a **3–6 tier CONCEPTUAL layering** where "stacked on a foundation" IS the message — abstraction levels, a disclosure ladder, a maturity model, a decision hierarchy; short labels | a **literal software architecture** needing connections / data-flow / a bus (use `node`+`connector` / `hub_spoke`), or when a layer encodes a **quantity/proportion** (use `tier_stack`/`funnel` — iso slabs are uniform), or **>6** layers (raises) |
+| **`iso_prism`** | ONE **hero block** beside a claim or big number that reads as *foundation / cornerstone / one unit*; seat a label via its returned **apex** anchor (above the whole face) | as a **data mark** (a lone prism compares against nothing — `iso_bars` is faithful even for one bar), as **repeated furniture** (defeats the dose rule), or dropped "for depth" with no meaning (mystery furniture) |
+
+**Audience gate:** the more the room rewards rigor (clinical, regulatory, thesis defense, peer
+review), the worse the presence-for-precision trade — there, a flat chart's plainness IS credibility.
+Reserve 2.5D for decks whose job is to *impress or orient*, not to *prove*.
+
 
 ## How the slide-design agent uses this (the Form ledger)
 For every **content** slide, the plan records one Form-ledger row — `slide | visual protagonist |
