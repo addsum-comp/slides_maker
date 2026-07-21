@@ -5876,6 +5876,13 @@ def iso_bars(slide, x, y, w, h, values, *, labels=None, base=None, highlight=Non
     n = len(values)
     if n == 0:
         raise ValueError("iso_bars needs at least one value")
+    if any(v < 0 for v in values):
+        raise ValueError("iso_bars is for non-negative MAGNITUDES — an extrusion height cannot be "
+                         "negative without lying about the value. For signed/before-after data use "
+                         "native_chart(kind='column') or designed_charts.waterfall.")
+    if n > 9:
+        raise ValueError("iso_bars gets cramped past ~9 bars (the isometric depth eats horizontal "
+                         "room). Use native_chart for a dense series, or split the data.")
     vmax = max(values) or 1.0
     bw = max(0.30, min(0.58, (w - (n - 1) * gap) / n * 0.62))
     hmax = h * 0.60                       # 0.60 not 0.72: reserve real headroom for value labels
@@ -5915,6 +5922,9 @@ def iso_stack(slide, x, y, w, h, layers, *, base=None, accents=None, slab=0.14, 
     n = len(items)
     if n == 0:
         raise ValueError("iso_stack needs at least one layer")
+    if n > 6:
+        raise ValueError("iso_stack reads clearly up to ~6 layers; %d slabs overflow the canvas and "
+                         "blur together. Group them, or use a flat step_list / tier_stack." % n)
     cols = ([_as_rgb(base)] * n if base is not None
             else (accents or palette(n, ACCENTS)))
     sw = min(w * 0.30, 1.7)               # slab footprint width in projected inches

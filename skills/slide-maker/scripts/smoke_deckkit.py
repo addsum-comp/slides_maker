@@ -806,12 +806,18 @@ def _iso_components():
                  accents=["2E9C93", "3E6E9E", "8A5BC7"])
     dk.lint_layout(p, verbose=False, strict=True)
 
+    for bad, why in [([], "empty"), ([-5, 3], "negative (a faithful chart cannot extrude it)"),
+                     (list(range(13)), "too many bars")]:
+        try:
+            dk.iso_bars(s, 0.8, 1.4, 8.4, 3.4, bad); assert False, "iso_bars must reject " + why
+        except ValueError:
+            pass
     try:
-        dk.iso_bars(s, 0.8, 1.4, 8.4, 3.4, [])
-        assert False, "empty iso_bars must raise"
+        dk.iso_stack(s, 0.6, 1.1, 9.0, 4.0, ["L%d" % i for i in range(8)])
+        assert False, "iso_stack must reject too many layers"
     except ValueError:
         pass
-ok("iso 2.5D suite (prism · faithful bars · aligned stack)", _iso_components)
+ok("iso 2.5D suite (prism · faithful bars · aligned stack · guards)", _iso_components)
 
 print(f"\nsmoke_deckkit: {len(fails)} failure(s)" + ("" if not fails else " — " + "; ".join(n for n, _ in fails)))
 sys.exit(1 if fails else 0)
