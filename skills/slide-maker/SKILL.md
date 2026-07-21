@@ -1071,6 +1071,18 @@ The helper set, by job:
   spreadsheet with **`series_from_csv(path, x_col, y_cols)`** → `(categories, series)`, stdlib, no pandas),
   plus the raster recipes in `scripts/designed_charts.py` (incl. **`waterfall`** — a total's rise/fall/
   total walk, semantic up/down colour) — pick per `references/data-viz.md`.
+- **Walkthrough / hierarchy / comparison-grid:** **`annotated_figure`** (a real figure + numbered
+  markers + a numbered caption rail + optional magnified inset — the guided figure walkthrough the
+  integral-figure rule kept demanding by hand) · **`small_multiples`** (identical mini native charts
+  with a SHARED value axis — the documented recipe left each panel auto-scaling, so a small bump and
+  a huge bump looked identical) · **`position_map`** (N LABELLED items on two continuous axes — the
+  within-cell position quadrant() throws away) · **`org_tree`** (tidy hierarchy: centroid parents,
+  horizontal bus; raises when it can't fit legibly).
+- **Placement by measurement:** `image_fx.quiet_region(path)` → the image's calmest ONE-INK region
+  + its mean luminance (choose dark vs light ink from data, not eyeballing) · `deckkit.pic_alpha`
+  (native picture opacity — a faint plate that keeps its own hues, no scrim shape) ·
+  `deckkit.design_intent(slide, envelope=…, rhyme=…)` (declare a deliberate quiet/baseline/bleed
+  register so the render-time lint audits intent instead of guessing it).
 - **Decision / plan / grid:** **`eval_matrix`** (options×criteria scoring grid — `harvey_ball` fifths-fill
   glyphs or ✓/◐/✕ marks, `recommend=` tints the winner) · **`heat_matrix`** (category×category grid coloured
   by value, `scale="seq"|"div"|"risk"`) · **`tier_stack`** (one taper: `mode="funnel"` drop-off /

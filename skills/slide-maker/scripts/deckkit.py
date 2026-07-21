@@ -3624,6 +3624,279 @@ def logo(slide, path, *, corner="tr", h=0.42, margin=0.3, w_in=None, h_in=None, 
 
 
 # ===================================================================== notes
+def org_tree(slide, x, y, w, h, root, *, accent=None, node_h=0.42, gap_y=0.42,
+             label_size=11, font=None, line_c=None):
+    """A tidy HIERARCHY tree (org chart / taxonomy / decision ownership) — parent drop,
+    horizontal bus, even child drops.
+
+    root — ("label", [child, ...]) nested tuples; a leaf is ("label", []) or just "label".
+    Layout is the classic two-pass tidy-tree: post-order assigns each leaf the next slot and
+    each parent the CENTROID of its children (the part that stops being hand-placeable at
+    depth 3); then the slot grid scales to fit w. Raises when depth/width can't fit legibly.
+    """
+    def norm(n):
+        if isinstance(n, str):
+            return (n, [])
+        return (str(n[0]), [norm(c) for c in (n[1] if len(n) > 1 else [])])
+    root = norm(root)
+
+    slots = {"next": 0}
+    pos = {}                                             # id(node) -> (slot_x, depth)
+    def layout(node, depth):
+        label, kids = node
+        if not kids:
+            sx = slots["next"]; slots["next"] += 1
+        else:
+            xs = [layout(k, depth + 1) for k in kids]
+            sx = sum(xs) / len(xs)
+        pos[id(node)] = (sx, depth)
+        return sx
+    layout(root, 0)
+    n_slots = max(slots["next"], 1)
+    depth_max = max(d for _, d in pos.values())
+    node_w = min(1.9, (w - 0.2 * (n_slots - 1)) / n_slots)
+    if node_w < 0.85:
+        raise ValueError(f"org_tree(): {n_slots} leaves need node width {node_w:.2f}in (<0.85) — "
+                         f"split the tree or go wider")
+    if (depth_max + 1) * (node_h + gap_y) - gap_y > h + 0.01:
+        raise ValueError(f"org_tree(): depth {depth_max + 1} needs "
+                         f"{(depth_max + 1) * (node_h + gap_y) - gap_y:.1f}in (> {h:.1f}) — "
+                         f"shrink node_h/gap_y or split")
+    acc = accent if accent is not None else BLUE
+    lc = _as_rgb(line_c) if line_c is not None else _as_rgb(MUTE)
+    pitch = (w - node_w) / max(n_slots - 1, 1)
+    def draw(node):
+        label, kids = node
+        sx, depth = pos[id(node)]
+        nx = x + sx * pitch
+        ny = y + depth * (node_h + gap_y)
+        b = box(slide, nx, ny, node_w, node_h, fill=(acc if depth == 0 else WHITE),
+                line=(None if depth == 0 else acc), line_w=1.1, round=True, r=0.08)
+        text(slide, nx, ny, node_w, node_h,
+             [[(label, label_size if depth == 0 else label_size - 1,
+                _as_rgb(WHITE) if depth == 0 else _as_rgb(DEEP), depth == 0, False, font or FONT)]],
+             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
+        if kids:
+            busy = ny + node_h + gap_y / 2
+            box(slide, nx + node_w / 2 - 0.008, ny + node_h, 0.016, gap_y / 2, fill=lc)
+            kxs = [x + pos[id(k)][0] * pitch + node_w / 2 for k in kids]
+            box(slide, min(kxs) - 0.008, busy - 0.008, max(kxs) - min(kxs) + 0.016, 0.016, fill=lc)
+            for k, kx in zip(kids, kxs):
+                box(slide, kx - 0.008, busy, 0.016, gap_y / 2, fill=lc)
+                draw(k)
+        return b
+    draw(root)
+    return y + (depth_max + 1) * (node_h + gap_y) - gap_y
+
+
+def annotated_figure(slide, x, y, w, h, img, callouts, *, rail="right", rail_w=2.5,
+                     accent=None, label_size=10.5, font=None, inset=None, alt=None):
+    """A real figure with NUMBERED markers + a numbered caption rail — the guided walkthrough.
+
+    callouts — [(fx, fy, "caption"), ...] with fx/fy FRACTIONAL (0-1) positions on the image.
+    The skill's own philosophy leans hardest on real figures ("use the source's own figures,
+    WHOLE"), yet marker placement + caption routing was re-derived by hand per deck and failed
+    invisibly until render. One call: place the figure, drop numbered discs at the named spots,
+    and list the same numbers in a caption rail beside it (rail="right"|"bottom").
+
+    inset — optional (fx, fy, frac) magnified detail: crops the SAME image around that point
+    (via Picture.crop_*, no image processing) into a corner panel with a hairline link.
+    Returns the figure's placed rect (px, py, pw, ph).
+    """
+    if not callouts:
+        raise ValueError("annotated_figure(): no callouts — use picture() for a plain figure")
+    if len(callouts) > 8:
+        raise ValueError("annotated_figure(): %d callouts — past ~8 the figure reads as a diagram "
+                         "of markers; split the walkthrough" % len(callouts))
+    acc = _as_rgb(accent) if accent is not None else _as_rgb(MAGENTA)
+    if rail == "right":
+        fw, fh = w - rail_w - 0.25, h
+        rx0, ry0, rw0 = x + fw + 0.25, y, rail_w
+    else:
+        rail_h = min(0.42 * h, 0.30 + 0.34 * len(callouts))
+        fw, fh = w, h - rail_h - 0.15
+        rx0, ry0, rw0 = x, y + fh + 0.15, w
+    pic = picture(slide, img, x, y, fw, fh, fit="contain", alt=alt or "annotated figure")
+    # the CONTAINED image's real rect (letterboxed inside the frame)
+    px, py = pic.left / 914400.0, pic.top / 914400.0
+    pw, ph = pic.width / 914400.0, pic.height / 914400.0
+    d = 0.26
+    for i, (fx, fy, _cap) in enumerate(callouts, 1):
+        cx, cy = px + float(fx) * pw, py + float(fy) * ph
+        o = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - d / 2), Inches(cy - d / 2),
+                                         Inches(d), Inches(d)))
+        o.fill.solid(); o.fill.fore_color.rgb = acc
+        o.line.color.rgb = _as_rgb(WHITE); o.line.width = Pt(1.2); o.shadow.inherit = False
+        tf = o.text_frame; tf.word_wrap = False
+        tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = Pt(0)
+        r = tf.paragraphs[0].add_run(); r.text = str(i)
+        set_font(r, 11, _as_rgb(WHITE), True, False, font or FONT)
+        tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+        tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    yy = ry0
+    for i, (_fx, _fy, cap) in enumerate(callouts, 1):
+        o = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(rx0), Inches(yy + 0.01),
+                                         Inches(0.2), Inches(0.2)))
+        o.fill.solid(); o.fill.fore_color.rgb = acc; o.line.fill.background(); o.shadow.inherit = False
+        tf = o.text_frame; tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = Pt(0)
+        r = tf.paragraphs[0].add_run(); r.text = str(i)
+        set_font(r, 9, _as_rgb(WHITE), True, False, font or FONT)
+        tf.paragraphs[0].alignment = PP_ALIGN.CENTER; tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+        cap_h = max(0.24, measure_text([(str(cap), False)], rw0 - 0.32, label_size))
+        text(slide, rx0 + 0.30, yy, rw0 - 0.32, cap_h,
+             [[(str(cap), label_size, _as_rgb(DEEP), False, False, font or FONT)]],
+             space_after=0, line_spacing=1.12)
+        yy += cap_h + 0.10
+    if inset is not None:
+        ifx, ify, frac = inset
+        iw = min(0.34 * fw, 1.9)
+        ih = iw * ph / pw
+        # place the inset in the first CORNER that covers no callout marker (a corner panel
+        # sitting on top of marker 2 defeats the walkthrough it magnifies)
+        corners = [(px + pw - iw - 0.08, py + 0.08), (px + 0.08, py + 0.08),
+                   (px + pw - iw - 0.08, py + ph - ih - 0.08), (px + 0.08, py + ph - ih - 0.08)]
+        def _covers(cx0, cy0):
+            return any(cx0 - 0.15 <= px + float(fx_) * pw <= cx0 + iw + 0.15
+                       and cy0 - 0.15 <= py + float(fy_) * ph <= cy0 + ih + 0.15
+                       for fx_, fy_, _c in callouts)
+        ix0, iy0 = next(((cx0, cy0) for cx0, cy0 in corners if not _covers(cx0, cy0)), corners[0])
+        ipic = picture(slide, img, ix0, iy0, iw, ih,
+                       fit="cover", alt="magnified detail")
+        ipic.crop_left = max(0.0, min(1 - frac, float(ifx) - frac / 2))
+        ipic.crop_right = max(0.0, 1 - (ipic.crop_left + frac))
+        ipic.crop_top = max(0.0, min(1 - frac, float(ify) - frac / 2))
+        ipic.crop_bottom = max(0.0, 1 - (ipic.crop_top + frac))
+        ipic.line.color.rgb = acc; ipic.line.width = Pt(1.4)
+    return (px, py, pw, ph)
+
+
+def position_map(slide, x, y, w, h, points, *, x_labels=("low", "high"), y_labels=("low", "high"),
+                 accent=None, highlight=None, dot=0.14, label_size=10.5, font=None, ink=None):
+    """N LABELLED items on two continuous axes — the form quadrant() cannot express.
+
+    points — [(label, xv, yv)] or [(label, xv, yv, hex_colour)]; xv/yv on any numeric scale
+    (normalised internally, 8% padding). quadrant() returns four cells to fill with cards, which
+    throws away the WITHIN-cell position that is the whole argument; native_bubble drops labels.
+    This is the "where does each option actually sit" exhibit.
+
+    Labels: greedy anti-collision — right of the dot, flipped left near the right edge, nudged
+    down on overlap; raises ValueError naming the pair only when two dots truly coincide.
+    highlight — index drawn in the accent with a bold label; others in muted ink.
+    """
+    if len(points) < 2:
+        raise ValueError("position_map(): needs >=2 points")
+    ik = _as_rgb(ink) if ink is not None else _as_rgb(DEEP)
+    acc = _as_rgb(accent) if accent is not None else _as_rgb(MAGENTA)
+    xs = [float(p[1]) for p in points]; ys = [float(p[2]) for p in points]
+    x0v, x1v = min(xs), max(xs); y0v, y1v = min(ys), max(ys)
+    xsp = (x1v - x0v) or 1.0; ysp = (y1v - y0v) or 1.0
+    for (la, xa, ya, *_), (lb, xb2, yb, *_) in (
+            (points[i], points[j]) for i in range(len(points)) for j in range(i + 1, len(points))):
+        if abs(xa - xb2) / xsp < 0.015 and abs(ya - yb) / ysp < 0.015:
+            raise ValueError(f"position_map(): '{la}' and '{lb}' coincide — the map cannot "
+                             f"separate them; jitter one or merge the rows")
+    # axes: hairline cross with end labels
+    ax0, ay0 = x + 0.05, y + h - 0.3                    # origin (bottom-left of plot area)
+    aw, ah = w - 0.1, h - 0.55
+    box(slide, ax0, ay0, aw, 0.016, fill=MUTE)
+    box(slide, ax0, ay0 - ah, 0.016, ah, fill=MUTE)
+    text(slide, ax0, ay0 + 0.06, 1.8, 0.2, [[(str(x_labels[0]), 9, _as_rgb(MUTE), False, False, font or FONT)]], space_after=0)
+    text(slide, ax0 + aw - 1.8, ay0 + 0.06, 1.8, 0.2,
+         [[(str(x_labels[1]), 9, _as_rgb(MUTE), False, False, font or FONT)]],
+         align=PP_ALIGN.RIGHT, space_after=0)
+    text(slide, ax0 + 0.06, ay0 - 0.24, 1.8, 0.2, [[(str(y_labels[0]), 9, _as_rgb(MUTE), False, False, font or FONT)]], space_after=0)
+    text(slide, ax0 + 0.06, ay0 - ah, 1.8, 0.2, [[(str(y_labels[1]), 9, _as_rgb(MUTE), False, False, font or FONT)]], space_after=0)
+    placed = []                                          # label rects for greedy collision nudge
+    lab_w, lab_h = 1.35, 0.21
+    for i, p in enumerate(points):
+        name, xv, yv = str(p[0]), float(p[1]), float(p[2])
+        hue = _as_rgb(p[3]) if len(p) > 3 else (acc if (highlight is None or i == highlight) else RGBColor(0x9A, 0xA1, 0xAE))
+        fx = 0.08 + 0.84 * (xv - x0v) / xsp
+        fy = 0.08 + 0.84 * (yv - y0v) / ysp
+        cx = ax0 + fx * aw
+        cy = ay0 - fy * ah
+        d = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - dot / 2), Inches(cy - dot / 2),
+                                         Inches(dot), Inches(dot)))
+        d.fill.solid(); d.fill.fore_color.rgb = hue; d.line.color.rgb = _as_rgb(WHITE); d.line.width = Pt(1.0)
+        d.shadow.inherit = False
+        lx = cx + dot / 2 + 0.05
+        al = PP_ALIGN.LEFT
+        if lx + lab_w > x + w - 0.05:                    # flip left near the right edge
+            lx = cx - dot / 2 - 0.05 - lab_w
+            al = PP_ALIGN.RIGHT
+        ly = cy - lab_h / 2
+        for _try in range(6):                            # nudge down past earlier labels
+            if not any(abs(ly - py_) < lab_h and not (lx + lab_w < px_ or px_ + lab_w < lx)
+                       for px_, py_ in placed):
+                break
+            ly += lab_h + 0.02
+        placed.append((lx, ly))
+        is_hero = (highlight is not None and i == highlight)
+        text(slide, lx, ly, lab_w, lab_h,
+             [[(name, label_size, ik if (highlight is None or is_hero) else _as_rgb(MUTE),
+                is_hero, False, font or FONT)]], align=al, space_after=0)
+    return y + h
+
+
+def small_multiples(slide, x, y, w, h, panels, *, categories=None, cols=None, kind="line",
+                    accent=None, highlight=None, gap=0.28, label_size=10.5, shared_scale=True,
+                    font=None):
+    """A grid of IDENTICAL mini charts with a SHARED value axis — the small-multiples form.
+
+    panels     — [(title, values), ...]; every panel shares `categories` (x labels).
+    highlight  — index of the ONE panel that carries the story (its series gets the accent;
+                 the rest render muted) — small multiples argue by comparison, one protagonist.
+    shared_scale — pin every panel's value axis to the same [lo, hi]. This is the POINT of the
+                 form: `data-viz.md` and `form-selection.md` both prescribe shared scales, but
+                 composing native_chart() by hand lets PowerPoint auto-scale each panel, so a
+                 small bump and a huge bump look identical — a silent correctness failure
+                 invisible to the geometry lint. Building them through ONE call closes it.
+
+    Returns the bottom y. Grid math via columns()-style symmetric packing; ~2-12 panels.
+    """
+    if not panels:
+        raise ValueError("small_multiples(): no panels")
+    n = len(panels)
+    if cols is None:
+        cols = 2 if n <= 4 else 3 if n <= 9 else 4
+    rows_n = (n + cols - 1) // cols
+    pw = (w - gap * (cols - 1)) / cols
+    ph = (h - gap * (rows_n - 1) - 0.24 * rows_n) / rows_n     # 0.24in per-panel title band
+    if pw < 1.2 or ph < 0.8:
+        raise ValueError(f"small_multiples(): {n} panels don't fit {w:.1f}x{h:.1f}in — "
+                         f"panel would be {pw:.2f}x{ph:.2f}in (need >=1.2x0.8); enlarge or cut panels")
+    acc = _as_rgb(accent) if accent is not None else _as_rgb(MAGENTA)
+    mut = RGBColor(0xB8, 0xBE, 0xCC)
+    lo = min(float(v) for _, vals in panels for v in vals)
+    hi = max(float(v) for _, vals in panels for v in vals)
+    lo = min(0.0, lo)                                          # honest magnitude: include zero
+    span = (hi - lo) or 1.0
+    hi = hi + 0.06 * span
+    cats = categories or [str(i + 1) for i in range(max(len(v) for _, v in panels))]
+    for i, (ptitle, vals) in enumerate(panels):
+        px = x + (i % cols) * (pw + gap)
+        py = y + (i // cols) * (ph + gap + 0.24)
+        is_hero = (highlight is not None and i == highlight)
+        col = acc if (is_hero or highlight is None) else mut
+        text(slide, px + 0.02, py, pw - 0.04, 0.22,
+             [[(str(ptitle), label_size, _as_rgb(DEEP) if is_hero or highlight is None else _as_rgb(MUTE),
+                bool(is_hero), False, font or FONT)]], space_after=0)
+        ch = native_chart(slide, px, py + 0.24, pw, ph, cats, [(str(ptitle), list(vals))],
+                          kind=kind, palette=[col], legend=False, font=font, zero_base=True)
+        if shared_scale:
+            try:
+                ch.value_axis.minimum_scale = lo
+                ch.value_axis.maximum_scale = hi
+            except Exception:
+                pass
+            if i % cols != 0:                                  # inner panels drop the duplicate axis
+                try:
+                    ch.value_axis.visible = False
+                except Exception:
+                    pass
+    return y + rows_n * (ph + 0.24) + (rows_n - 1) * gap
+
+
 def design_intent(slide, *, envelope=None, rhyme=None, reason=""):
     """Declare a slide's DELIBERATE design register so the render-time lint can tell intent
     from accident (three of its messages say "record the quiet-register exception" — this is

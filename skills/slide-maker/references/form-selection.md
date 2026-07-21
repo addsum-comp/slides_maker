@@ -86,6 +86,14 @@ corner** → `corner_tab`. **East-Asian register** (ink/traditional decks) — `
 **science schematic** (force/ray/circuit/apparatus) per `schematic-diagrams.md`; reach for the
 exact **component** in `design-gallery.md`; place safely with the `deckkit` helpers in SKILL.md step 4.
 
+## New forms (quick index)
+- **Small multiples** → `deckkit.small_multiples` — build them through the ONE call (hand-composing
+  native_chart per panel silently loses the shared scale that IS the form).
+- **Labelled 2-D position** → `deckkit.position_map` (quadrant() discards within-cell position).
+- **Figure walkthrough** → `deckkit.annotated_figure` (numbered markers + caption rail + inset).
+- **Hierarchy** → `deckkit.org_tree` (tidy centroid layout; auto-raises when unfittable).
+
+
 ## How the slide-design agent uses this (the Form ledger)
 For every **content** slide, the plan records one Form-ledger row — `slide | visual protagonist |
 format-family (card / chart / diagram / quote / big-number / timeline / table / photo) | build?` — plus,

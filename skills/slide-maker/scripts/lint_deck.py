@@ -568,11 +568,13 @@ def _slide_stats(slide, bx, sw, sh):
     top_band = 0.20 * sh
     title_pt = 0.0
     title_txt = ""
+    title_top = None
     for s in bx:
         if s["text"] and not s["bg"] and s["t"] < top_band and s["full"]:
             wc = len(s["full"].split())
             if 0 < wc <= 12 and s["size"] > title_pt:
                 title_pt, title_txt = s["size"], s["full"]
+                title_top = s["t"]
     # char-weighted median of body-class runs (>11pt, excludes footer/caption chrome). Char-weighting
     # already downweights a short hero numeral (a 2-char "96" barely counts vs a body paragraph), so
     # no run needs dropping — the median lands on the tier the reader actually reads.
@@ -611,7 +613,7 @@ def _slide_stats(slide, bx, sw, sh):
     except Exception:
         pass
     return {
-        "title_pt": title_pt, "title_txt": title_txt,
+        "title_pt": title_pt, "title_txt": title_txt, "title_top": title_top,
         "body_tier": body_tier, "big_run_words": big_run_words, "intent": intent,
         "halves": halves, "boxy": boxy,
         "notes": notes_text,
@@ -905,6 +907,21 @@ def _print_stats(rows, mode, sw, sh, lums=None, static_ok=False):
           f"· type drama {drama:.1f}× · size tokens in use {len(tokens)} (target 4-5 deck-wide) · "
           f"distinct skeletons {n_skel} | "
           f"builds {builds}/{n} · transitions {transd}/{n} · avg occupancy {avg_ink*100:.0f}%")
+    # ── cross-slide REGISTRATION: consecutive content slides whose title tops drift by a hair
+    # (0.02-0.12in) read as a twitch when advancing — identical is right, a big move is deliberate,
+    # the in-between is an accident no per-slide check can see. Uses the tops already recorded.
+    tops = [(i, r.get("title_top")) for i, r in enumerate(rows)
+            if r.get("title_top") is not None and r.get("title_pt", 0) > 0]
+    drift = []
+    for (ia, ta), (ib, tb) in zip(tops, tops[1:]):
+        if ib - ia == 1 and 0.02 < abs(ta - tb) < 0.12:
+            drift.append((ib + 1, abs(ta - tb)))
+    if len(drift) >= 2:
+        pages = ", ".join(str(p) for p, _ in drift[:5])
+        warns.append(f"REGISTRATION DRIFT: consecutive slides' title tops drift by a hair "
+                     f"(slides {pages}; 0.02-0.12in) — pin titles to ONE y across the deck; "
+                     f"identical is calm, a deliberate jump is fine, a wobble is neither")
+
     # ── deck-level envelope distribution (the slides-to-video import): the subtler monotony is
     # every interior slide ending its content on the SAME line. Monoculture, not any single page,
     # is the defect — a deck needs default-band pages AND some that stop high AND some that ride low.

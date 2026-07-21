@@ -58,3 +58,54 @@ if __name__ == "__main__":
     a = ap.parse_args()
     p = grayscale(a.src, a.out) if a.gray else duotone(a.src, a.shadow, a.highlight, a.out, halftone=a.halftone)
     print("wrote", p)
+
+
+def quiet_region(path, *, grid=4):
+    """Find the CALMEST region of an image — where title text can sit without fighting linework.
+
+    Splits the image into a grid x grid gride, scores each cell by local luminance variance
+    (busy-ness), and greedily grows the best-scoring rectangle of cells. Returns
+    (fx, fy, fw, fh, mean_lum) — fractional rect + 0-255 mean luminance, so the caller both
+    PLACES the text and picks its ink (mean_lum > 150 -> dark ink, else light ink).
+
+    This replaces eyeballing "the sky looks empty" with a measurement — the Tokyo cover's calm
+    wedge was measured by hand-sampling bands; this is that probe, generalised. Since the skill
+    GENERATES its imagery, the found region can also be fed back into the prompt ("keep the
+    upper-left third calm").
+    """
+    from PIL import Image, ImageStat
+    im = Image.open(path).convert("L")
+    W, H = im.size
+    cw, ch = W // grid, H // grid
+    scores = {}
+    for gy in range(grid):
+        for gx in range(grid):
+            cell = im.crop((gx * cw, gy * ch, (gx + 1) * cw, (gy + 1) * ch))
+            st = ImageStat.Stat(cell)
+            scores[(gx, gy)] = (st.stddev[0], st.mean[0])
+    # best single cell, then greedily absorb the calmer neighbour row/col while variance stays low
+    best = min(scores, key=lambda k: scores[k][0])
+    x0 = x1 = best[0]; y0 = y1 = best[1]
+    # threshold: the best cell can be near-zero variance (flat cream), which made even a
+    # smooth gradient sky fail the *2+6 bar and the region never grew. Anchor on the image's
+    # own variance distribution instead: grow while a cell stays under the 40th percentile.
+    ordered = sorted(v[0] for v in scores.values())
+    thresh = max(scores[best][0] * 3.0 + 10.0, ordered[max(0, int(len(ordered) * 0.4) - 1)])
+    grown = True
+    while grown:
+        grown = False
+        for nx0, ny0, nx1, ny1 in ((x0 - 1, y0, x1, y1), (x0, y0, x1 + 1, y1),
+                                   (x0, y0 - 1, x1, y1), (x0, y0, x1, y1 + 1)):
+            if nx0 < 0 or ny0 < 0 or nx1 >= grid or ny1 >= grid or (nx0, ny0, nx1, ny1) == (x0, y0, x1, y1):
+                continue
+            cells = [(gx, gy) for gx in range(nx0, nx1 + 1) for gy in range(ny0, ny1 + 1)]
+            # calm is not enough — the region must be ONE ink zone. A full-height column that
+            # spans dark sky and cream ground averages to lum≈146, where NEITHER ink is safe.
+            if (max(scores[c][0] for c in cells) <= thresh
+                    and max(abs(scores[c][1] - scores[best][1]) for c in cells) <= 55):
+                x0, y0, x1, y1 = nx0, ny0, nx1, ny1
+                grown = True
+                break
+    cells = [(gx, gy) for gx in range(x0, x1 + 1) for gy in range(y0, y1 + 1)]
+    lum = sum(scores[c][1] for c in cells) / len(cells)
+    return (x0 / grid, y0 / grid, (x1 - x0 + 1) / grid, (y1 - y0 + 1) / grid, lum)

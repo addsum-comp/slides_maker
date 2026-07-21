@@ -662,5 +662,55 @@ def _pic_alpha():
     assert len(fixes) == 1 and fixes[0].get("amt") == "30000"
 ok("pic_alpha sets native picture opacity idempotently", _pic_alpha)
 
+
+# --- tier-2 components: build + lint clean, and their correctness contracts hold ---
+def _tier2_components():
+    p = dk.blank_deck(); s = dk.add_slide(p)
+    dk.small_multiples(s, 0.6, 0.6, 8.8, 4.2,
+                       [("A", [1, 2, 3]), ("B", [2, 2, 2]), ("C", [1, 5, 9]), ("D", [0, 1, 1])],
+                       categories=["x", "y", "z"], highlight=2)
+    # shared scale is the CONTRACT: every panel's value axis pinned to one [lo, hi]
+    charts = [sh.chart for sh in s.shapes if sh.has_chart]
+    assert len(charts) == 4
+    tops = {round(c.value_axis.maximum_scale, 4) for c in charts}
+    lows = {round(c.value_axis.minimum_scale, 4) for c in charts}
+    assert len(tops) == 1 and len(lows) == 1, "small_multiples panels must share one axis scale"
+    dk.lint_layout(p, verbose=False, strict=True)
+
+    p = dk.blank_deck(); s = dk.add_slide(p)
+    dk.position_map(s, 0.8, 0.8, 8.4, 4.2, [("A", 1, 1), ("B", 9, 8), ("C", 5, 2)], highlight=1)
+    dk.lint_layout(p, verbose=False, strict=True)
+    try:
+        dk.position_map(s, 0.8, 0.8, 8.4, 4.2, [("A", 5, 5), ("B", 5.0, 5.0)])
+        assert False, "coinciding points must raise"
+    except ValueError:
+        pass
+
+    p = dk.blank_deck(); s = dk.add_slide(p)
+    dk.org_tree(s, 0.6, 0.6, 8.8, 4.4,
+                ("R", [("a", [("a1", []), ("a2", [])]), ("b", [("b1", [])])]))
+    dk.lint_layout(p, verbose=False, strict=True)
+    try:
+        dk.org_tree(s, 0.6, 0.6, 2.0, 4.0, ("R", [(str(i), []) for i in range(9)]))
+        assert False, "an unfittable tree must raise, not squeeze"
+    except ValueError:
+        pass
+ok("tier-2 components (small_multiples shared axis · position_map · org_tree)", _tier2_components)
+
+
+def _quiet_region_contract():
+    import glob
+    from image_fx import quiet_region
+    imgs = glob.glob(os.path.expanduser(
+        "~/Downloads/slides_skill_test/tokyo-first-timers/assets/opt/hero_cover.jpg"))
+    if not imgs:
+        return
+    fx, fy, fw, fh, lum = quiet_region(imgs[0])
+    assert 0 <= fx <= 1 and 0 <= fy <= 1 and 0 < fw <= 1 and 0 < fh <= 1
+    # ink-zone coherence: the region must not average dark sky with cream ground into an
+    # unusable mid-lum (the exact failure the constraint was added for)
+    assert lum < 120 or lum > 150, "quiet_region returned a mixed-ink region (lum %d)" % lum
+ok("quiet_region returns one coherent ink zone", _quiet_region_contract)
+
 print(f"\nsmoke_deckkit: {len(fails)} failure(s)" + ("" if not fails else " — " + "; ".join(n for n, _ in fails)))
 sys.exit(1 if fails else 0)
