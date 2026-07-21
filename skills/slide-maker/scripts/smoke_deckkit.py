@@ -608,5 +608,21 @@ def _oldstyle_figures():
     dk.DISPLAY, dk.FONT = saved
 ok("numerals: prevented in components, warned (never blocked) on hand-set runs", _oldstyle_figures)
 
+
+# --- no shape may carry the inherited theme shadow ---
+def _no_inherited_effect():
+    from pptx.oxml.ns import qn as _qn
+    p = dk.blank_deck(); s = dk.add_slide(p)
+    dk.box(s, 0.5, 0.5, 3, 1, fill="1B3A63", round=True)
+    dk.chip(s, 0.5, 1.8, 2, 0.5, "A", "sub", "D4442E")
+    dk.node(s, 4, 0.5, 2, 0.8, "Node")
+    dk.connector(s, (4, 1.3), (6, 2.0))
+    dk.timeline(s, 0.5, 3.6, 8.6, [("2024", "A"), ("2025", "B"), ("2026", "C")])
+    stray = [sh for sh in s.shapes if sh._element.find(_qn("p:style")) is not None]
+    assert not stray, "%d shape(s) still carry the theme <p:style> (a soft shadow in LibreOffice)" % len(stray)
+    codes = [f[2] for f in (dk.lint_layout(p, verbose=False, strict=False) or [])]
+    assert "INHERITED_EFFECT" not in codes
+ok("no shape carries the inherited theme shadow (<p:style>)", _no_inherited_effect)
+
 print(f"\nsmoke_deckkit: {len(fails)} failure(s)" + ("" if not fails else " — " + "; ".join(n for n, _ in fails)))
 sys.exit(1 if fails else 0)

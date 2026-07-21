@@ -658,6 +658,29 @@ def _grad_fill(shape, stops, angle=90.0, radial=False):
     return shape
 
 
+
+def _flat(shape):
+    """Remove the inherited theme <p:style> from a generated shape.
+
+    python-pptx stamps every autoshape / connector / freeform with
+    `<p:style><a:effectRef idx="2">`, which resolves to the theme's soft drop shadow. Setting
+    `shadow.inherit = False` writes an empty `<a:effectLst/>` into spPr — PowerPoint honours that,
+    **LibreOffice does not**, and LibreOffice is what the render loop and the visual critic look at.
+    Measured under a plain box: a ~10px grey gradient (185,185,185) -> white below every edge.
+
+    The result was a soft shadow under every card, chip, callout, tile, node and island in every
+    deck this skill has produced — the single artifact that most separates "2010 SmartArt" from
+    "flat editorial". Shadows are still available, but only when a caller ASKS: `offset_shadow()`
+    draws a deliberate hard shadow, and `elevation=` writes a real `<a:outerShdw>`.
+    """
+    try:
+        el = shape._element.find(qn("p:style"))
+        if el is not None:
+            el.getparent().remove(el)
+    except Exception:
+        pass
+    return shape
+
 def box(slide, x, y, w, h, fill=None, line=None, line_w=1.0, round=False, corners="all", r=None,
         grad=None, grad_angle=90.0, grad_radial=False):
     """A rectangle. `round=True` rounds all four corners (radius = 8% of the shorter side,
@@ -677,7 +700,7 @@ def box(slide, x, y, w, h, fill=None, line=None, line_w=1.0, round=False, corner
         t = MSO_SHAPE.ROUND_2_SAME_RECTANGLE   # rounds the two top corners (rotate for bottom)
     else:
         t = MSO_SHAPE.ROUNDED_RECTANGLE
-    s = slide.shapes.add_shape(t, Inches(x), Inches(y), Inches(w), Inches(h))
+    s = _flat(slide.shapes.add_shape(t, Inches(x), Inches(y), Inches(w), Inches(h)))
     if grad is not None: _grad_fill(s, grad, angle=grad_angle, radial=grad_radial)
     elif fill is None: s.fill.background()
     else: s.fill.solid(); s.fill.fore_color.rgb = _as_rgb(fill)
@@ -698,7 +721,7 @@ def glow(slide, cx, cy, w, h, color, alpha=0.5):
     """A soft radial colour GLOW (centre-out) for depth/atmosphere on a DARK slide — place 1-2
     off-centre behind glass cards so a flat black slide gets dimensional lighting. Invisible on
     light decks; don't use there. (cx,cy) is the glow centre in inches."""
-    o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - w / 2), Inches(cy - h / 2), Inches(w), Inches(h))
+    o = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - w / 2), Inches(cy - h / 2), Inches(w), Inches(h)))
     o.line.fill.background(); o.shadow.inherit = False
     _grad_fill(o, [(0.0, color, alpha), (1.0, color, 0.0)], radial=True)
     return o
@@ -963,7 +986,7 @@ def quadrant(slide, x, y, w, h, *, x_labels=("", ""), y_labels=("", ""), gap=0.3
 
 
 def _connector(slide, x0, y0, x1, y1, color, w=1.5, dash=False):
-    c = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x0), Inches(y0), Inches(x1), Inches(y1))
+    c = _flat(slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x0), Inches(y0), Inches(x1), Inches(y1)))
     c.line.color.rgb = color; c.line.width = Pt(w); c.shadow.inherit = False
     if dash:
         ln = c.line._get_or_add_ln()
@@ -1494,7 +1517,7 @@ def backdrop_motif(slide, *, kind="grid", color=None, spacing=0.6, accent_disc=N
     for j in range(int(sh / spacing) + 1): box(slide, 0, j * spacing - 0.004, sw, 0.008, fill=c)
     if accent_disc is not None:
         cx, cy = disc_at or (sw - 1.6, 1.4)
-        o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - disc_r), Inches(cy - disc_r), Inches(2 * disc_r), Inches(2 * disc_r))
+        o = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - disc_r), Inches(cy - disc_r), Inches(2 * disc_r), Inches(2 * disc_r)))
         o.fill.solid(); o.fill.fore_color.rgb = accent_disc; o.line.fill.background(); o.shadow.inherit = False
 
 
@@ -1509,7 +1532,7 @@ def arrow(slide, x, y, w, h, color=BLUE, direction="right"):
     For an up/down arrow give it a tall, narrow box (small w, larger h); for left/right a
     wide, short box. The arrow fills the (w, h) box you pass."""
     shape = _ARROW_SHAPE.get(direction.lower(), MSO_SHAPE.RIGHT_ARROW)
-    a = slide.shapes.add_shape(shape, Inches(x), Inches(y), Inches(w), Inches(h))
+    a = _flat(slide.shapes.add_shape(shape, Inches(x), Inches(y), Inches(w), Inches(h)))
     a.fill.solid(); a.fill.fore_color.rgb = color
     a.line.fill.background(); a.shadow.inherit = False
     try: a.adjustments[0] = 0.55; a.adjustments[1] = 0.55
@@ -1778,7 +1801,7 @@ def icon_tile(slide, x, y, size, png, *, shape="circle", fill=None, grad=None, g
         grad = None
     sh_kind = {"circle": MSO_SHAPE.OVAL, "squircle": MSO_SHAPE.ROUNDED_RECTANGLE,
                "square": MSO_SHAPE.RECTANGLE}.get(shape, MSO_SHAPE.OVAL)
-    t = slide.shapes.add_shape(sh_kind, Inches(x), Inches(y), Inches(size), Inches(size))
+    t = _flat(slide.shapes.add_shape(sh_kind, Inches(x), Inches(y), Inches(size), Inches(size)))
     # CONTRAST GUARD — when the caller declares the glyph's ink colour, guarantee the tile it sits
     # ON clears the WCAG non-text 3:1 bar, auto-nudging the tile away from the glyph's luminance
     # (toward white for a dark glyph, toward near-black for a light one) only as far as needed. This
@@ -1829,9 +1852,9 @@ def icon_tile(slide, x, y, size, png, *, shape="circle", fill=None, grad=None, g
     if sheen:
         # a faint white highlight across the top — sells the glassy edge
         hh = size * 0.5
-        sh = slide.shapes.add_shape(
+        sh = _flat(slide.shapes.add_shape(
             MSO_SHAPE.OVAL if shape == "circle" else MSO_SHAPE.ROUNDED_RECTANGLE,
-            Inches(x + size * 0.12), Inches(y + size * 0.06), Inches(size * 0.76), Inches(hh))
+            Inches(x + size * 0.12), Inches(y + size * 0.06), Inches(size * 0.76), Inches(hh)))
         _grad_fill(sh, [(0.0, WHITE, 0.40), (1.0, WHITE, 0.0)], angle=90.0)
         sh.line.fill.background(); sh.shadow.inherit = False
     pad = pad if pad is not None else 0.26 * size
@@ -1882,15 +1905,15 @@ def seal(slide, x, y, size, char, *, fill=None, tcolor=None, shape="square",
     f = fill if fill is not None else RGBColor(0xA5, 0x2A, 0x2A)
     tc = tcolor if tcolor is not None else RGBColor(0xF5, 0xF1, 0xE8)
     if shape == "circle":
-        sh = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x), Inches(y), Inches(size), Inches(size))
+        sh = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x), Inches(y), Inches(size), Inches(size)))
         sh.fill.solid(); sh.fill.fore_color.rgb = f; sh.line.fill.background()
     else:
         box(slide, x, y, size, size, fill=f, round=rounded, r=0.1 * size)
     if border:
         inset = 0.1 * size
         if shape == "circle":
-            b = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + inset), Inches(y + inset),
-                                       Inches(size - 2 * inset), Inches(size - 2 * inset))
+            b = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + inset), Inches(y + inset),
+                                       Inches(size - 2 * inset), Inches(size - 2 * inset)))
             b.fill.background(); b.line.color.rgb = tc; b.line.width = Pt(1.0)
         else:
             box(slide, x + inset, y + inset, size - 2 * inset, size - 2 * inset,
@@ -3679,7 +3702,7 @@ def node(slide, x, y, w, h, label, *, shape="roundrect", fill=None, line=None, l
           "rect": MSO_SHAPE.RECTANGLE, "circle": MSO_SHAPE.OVAL,
           "diamond": MSO_SHAPE.DIAMOND, "parallelogram": MSO_SHAPE.PARALLELOGRAM,
           "cylinder": MSO_SHAPE.CAN}.get(shape, MSO_SHAPE.ROUNDED_RECTANGLE)
-    o = slide.shapes.add_shape(sh, Inches(x), Inches(y), Inches(w), Inches(h))
+    o = _flat(slide.shapes.add_shape(sh, Inches(x), Inches(y), Inches(w), Inches(h)))
     o.shadow.inherit = False
     if hub:
         o.fill.solid(); o.fill.fore_color.rgb = acc; o.line.fill.background()
@@ -3722,8 +3745,8 @@ def connector(slide, p0, p1, *, style="solid", color=None, width=1.5, label="", 
     flags a centre-anchored endpoint drawn above its block. The one time a centre endpoint is OK is
     the covered pattern — connector added BEFORE the node so the node paints over the interior seam."""
     col = color if color is not None else MUTE
-    c = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(p0[0]), Inches(p0[1]),
-                                   Inches(p1[0]), Inches(p1[1]))
+    c = _flat(slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(p0[0]), Inches(p0[1]),
+                                   Inches(p1[0]), Inches(p1[1])))
     c.line.color.rgb = col; c.line.width = Pt(width); c.shadow.inherit = False
     if style in ("dashed", "dotted"):
         ln = c.line._get_or_add_ln()
@@ -3806,7 +3829,7 @@ def elbow_connector(slide, pts, *, style="solid", color=None, width=1.5, arrow=T
     segs = []
     for i in range(len(pts) - 1):
         a, b = pts[i], pts[i + 1]
-        c = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(a[0]), Inches(a[1]), Inches(b[0]), Inches(b[1]))
+        c = _flat(slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(a[0]), Inches(a[1]), Inches(b[0]), Inches(b[1])))
         c.line.color.rgb = col; c.line.width = Pt(width); c.shadow.inherit = False
         if style in ("dashed", "dotted"):
             ln = c.line._get_or_add_ln()
@@ -4227,8 +4250,8 @@ def cycle_diagram(slide, cx, cy, nodes, *, rx=1.5, ry=1.0, node_size=0.42, ring_
     ic_ = ink if ink is not None else DEEP
     sc = sub_c if sub_c is not None else MUTE
     n = len(nodes)
-    o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - rx), Inches(cy - ry),
-                               Inches(2 * rx), Inches(2 * ry))
+    o = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - rx), Inches(cy - ry),
+                               Inches(2 * rx), Inches(2 * ry)))
     o.fill.background(); o.line.color.rgb = rc; o.line.width = Pt(2.0); o.shadow.inherit = False
     import math as _m
     pts = []
@@ -4474,7 +4497,7 @@ def status_stamp(slide, x, y, text_str, *, color=None, size=0.95, rotation=-12):
     """A rotated state STAMP ('SOLD OUT', 'CONFIDENTIAL') — a bordered caps mark attached to a
     card/footer. Independent of the CJK `seal`."""
     c = color if color is not None else MAGENTA
-    sh = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(size * 1.7), Inches(size * 0.5))
+    sh = _flat(slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(size * 1.7), Inches(size * 0.5)))
     sh.fill.background(); sh.line.color.rgb = c; sh.line.width = Pt(1.6); sh.rotation = rotation
     sh.shadow.inherit = False
     text(slide, x, y, size * 1.7, size * 0.5, [[(text_str.upper(), 13, c, True, False)]],
@@ -4504,7 +4527,7 @@ def concentric_rings(slide, cx, cy, layers, *, accent=None, ink=None, r0=1.6, ri
     for i in range(n):
         r = r0 - i * ring
         col = _blend(acc, WHITE, 0.75 - 0.22 * i)
-        o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - r), Inches(cy - r), Inches(2 * r), Inches(2 * r))
+        o = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - r), Inches(cy - r), Inches(2 * r), Inches(2 * r)))
         o.fill.solid(); o.fill.fore_color.rgb = col; o.line.color.rgb = acc; o.line.width = Pt(1.2); o.shadow.inherit = False
     for i, lab in enumerate(layers):
         r = r0 - i * ring
@@ -4807,7 +4830,7 @@ def diagram_island(slide, x, y, w, h, *, caption="", bezel=None, fill=None, cap_
 def gradient_rule(slide, x, y, w, c0, c1, *, h=0.05, angle=0):
     """A thin two-stop GRADIENT rule (navy→emerald, amber→blue) — a brand signature under a title
     or along an edge."""
-    sh = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+    sh = _flat(slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h)))
     sh.line.fill.background(); sh.shadow.inherit = False
     sh.fill.gradient()
     try:
@@ -5096,6 +5119,19 @@ def lint_layout(prs, *, verbose=True, strict=False, overlap_tol=0.05, escape_tol
         # display numeral, where the number visibly bobs up and down and misaligns with adjacent
         # CJK/Latin. This rule was documented in five reference files and still shipped repeatedly —
         # prose is advisory, so it is a deterministic gate now (SKILL.md's enforcement invariant).
+        # INHERITED_EFFECT — a shape still carrying the theme <p:style>. python-pptx stamps it on
+        # every autoshape/connector/freeform, and LibreOffice renders its soft drop shadow even
+        # when spPr says <a:effectLst/>. deckkit strips it via _flat(); a shape that still has one
+        # came from raw python-pptx and will render with a shadow nobody asked for.
+        stray = [getattr(sh, "name", "?") for sh in slide.shapes
+                 if getattr(sh, "_element", None) is not None
+                 and sh._element.find(qn("p:style")) is not None]
+        if stray:
+            findings.append((n, "WARN", "INHERITED_EFFECT",
+                             f"{len(stray)} shape(s) still carry the theme <p:style> (e.g. "
+                             f"'{stray[0]}') — LibreOffice will draw a soft drop shadow under them. "
+                             "Create shapes through deckkit, or pass them through deckkit._flat()"))
+
         bad_fig = []
         for sh in slide.shapes:
             if not getattr(sh, "has_text_frame", False):
@@ -5626,12 +5662,12 @@ def harvey_ball(slide, cx, cy, level, *, d=0.24, accent=None, track=None):
     r = d / 2.0
     x0, y0 = cx - r, cy - r
     outline = tr if contrast_ratio(tr, WHITE) >= 1.25 else _blend(acc, WHITE, 0.5)
-    ring = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x0), Inches(y0), Inches(d), Inches(d))
+    ring = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x0), Inches(y0), Inches(d), Inches(d)))
     ring.fill.solid(); ring.fill.fore_color.rgb = WHITE
     ring.line.color.rgb = outline; ring.line.width = Pt(1.1); ring.shadow.inherit = False
     wedge = None
     if lvl >= 4:
-        wedge = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x0), Inches(y0), Inches(d), Inches(d))
+        wedge = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x0), Inches(y0), Inches(d), Inches(d)))
         wedge.fill.solid(); wedge.fill.fore_color.rgb = acc
         wedge.line.color.rgb = outline; wedge.line.width = Pt(1.1); wedge.shadow.inherit = False
     elif lvl >= 1:
@@ -5640,7 +5676,7 @@ def harvey_ball(slide, cx, cy, level, *, d=0.24, accent=None, track=None):
         # renderer sweep clockwise from start to end (sweep = (end-start) mod 360 = level/4·360°).
         start = 270.0
         end = (start + (lvl / 4.0) * 360.0) % 360.0
-        wedge = slide.shapes.add_shape(MSO_SHAPE.PIE, Inches(x0), Inches(y0), Inches(d), Inches(d))
+        wedge = _flat(slide.shapes.add_shape(MSO_SHAPE.PIE, Inches(x0), Inches(y0), Inches(d), Inches(d)))
         wedge.fill.solid(); wedge.fill.fore_color.rgb = acc
         wedge.line.fill.background(); wedge.shadow.inherit = False
         # python-pptx pie adj values are angle_deg × 0.6 (the default 0..270° pie reads [0.0, 162.0])
@@ -5841,8 +5877,8 @@ def device_frame(slide, path, x, y, w, h, *, chrome="browser", url=None, accent=
     box(slide, x, y, w, ch_h, corners="top", r=r_out, fill=chrome_c)
     dr = min(0.062, ch_h * 0.26)
     for i, lc in enumerate((RGBColor(0xFF, 0x5F, 0x57), RGBColor(0xFE, 0xBC, 0x2E), RGBColor(0x28, 0xC8, 0x40))):
-        o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + 0.14 + i * (dr * 2 + 0.06)),
-                                   Inches(y + ch_h / 2.0 - dr), Inches(2 * dr), Inches(2 * dr))
+        o = _flat(slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + 0.14 + i * (dr * 2 + 0.06)),
+                                         Inches(y + ch_h / 2.0 - dr), Inches(2 * dr), Inches(2 * dr)))
         o.fill.solid(); o.fill.fore_color.rgb = lc; o.line.fill.background(); o.shadow.inherit = False
     pill_x = x + 0.14 + 3 * (dr * 2 + 0.06) + 0.14
     pill_w = max(0.9, w - (pill_x - x) - 0.5)
