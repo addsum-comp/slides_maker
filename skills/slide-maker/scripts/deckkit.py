@@ -3808,7 +3808,13 @@ def position_map(slide, x, y, w, h, points, *, x_labels=("low", "high"), y_label
     text(slide, ax0 + 0.06, ay0 - ah, 1.8, 0.2, [[(str(y_labels[1]), 9, _as_rgb(MUTE), False, False, font or FONT)]], space_after=0)
     placed = []                                          # label rects for greedy collision nudge
     lab_w, lab_h = 1.35, 0.21
-    for i, p in enumerate(points):
+    # the HERO's label claims its spot first — greedy order otherwise lets a neighbour push the
+    # one label that matters most into the worst position
+    order = list(range(len(points)))
+    if highlight is not None and 0 <= highlight < len(points):
+        order.remove(highlight); order.insert(0, highlight)
+    for i in order:
+        p = points[i]
         name, xv, yv = str(p[0]), float(p[1]), float(p[2])
         hue = _as_rgb(p[3]) if len(p) > 3 else (acc if (highlight is None or i == highlight) else RGBColor(0x9A, 0xA1, 0xAE))
         fx = 0.08 + 0.84 * (xv - x0v) / xsp
@@ -3832,9 +3838,11 @@ def position_map(slide, x, y, w, h, points, *, x_labels=("low", "high"), y_label
             ly += lab_h + 0.02
         placed.append((lx, ly))
         is_hero = (highlight is not None and i == highlight)
+        # the hero's label takes the DOT's hue — colour is what binds a floating label to its
+        # point when the anti-collision nudge separates them
+        lab_c = hue if is_hero else (ik if highlight is None else _as_rgb(MUTE))
         text(slide, lx, ly, lab_w, lab_h,
-             [[(name, label_size, ik if (highlight is None or is_hero) else _as_rgb(MUTE),
-                is_hero, False, font or FONT)]], align=al, space_after=0)
+             [[(name, label_size, lab_c, is_hero, False, font or FONT)]], align=al, space_after=0)
     return y + h
 
 

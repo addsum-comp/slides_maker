@@ -698,6 +698,34 @@ def _tier2_components():
 ok("tier-2 components (small_multiples shared axis · position_map · org_tree)", _tier2_components)
 
 
+def _position_map_hero_binding():
+    """The hero label must be BOUND to its dot — bold + the dot's own hue — and must claim its
+    slot before the greedy nudge, or a neighbour pushes the one label that matters off its point."""
+    from pptx.util import Emu
+
+    def probe(highlight):
+        p = dk.blank_deck(); sl = dk.add_slide(p)
+        dk.position_map(sl, 0.6, 0.6, 8.8, 4.2,
+                        [("alpha", 1, 1), ("beta", 9, 9), ("gamma", 8.6, 8.4)],
+                        highlight=highlight, accent="1F6E68")
+        out = {}
+        for sh in sl.shapes:
+            if sh.has_text_frame and sh.text_frame.text in ("alpha", "beta", "gamma"):
+                r = sh.text_frame.paragraphs[0].runs[0]
+                col = str(r.font.color.rgb) if (r.font.color and r.font.color.type is not None) else None
+                out[sh.text_frame.text] = (round(Emu(sh.top).inches, 3), r.font.bold, col)
+        return out
+
+    a = probe(1)
+    assert a["beta"][1] is True and a["beta"][2] == "1F6E68", "hero label must be bold in the dot's hue"
+    assert a["alpha"][1] is not True and a["gamma"][1] is not True, "non-hero labels stay quiet"
+    b = probe(2)
+    assert b["gamma"][2] == "1F6E68" and b["beta"][2] != "1F6E68", "hue must follow the declared hero"
+    assert b["gamma"][0] <= a["gamma"][0], "hero-first ordering must not push the hero down"
+    assert all(v[1] is not True for v in probe(None).values()), "no highlight => no bold label"
+ok("position_map binds the hero label to its dot (bold + hue + first claim)", _position_map_hero_binding)
+
+
 def _quiet_region_contract():
     import glob
     from image_fx import quiet_region
