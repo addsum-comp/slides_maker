@@ -2035,7 +2035,9 @@ Then run the **actor-critic loop** — this is the quality engine, and the criti
      was never chosen from alternatives is visible as such) **with the picked composition tokens**
      (`cover <token> · home skeleton <token>` — the design lens checks the BUILT cover against the
      archetype the user picked, and the rhythm map's plurality against the picked skeleton), the semantic-colour
-     ledger, the type tokens, the motion manifest, the **chosen preset name + its `guard` string
+     ledger, the type tokens, the **`interior register:` cue** (the quiet register signature that
+     repeats on interior slides, or `none (flat by register — <reason>)` — the critic's
+     `register_interiors` check reads it), the motion manifest, the **chosen preset name + its `guard` string
      verbatim** (or `custom look — no preset guards`) (on the generated-template branch, plus the four identity-propagation contract lines — palette · type register · component geometry · surface), the **`signature proof:` token**
      (`slide N → <png>` or `skipped: <carve>` — so the critic compares the SHIPPED signature slide
      against the frame that was approved before the rest of the deck existed, and a silent skip is
@@ -2391,7 +2393,8 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
   `deckkit.choropleth()` (which adds the native title + legend); `references/data-viz.md`. `presets.py` — named
   design-language presets (glassmorphism · swiss · editorial_paper · editorial_report · risograph ·
   memphis · brutalist · blueprint · ink_wash · eastern_traditional · **consulting** (MBB action-title) ·
-  **dark_tech** (engineering dark + diagram-island) · **luxury_dark** · **museum_memorial**; ink_wash/
+  **dark_tech** (engineering dark + diagram-island) · **luxury_dark** · **museum_memorial** ·
+  **bauhaus** · **midcentury** · **terminal** · **synthwave** — **18 total**; ink_wash/
   eastern_traditional → `references/east-asian-aesthetic.md`; the full style+component catalogue →
   `references/design-gallery.md`).
 - `image_prompts.py` (build the prompt manifest) → `generate_images_codex.py` (no-key, Codex CLI) /

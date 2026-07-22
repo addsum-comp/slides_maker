@@ -642,7 +642,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-s
 .dir.selected .pick-btn{background:var(--ac);color:#fff;border-color:var(--ac)}
 .dir.selected .pick-btn::after{content:" ✓ selected";font-weight:700;opacity:.95}
 
-/* describe-your-own (D) */
+/* describe-your-own (dynamic letter — E on the 4-up gate, D on a 3-up) */
 .dsec{max-width:1180px;margin:0 auto 34px;background:#212429;border:1px dashed #3a3f46;
   border-radius:14px;padding:18px}
 .dsec h2{font-size:16px;font-weight:700;margin-bottom:6px}

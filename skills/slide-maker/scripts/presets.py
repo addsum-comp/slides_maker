@@ -282,7 +282,8 @@ PRESETS = {
                    "arcs) · atomic orbit (ellipse rings + dot nodes), drawn as thin-line vector; "
                    "solid-fill + thin-line mix, rounded organic shapes, no texture.",
         "guard": "the harvest palette is the identity — never pastel it up or add a fifth loud hue; "
-                 "one atomic/starburst motif per section, not per slide.",
+                 "the LOUD atomic/starburst motif is dosed one per section, not per slide (a quiet "
+                 "corner-echo register mark may repeat every slide — that is SYSTEM, not stamping).",
         "image_prompt": "mid-century modern illustration, mustard avocado burnt-orange teal on cream, "
                         "atomic starburst motifs, 1950s optimism, no text",
         "when": "culture, retro brand, lifestyle, a warm optimistic register; anything Eames-era.",
@@ -316,8 +317,9 @@ PRESETS = {
                    "magenta→purple) with a horizon sun; neon magenta/cyan accents with a soft glow "
                    "(layered offset shadows); chrome/beveled display type. Vivid but keep text on a "
                    "solid panel where it crosses the grid.",
-        "guard": "the neon glow is chrome, never on body text (it kills legibility); one grid horizon "
-                 "per divider/cover, not on every content slide.",
+        "guard": "the neon glow is chrome, never on body text (it kills legibility); the LOUD full grid "
+                 "horizon is dosed one per divider/cover, not on every content slide (a faint low-edge "
+                 "horizon register may repeat every slide — that is SYSTEM, not stamping).",
         "image_prompt": "synthwave outrun, neon magenta cyan sunset grid horizon, 80s retro-future, "
                         "glowing perspective grid, no text",
         "when": "launch, gaming, music/culture, a bold retro-future register; audiences wanting energy.",
