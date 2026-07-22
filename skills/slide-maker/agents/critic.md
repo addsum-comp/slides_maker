@@ -106,7 +106,10 @@ something.
   `signature proof:` token (`slide N → <png>`, or `skipped: <carve>`) — compare the
   SHIPPED signature slide against the frame approved before the rest of the deck existed; a proof
   skipped with no named carve is itself a distinctiveness finding ·
-  semantic-colour ledger · type tokens · motion manifest · the chosen preset name + its `guard`
+  semantic-colour ledger · type tokens · the **`interior register:` cue** (`<the quiet register
+  signature that repeats on interior slides> | none (flat by register — <reason>)`, which the
+  distinctiveness/consistency axis's `register_interiors` check reads — so a style that stops at the
+  cover is visible) · motion manifest · the chosen preset name + its `guard`
   string verbatim (or `custom look — no preset guards`) (on the generated-template branch, plus the four identity-propagation contract lines — palette · type register · component geometry · surface) · the `logo plan:` line with its evidence
   token · the checkpoint motif line (device + meaning + legibility mode) · the approved image opt-in
   rows with their per-row source tokens (+ license/credit notes and any declared stylized deviation) ·
@@ -248,10 +251,14 @@ Do not just skim for the first few obvious issues. Run these passes:
        same four principles the planner designed to, so findings name a shared cause: **Contrast** (does
        one element pop, clear size/weight/colour steps, ≤2 *text* fonts (a mono for code / a CJK face
        don't count), no underline-for-emphasis — or does it
-       blur to an even grey field?), **Repetition** (do title chrome / accent / fonts / footer
-       repeat so the deck reads as one designed thing — flag a slide that breaks the system; the
-       signature MOTIF is exempt from this every-slide list — it's a DOSED device, 2–3 appearances
-       per the chrome budget, and per-slide motif stamping is itself the finding), **Alignment**
+       blur to an even grey field?), **Repetition** (do title chrome / accent / fonts / footer /
+       **the quiet register signature** (a faint grid/scanline, a corner numeral, an edge rule, a small
+       seal) repeat so the deck reads as one designed thing — flag a slide that breaks the system, and
+       flag a deck whose style **stops at the cover** — interiors bare default — as a `register_interiors`
+       finding (the `interior register:` contract line names the cue, or a `none — <reason>` carve); the
+       loud signature MOTIF is a different object, exempt from this every-slide list — it's a DOSED
+       device, 2–3 appearances per the chrome budget, and per-slide *loud-motif* stamping is itself the
+       finding (a QUIET register repeating every slide is the SYSTEM, not stamping)), **Alignment**
        (is everything on a shared grid, or is something off-grid/eyeballed?), **Proximity** (are related
        items grouped and unrelated ones separated, inter-group gap > intra-group?). A slide that feels
        "off" usually violates one — name which.
@@ -932,7 +939,7 @@ line it audits).
   },
   "plan_audit": {
     "_comment": "the contract-card audit — each declared contract judged from PIXELS as kept | broken | degraded, lens-owned; null (with the reason) for direction previews / external decks with no plans",
-    "lens_b": {"skeleton_rhythm": "kept|broken|degraded — <one clause>", "wow": [{"slide": 0, "landed": true, "why": "<one clause vs its actual neighbours — a WOW that is merely big did not land>"}], "signature_move": {"verdict": "landed|sanded|timid|clashing — judged vs the boldness dial (at bold/experimental a surviving timid/sanded verdict triggers Step 5's blocking-until-waived escalation)", "why": "<one clause>", "carried": [{"slide": 0, "structural": true, "note": "<does the idea do structural work here (the motif is this slide's own geometry) or was it stamped (a badge/rule/corner mark)? one entry per carried_by slide from the contract card>"}], "proof": "matches | diverged: <clause> | skipped: <carve — legitimate|no-carve, and no-carve is itself a distinctiveness finding>"}, "memorable_one_thing": "<the ONE thing a viewer remembers tomorrow; if 'a clean competent deck' at boldness>=balanced+, that is a finding>", "composition": {"cover_archetype": "kept|broken — is the BUILT cover the picked cover token (centred/low-left/split-vertical/full-bleed-type)?", "home_skeleton_plurality": "kept|broken — is the picked home skeleton the rhythm map's most-used skeleton?"}, "money_slide": "<did the visual peak land on the declared slide?>", "semantic_colour": "<ledger kept / a hue double-booked where>", "type_tokens": "<sizes drawn from the declared tokens?>", "eye_path_misses": ["<slides whose squint-level first-read missed the declared hero>"]},
+    "lens_b": {"skeleton_rhythm": "kept|broken|degraded — <one clause>", "wow": [{"slide": 0, "landed": true, "why": "<one clause vs its actual neighbours — a WOW that is merely big did not land>"}], "signature_move": {"verdict": "landed|sanded|timid|clashing — judged vs the boldness dial (at bold/experimental a surviving timid/sanded verdict triggers Step 5's blocking-until-waived escalation)", "why": "<one clause>", "carried": [{"slide": 0, "structural": true, "note": "<does the idea do structural work here (the motif is this slide's own geometry) or was it stamped (a badge/rule/corner mark)? one entry per carried_by slide from the contract card>"}], "proof": "matches | diverged: <clause> | skipped: <carve — legitimate|no-carve, and no-carve is itself a distinctiveness finding>"}, "memorable_one_thing": "<the ONE thing a viewer remembers tomorrow; if 'a clean competent deck' at boldness>=balanced+, that is a finding>", "composition": {"cover_archetype": "kept|broken — is the BUILT cover the picked cover token (centred/low-left/split-vertical/full-bleed-type)?", "home_skeleton_plurality": "kept|broken — is the picked home skeleton the rhythm map's most-used skeleton?"}, "register_interiors": "kept | bookends-only — does the quiet register signature (the contract card's `interior register:` cue) reach ordinary interior slides, or does the style stop at the cover/dividers? bookends-only with no declared `none — <reason>` carve is a finding (的风格要走所有页)", "money_slide": "<did the visual peak land on the declared slide?>", "semantic_colour": "<ledger kept / a hue double-booked where>", "type_tokens": "<sizes drawn from the declared tokens?>", "eye_path_misses": ["<slides whose squint-level first-read missed the declared hero>"]},
     "lens_a": {"memory_sentence": "<your remembered ONE sentence, written BEFORE reading the card's deck message>", "matches_deck_message": true, "curve_visible": "<is the declared emotional curve visible in pacing?>", "takeaway_titles": "<content-slide titles vs the takeaway table — list divergent slides>", "motion_manifest": "kept|broken|degraded"}
   },
   "probes": {

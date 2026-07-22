@@ -68,6 +68,13 @@ _DEFAULTS = {
     "cover": "centred",         # centred | low-left | split-vertical | full-bleed-type
     "skeleton": "statement",    # statement | split | island | band | rail
     "dna": None,                # preset name → its signature motif in the cover preview
+    # A BESPOKE register (invented for THIS content, not one of the 18 presets) makes itself
+    # first-class in the preview by supplying its OWN motif HTML: `cover_motif` (loud hero motif on
+    # the cover) and `ambient_motif` (the quiet register signature echoed on every interior slide).
+    # Inline-style the HTML (the CSS classes are preset-specific). When present these WIN over the
+    # `dna` name switch, so a bespoke direction renders a real style, not a motif-less colourway.
+    "cover_motif": None,        # raw HTML: this bespoke register's signature motif on the cover
+    "ambient_motif": None,      # raw HTML: its quiet register signature for interior slides
 }
 
 _COVERS = ("centred", "low-left", "split-vertical", "full-bleed-type")
@@ -131,9 +138,14 @@ def preset_directions(names):
     """Turn a list of preset names into direction-token dicts with real DNA. Two escape hatches so
     one call can build a MIXED set:
       • an unknown NAME (str) falls through to a plain token (a synthesised direction);
-      • a DICT is passed through verbatim (normalised at render) — this is how the no-AI gate adds its
-        4th option: a pure COLOUR-SCHEME direction (no `dna`), whose consistency is palette+type, not a
-        motif. e.g. preset_directions(["swiss","blueprint","terminal", {"name":"Signal", ...}])."""
+      • a DICT is passed through verbatim (normalised at render). This carries TWO first-class cases:
+          – a pure COLOUR-SCHEME direction (no motif fields) — the no-AI gate's 4th option, whose
+            consistency is palette+type, not a motif;
+          – a BESPOKE REGISTER invented for the content — supply `cover_motif` + `ambient_motif` HTML
+            and it renders its OWN real DNA (loud hero motif on the cover, quiet echo on every interior
+            slide), a first-class peer of a named preset, NOT a motif-less colourway. Prefer this when
+            the content has a visual world of its own.
+        e.g. preset_directions(["swiss","blueprint", {"name":"Sonar","cover_motif":"<div…>", …}])."""
     import presets as _P
     out = []
     for n in names:
@@ -180,7 +192,10 @@ def _footer(S, page, tag=""):
 def _dna_cover(S):
     """The signature motif that makes each preset recognisable at a glance — rendered as an overlay
     on the cover so the direction gate shows a STYLE, not a colour scheme. Returns HTML; the
-    per-DNA CSS lives in _DNA_CSS. A direction with no `dna` returns nothing."""
+    per-DNA CSS lives in _DNA_CSS. A bespoke register supplies its own `cover_motif` HTML (wins over
+    the name switch); a direction with neither `cover_motif` nor a known `dna` returns nothing."""
+    if S.get("cover_motif"):
+        return S["cover_motif"]          # bespoke register — its own hero motif, first-class in the preview
     d = S.get("dna")
     if not d:
         return ""
@@ -245,8 +260,11 @@ def _dna_ambient(S):
     """The QUIET register signature that runs on EVERY interior slide — so the chosen style carries
     through ALL pages, not just the cover (the "只有首尾页" failure). This is a restrained echo of the
     hero motif in _dna_cover: corners / edges / backgrounds only, low opacity, z-index:0 behind the
-    content. A direction with no `dna` (a pure colour-scheme direction) returns nothing — its
-    consistency is palette + type, which already run deck-wide."""
+    content. A bespoke register supplies its own `ambient_motif` HTML (wins over the name switch); a
+    pure colour-scheme direction (no motif of any kind) returns nothing — its consistency is
+    palette + type, which already run deck-wide."""
+    if S.get("ambient_motif"):
+        return f'<div class="dna-amb dna-amb-custom">{S["ambient_motif"]}</div>'   # bespoke register's quiet echo
     d = S.get("dna")
     if not d:
         return ""

@@ -394,8 +394,11 @@ four template choices:
      the best fit, and post the rendered images + pick as the FYI (mirror of the Q1(d)
      image-tool hero checkpoint) — the waiver removes the stop, never the artifact.
      - *Running the gate* → run **Gate A** of `references/collaborative-mode.md`. **The directions
-       are REAL STYLES, not synthesised colour schemes** — pick the **3 best-fit named presets** for
-       THIS topic/audience from the 18-preset library (read each preset's `when` field in
+       are REAL STYLES — a named preset OR a bespoke register with its own motif — never three shades
+       of one palette.** ("Synthesised" is not the enemy; a *motif-less colourway* is. A bespoke
+       register you invent for this content is a real style and a first-class peer of a preset — often
+       the more daring answer, see the launchpad note below.) Pick the **3 best-fit design languages** for
+       THIS topic/audience — presets from the 18-preset library (read each preset's `when` field in
        `scripts/presets.py` / `references/design-gallery.md`; e.g. a technical talk → blueprint /
        dark_tech / swiss, a culture deck → memphis / risograph / editorial_paper, a Chinese-heritage
        deck → ink_wash / eastern_traditional / museum_memorial), then
@@ -416,9 +419,15 @@ four template choices:
          verbatim as a no-`dna` colour direction (name it e.g. *"Signal — pure palette + type"*).
          The HTML labels A–D as the four options and **E — describe your own** as the fifth slot (the
          own-letter is dynamic, so no collision). *(With an image tool it's the OTHER branch — Q1(d)'s
-         style gate — which stays at 3.)* *(A bespoke synthesised token-set is still allowed for A–C
-         too — for a topic no preset fits, or when the user's "describe your own" needs it — but the
-         DEFAULT is to recommend the best-fit real styles + the one colour option and let them pick.)*
+         style gate — which stays at 3.)*
+       - **Presets are the FLOOR you beat, not the menu you satisfy — PREFER a bespoke register when
+         the content has one.** Any of A–C may be a **bespoke synthesised direction** (a dict in the
+         `preset_directions` list, carrying its OWN motif so it renders real DNA) — and when THIS
+         content has a distinctive visual world of its own, *prefer* inventing that register over a
+         merely-adequate preset. A bespoke register with a named motif + palette + type + its own guard
+         + item-(q) all-pages carry is as legitimate as any preset and usually the bolder pick. Weigh it
+         on every design-clean deck — it is a default consideration, not a fallback for "a topic no
+         preset fits". The library raises the floor; your job is still to beat it.
        - 🔴 **DIVERGENCE IS A PAIRWISE RULE, NOT AN EXHORTATION: any two directions must differ on
          ≥2 of four axes — {palette mood · type attitude · density/scale · COMPOSITION ENVELOPE}.**
          "Distinct light/dark, warm/cool, serif/sans" describes *knobs*; a dark version and a light
@@ -445,7 +454,13 @@ four template choices:
        *type the look they have in mind* (a reference, a brand, a mood, a constraint) and you
        **synthesize a new direction from that description** — regenerate the HTML link and show it
        alongside (iterate until they consent), rather than forcing one of your four guesses. The four
-       are only your opening proposals; the author's own intention always outranks them. On the
+       are only your opening proposals; the author's own intention always outranks them. **The pick
+       fixes the REGISTER (palette · type · composition · the interior register signature), NOT the
+       daring — it is a launchpad, not a finished design.** "Picked a preset → rendered the preset" does
+       not discharge the design step: the boldness/signature-move gate still runs in full and the deck
+       still owes one `signature move` this preset would not have made (`agents/slide-design.md` §1,
+       self-verify (h)/(k); the critic's distinctiveness axis flags a faithful-preset-with-no-bespoke-move
+       as template-with-extra-steps). On the
        pick, the chosen token-set becomes the deck's `style.py` **including its composition — the
        `cover` token is BUILT as the cover's actual layout, and the `skeleton` token becomes the
        rhythm map's plurality skeleton (`collaborative-mode.md` Gate A step 7; a style.py that
@@ -1696,7 +1711,8 @@ those here; read its report instead).
 3. **Plan↔code correspondence**: (a) mechanical — diff the design plan's per-slide rows against the slide-function docstrings (icon family included; the classic inline-mode miss); (b) spot-check — each `build:` docstring has matching `Build.step` calls in its function body; (c) **cover carries its promises** — the built cover shows the self-verify-(l) device, the motif's label/legend where the plan said the STRANGER TEST is satisfied by labeling, and the `logo plan:` asset placed as planned (official file untouched; on a single-entity deck a cover with no logo and no recorded `n/a` reason is a ✗).
 4. **Charts native**: every chart is editable-native unless a matplotlib look was deliberately chosen; legends sit off the data. Same bar for math: every 1-D equation is `equation_native`; raster `equation_png` only for genuinely 2-D layout (fractions/matrices), named as such.
 5. **Evidence real**: every domain image/figure is the real computed/source artifact — no plausible stand-in; PDF crops checked on all four edges; every SOURCED photo comes from a sanctioned origin (Commons / Openverse / press kit / user file), its subject verified against caption/geotag/category, it is **watermark-free** (a watermark is an unlicensed-preview tell → reject the file; never crop/blur/inpaint the mark away), its license recorded (credit placed where required), it is **aesthetically vetted** (an ugly / under-construction / blurry / unrepresentative shot is rejected even when the subject is correct → re-source, or generate a declared-stylized illustration via the `searched, found but low-quality → generated, flagged illustrative` rung), and it is palette-treated so mixed sources read as one deck; no generated CONTENT image claims photographic reality for a real-and-specific subject (REFERENT RULE, `references/image-generation.md` — generated-template identity plates and declared stylized illustrations are exempt; a real subject with no findable photo uses a recorded `searched, none found → …` rung). Any **text over a hero/photo/plate** is verified legible against the pixels — no image linework crosses the glyphs (a scrim only dims a bright line; cover it with a near-opaque panel), eyebrow/kicker included, with a clear title↔subtitle gap (render self-check "Text over an image").
-6. **Colour keyed**: the semantic-colour ledger's meanings are taught on-slide (key at first use) and no accent appears outside its bound meaning; chrome stays quiet (motif ≤3 appearances) AND the chosen preset's `guard` constraints hold on every slide (quote the guard line in the tick).
+6. **Colour keyed**: the semantic-colour ledger's meanings are taught on-slide (key at first use) and no accent appears outside its bound meaning; chrome stays quiet — the **loud** signature motif ≤3 appearances (a *quiet register signature* — faint grid/scanline, corner numeral, edge rule, small seal — MAY repeat on every slide; that is SYSTEM, not stamping) — AND the chosen preset's `guard` constraints hold on every slide (quote the guard line in the tick).
+6b. **Register carries all pages (的风格要走所有页)**: the quiet register signature reaches ordinary interior slides, not just the cover/dividers — the `interior register:` contract cue is present on interiors, or a `none (flat by register — <reason>)` carve is recorded. A style dressed only on the bookends fails.
 7. **Claims current**: every time-bound ledger row re-verified with as-of = TODAY; the deck carries its "as of" date.
 8. **Language & hygiene**: one language throughout; zero meta-annotations ("placeholder"/"TODO"/"AI-generated"); voice pass done on every line.
 9. **Eye path**: squint each slide — first look lands on the named hero, 3–4 hierarchy levels survive the blur.

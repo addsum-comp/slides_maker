@@ -238,6 +238,31 @@ def main():
             assert "dna-amb-" not in ah._slide_diagram(Sc), "colour direction must carry no ambient motif"
         ok("style runs through ALL slides (ambient register) + colour 4th option", _style_runs_through_all_slides)
 
+        def _bespoke_register_is_first_class():
+            """A bespoke register invented for the content (not one of the 18 presets) must render its
+            OWN real DNA in the preview — a first-class peer of a preset, not a motif-less colourway —
+            so the preset-driven gate never demotes agent-invented bold design (的大胆设计能力)."""
+            sys.path.insert(0, HERE)
+            import importlib, archetypes_html as ah
+            importlib.reload(ah)
+            bespoke = {"name": "Sonar", "accent": "#35E0C9", "cover": "low-left", "skeleton": "island",
+                       "cover_motif": '<div class="ping" style="border:2px solid #35E0C9"></div>',
+                       "ambient_motif": '<span class="ping-echo" style="border:1px solid #35E0C9"></span>'}
+            S = ah._norm(bespoke)
+            # its own hero motif on the cover (wins over the empty dna switch)
+            assert "ping" in ah._dna_cover(S), "bespoke cover_motif must render on the cover"
+            # its quiet echo on EVERY interior slide
+            for fn in (ah._slide_bullets, ah._slide_diagram, ah._slide_data):
+                html = fn(S)
+                assert "dna-amb-custom" in html and "ping-echo" in html, \
+                    "bespoke ambient_motif must render on " + fn.__name__
+            # it mixes into a preset_directions call and the whole page builds
+            import os
+            out = os.path.join(d, "bespoke.html")
+            ah.build_directions_html(ah.preset_directions([bespoke, "swiss"]), out, "T")
+            assert "Sonar" in open(out, encoding="utf-8").read()
+        ok("bespoke register is first-class in the gate (renders its own DNA)", _bespoke_register_is_first_class)
+
     print("smoke_directions: {} failure(s)".format(len(FAILS)))
     return 1 if FAILS else 0
 

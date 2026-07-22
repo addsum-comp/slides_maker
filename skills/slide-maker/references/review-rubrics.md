@@ -263,8 +263,14 @@ Score each dimension; cite specific slides.
    **loud / stamped chrome** — decorative furniture (a colour spine, a multi-hue strip or rainbow rule,
    a heavy title badge) repeated identically on every slide and competing with content for attention:
    the chrome budget (`agents/slide-design.md` §1) puts saturated colour on content elements and holds
-   the signature motif to ~2–3 appearances, so palette-as-ornament stamped per-slide is a finding even
-   when each instance is individually tidy; **opaque motif (fails the STRANGER TEST)** — the deck's
+   the **loud** signature motif to ~2–3 appearances, so palette-as-ornament stamped per-slide is a finding even
+   when each instance is individually tidy — **but a QUIET register signature is the opposite finding**:
+   a faint grid/scanline, a corner numeral, a thin edge rule or small seal that repeats on every slide
+   is legitimate SYSTEM repetition (it makes the style run through all pages), and a deck whose style
+   **stops at the cover** — dressed bookends, bare-default interiors — is a `register_interiors` finding
+   (the contract card's `interior register:` cue names it, or a `none — <reason>` carve clears it: 的风格要走所有页);
+   distinguish the two by loudness/meaning — the quiet register carries no standalone meaning and never
+   competes with content, so "never stamp" bites only the loud motif; **opaque motif (fails the STRANGER TEST)** — the deck's
    signature device encodes a meaning (pillars, phases, engines) that a first-time viewer could not
    name from the canvas alone: no label at first appearance, not figurative enough to read unaided,
    and no on-canvas legend (`agents/slide-design.md` §1 STRANGER TEST) — describe what a stranger

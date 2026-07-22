@@ -202,6 +202,17 @@ feel art-directed rather than defaulted, and it's yours to set once and hold. Pi
   or dividers · closer), never per-slide stamping. Test: delete the ornament — if no meaning is lost,
   it must be visually quiet or absent. A vivid deck and quiet chrome are not in tension: vibrancy is a
   *content* dial, chrome loudness a separate one — raise the first without touching the second.
+  - **The QUIET REGISTER SIGNATURE is the one thing that IS meant to repeat every slide — and it is NOT
+    "stamping".** Distinguish two different objects: (1) the **loud signature motif / WOW / hero device**
+    — the daring one, dosed 2–3 (above); stamping IT per-slide is the finding. (2) the **quiet register
+    signature** — a faint grid or scanline, a corner numeral system, a thin edge rule, a small seal:
+    *chrome-level, low-contrast, carries no standalone meaning, never competes with content.* This is
+    part of the **repeating design SYSTEM** (palette · type · spacing · chrome geometry — §1's "the
+    system repeats on every slide", CRAP Repetition) and is exactly what makes the chosen style *run
+    through all pages* rather than living only on the bookends (self-verify (q); the direction gate
+    previews it with `_dna_ambient`). The delete-the-ornament test still governs it: if the quiet
+    register carries no meaning it must stay *visually quiet* — which is the point, not a violation. So
+    "never per-slide stamping" bites the LOUD motif; the quiet register is welcome on every slide.
 - **Freshness — derive the look from THIS deck's subject, not from your last deck.** The strongest
   signature device is content-born (a flywheel story → a ring motif; a funnel story → a taper; a
   timeline deck → an axis; a bilingual deck → the lockup), not a stock ornament any deck could wear.
@@ -764,16 +775,20 @@ NOT a blanket per-slide quota):
   origins you haven't searched; declaring the intent is your half of the contract.)
 - **(q) the register carries through EVERY slide, not just the cover/dividers (的风格要走所有页)** — the
   chosen style's signature is visible on ordinary interior content slides, not only the bookends. This
-  is stronger than "the palette/type repeat" (which item (m)'s one-canvas-system already covers): the
-  deck's *motif register* — the ambient signature the direction gate previews with `_dna_ambient`
-  (a corner mark, an edge rule, a faint grid/scanline, a recurring numeral/seal) — must have a **quiet,
+  is the **quiet register signature** of the chrome-budget rule (§ "The QUIET REGISTER SIGNATURE…"),
+  *not* the loud signature motif: a faint grid/scanline, a corner numeral system, a thin edge rule, a
+  small seal — the ambient register the direction gate previews with `_dna_ambient` — with a **quiet,
   legible home on interior slides too**, so a stranger squinting at page 7 still reads the same design
-  language as the cover. The bar is RESTRAINT, not repetition-of-the-hero: a loud hero motif stamped
-  identically on every slide fails item (b)'s block-sameness gate; the register signature is the
-  *dialed-down* echo (chrome-budget quiet, never fighting the content). A deck whose style lives only
-  on the first and last page — cover dressed, interiors bare default — FAILS this check. (History: a
-  user flagged exactly this — "风格肯定是要走所有页的，不能只有首尾页".) Record the interior register cue
-  in the plan's design-language line; the critic's distinctiveness/consistency axis reads it.
+  language as the cover. Read the disambiguation literally: the bar is RESTRAINT, and a *loud* hero
+  motif stamped identically on every slide fails BOTH item (b)'s block-sameness gate AND the
+  chrome-budget dose — the register signature is the chrome-quiet, meaning-free *echo* that repeats as
+  part of the design SYSTEM (item (m)/§1), never fighting content. A deck whose style lives only on the
+  first and last page — cover dressed, interiors bare default — FAILS this check. (History: a user
+  flagged exactly this — "风格肯定是要走所有页的，不能只有首尾页".) **Record it as a real contract-card
+  field** — the design-language block carries `interior register: <the quiet cue> | none (flat by
+  register — <reason>)` — so the critic's Lens-B `register_interiors` check (`agents/critic.md`,
+  `references/review-rubrics.md`) can read it; a bare style whose register stops at the cover, with no
+  named `none`-carve, is an interiors-bookends-only finding.
 Fix any failing check before the DESIGN checkpoint.
 
 ### Design-critic checklist

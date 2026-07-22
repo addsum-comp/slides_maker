@@ -36,13 +36,23 @@ direction*; the single real render confirms *fidelity*.
 > branch it runs BY DEFAULT (SKILL.md Q1(c); named carves there), because that is the one
 > branch where the look is invented from nothing and the user has seen no options.
 1. From the interview (purpose/audience/style) offer **differentiated directions** — distinct design
-   *languages*, not three shades of one idea. **Default: recommend the 3 best-fit REAL PRESETS** for
-   this topic from the 18-preset library (read each preset's `when` field in `scripts/presets.py`),
-   and build the direction tokens with **`archetypes_html.preset_directions([names])`** so each
-   preview carries the preset's real **DNA** (its signature motif), not just its palette. A preset is
-   a whole visual language — this is what stops the options reading as "the same layout in three
-   colours". Synthesise a bespoke direction only for a topic no preset fits, or for the user's
-   "describe your own" slot.
+   *languages* (a named preset **or** a bespoke register invented for THIS content), never three shades
+   of one idea. **Default: recommend the 3 best-fit REAL DESIGN LANGUAGES** for this topic — best-fit
+   presets from the 18-preset library (read each preset's `when` field in `scripts/presets.py`) **and/or
+   a bespoke register you invent when the content has a look of its own** — built into direction tokens
+   with **`archetypes_html.preset_directions([names])`** (a bespoke direction is a **dict** in that list,
+   carrying its OWN motif so it too renders real DNA, not just palette). "REAL STYLE" means *a language
+   with its own motif* — a preset **or** a bespoke register both qualify; the thing being ruled out is
+   three colourways of one layout, NOT synthesis itself.
+   - **Presets are the FLOOR you beat, not the menu you satisfy.** The library exists so a rushed deck
+     never looks defaulted — but whenever this content has a register the library doesn't quite reach
+     (a subject with its own visual world — deep-sea sonar, a manuscript archive, a specific brand
+     universe), **synthesising a bespoke direction is a first-class peer of preset-selection, weighed on
+     every deck — not a fallback only for "a topic no preset fits".** A bespoke register that carries a
+     named motif + palette + type + its own **guard** (register floor) + runs through all pages (item
+     (q)) is as legitimate as any preset, and is often the stronger, more daring answer. The "describe
+     your own" slot is the *user*-initiated path; this is the *agent*-initiated one — reach for it when
+     the content earns it.
    - **The DNA runs through EVERY preview slide, not just the cover.** `preset_directions` marks each
      token with its `dna`; the cover shows the loud hero motif (`_dna_cover`) and every interior
      archetype slide carries a quiet **ambient register signature** (`_dna_ambient` — a corner mark,
@@ -83,8 +93,13 @@ direction*; the single real render confirms *fidelity*.
    axis, and an unknown value is a hard error rather than a silent fallback, so the gate can never
    claim a composition it did not render. When a token comes from `preset_directions` it also carries
    a **`dna`** marker (the preset name) that drives the cover hero motif + the ambient register on
-   every interior slide; a hand-built colour-scheme direction simply omits `dna`. Keep the **fonts
-   portable** (Georgia, Arial/Helvetica, 'Times New Roman', Consolas, Verdana — present on
+   every interior slide. Two dict cases matter for INVENTED directions: a **pure colour-scheme
+   direction** simply omits any motif field (its consistency is palette+type); a **BESPOKE REGISTER**
+   invented for the content supplies its OWN motif — **`cover_motif`** (raw, inline-styled HTML for the
+   loud hero motif on the cover) and **`ambient_motif`** (the quiet register signature echoed on every
+   interior slide) — so it renders real DNA and is a first-class peer of a preset, not a motif-less
+   colourway. This is the mechanism that makes agent-invented bespoke a genuine gate option, not just a
+   palette. Keep the **fonts portable** (Georgia, Arial/Helvetica, 'Times New Roman', Consolas, Verdana — present on
    macOS+Windows) so the preview and the eventual pptx agree. This same token set seeds the chosen
    direction's `style.py` later, so there's **one source of truth** and no HTML→pptx drift. Write the
    2–4 directions to a `directions.json` in a disposable `_directions/` subfolder of the deck folder.
@@ -118,10 +133,19 @@ direction*; the single real render confirms *fidelity*.
      Never force one of your rendered directions.
    - *(Optional, when a host browser tool or headless Chrome is available, you may screenshot
      the page to show inline too — but the link is the deliverable the user reviews.)*
-6. Apply knobs — or a "D" free-text intention — by editing the **token-set** and re-running
+6. Apply knobs — or a describe-your-own free-text intention (the own-letter slot: **E** on the 4-up
+   no-image-tool gate, D on a 3-up) — by editing the **token-set** and re-running
    `archetypes_html.py` (a tweak = change a constant + regenerate the page — cheap, instant,
    no LibreOffice) until the user consents.
-7. On consent: **(a)** turn the chosen token-set into the deck's `style.py` (the standard
+7. On consent: **the pick fixes the REGISTER (palette · type · composition · the interior register
+   signature), not the DARING — it is a launchpad, not a finished design.** The gate chose a
+   *language*; the deck still has to say something in it. So the slide-design boldness/signature-move
+   gate runs in full on the picked direction (`agents/slide-design.md` §1 + self-verify (h)/(k)): the
+   deck still owes a `boldness` dial and one **`signature move` this preset would not have made** — a
+   choice no template (or preset) would have. "Picked a preset → rendered the preset" does **not**
+   discharge the design step; a deck that is a faithful preset with no bespoke move is a
+   template-with-extra-steps and the critic's distinctiveness axis treats it as a finding. Then:
+   **(a)** turn the chosen token-set into the deck's `style.py` (the standard
    style-module interface) — **including its COMPOSITION: the `cover` token is implemented as the
    style's cover composition** (the deck has ONE cover and the user chose its shape; a style.py
    that carries the palette but builds a default-centred cover has quietly discarded half the

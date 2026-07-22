@@ -9,6 +9,37 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+### Fixed — bold BESPOKE design is first-class again (the preset gate was a launchpad, not a menu)
+- A strict two-front audit (integration + bold-design) of the preset-driven gate found the gate
+  *framing* had quietly demoted agent-invented styles: bespoke was licensed "only for a topic no
+  preset fits" (an escape hatch), the phrase "REAL STYLES, not synthesised colour schemes" falsely
+  equated *synthesised* with *colours-only*, and nothing at the gate said a picked preset is a **floor
+  to beat, not a destination**. The downstream boldness/signature-move machinery was fully intact
+  (structurally the skill couldn't ship a template-with-extra-steps deck) — but the gate pointed the
+  wrong way. Reframed across `SKILL.md` + `references/collaborative-mode.md`: presets are the FLOOR you
+  beat; a bespoke register invented for THIS content (its own motif + palette + type + guard + all-pages
+  carry) is a **first-class peer**, *preferred* when the content has a visual world of its own; and the
+  gate now reconnects to the signature-move gate — "picked a preset → rendered the preset" does NOT
+  discharge the design step.
+- **Bespoke registers now render their OWN real DNA in the preview**, so the claim above is true rather
+  than aspirational: a direction dict may carry `cover_motif` + `ambient_motif` HTML (its loud hero
+  motif + quiet interior echo), which `_dna_cover`/`_dna_ambient` render verbatim — a first-class peer
+  of a named preset, not a motif-less colourway. Verified end-to-end (a bespoke "Sonar" register: ping
+  rings on the cover, a quiet ring echo on every interior slide). New `smoke_directions` regression.
+
+### Fixed — self-verify (q) is now actually ENFORCED (it pointed at hooks that didn't exist)
+- The integration audit found new item (q) ("style runs through every slide") named a critic check and
+  a plan field that were both fictional, so the "只有首尾页" failure could still ship uncaught. Wired it
+  for real: a **`interior register:` contract-card field** (`agents/critic.md`), a **`register_interiors`
+  Lens-B check** (`critic.md` schema + `references/review-rubrics.md`), and a **PRE-FLIGHT tick (6b)**
+  (`SKILL.md`). A style dressed only on the bookends, with no `none — <reason>` carve, is now a finding.
+- **Resolved (q)'s conflict with the motif-dosing gates.** (q) prescribes a per-slide corner mark / edge
+  rule / grid — the exact devices the chrome-budget rule, PRE-FLIGHT 6, and the critic's stamping check
+  flag as findings. Added the governing distinction everywhere: a **quiet register signature** (faint,
+  meaning-free, chrome-level) is part of the *repeating design SYSTEM* and is welcome on every slide;
+  "never per-slide stamping" bites only the **loud signature motif** (the dosed 2–3-appearance daring
+  device). Propagated to `slide-design.md`, `SKILL.md` PRE-FLIGHT 6, `critic.md`, `review-rubrics.md`.
+
 ### Added — the chosen style now runs through EVERY slide, not just the cover (的风格要走所有页)
 - A user reported a style that "只有首尾页" — lived only on the first/last page. Root cause: the
   direction-gate preview rendered each preset's DNA on the **cover only**; interior archetype slides
