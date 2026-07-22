@@ -9,6 +9,8 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+## [3.8.0] — 2026-07-22
+
 ### Added — native 2.5D isometric components (no generated image)
 - **`deckkit.iso_bars`** — a **faithful** 2.5D bar chart: extrusion height is linear in the value and
   zero-based, so the depth never distorts the data (this is why the projection is parallel, not
@@ -76,6 +78,15 @@ section is a distilled summary — the full notes live on the
   over-suppressing audit list, a green pre-flight for an unopened deck, a composition axis that
   stopped at the preview, an iso_prism return that produced invisible labels, iso_stack labels
   drifting into the trough beside the next slab — each fixed and locked with a regression.
+- **Whole-skill maturity audit (six lenses, adversarially verified)** closed the last integration
+  gaps from the recent gate additions: a composition `skeleton` token that could **crash the
+  direction gate** (a 5-value hard-error set feeding an 8-value rhythm-map vocabulary — now accepts
+  all eight); a **dead rule** where the composition tokens were produced and routed to the design
+  lens but the critic brief never consumed them (now wired producer→consumer→arbiter with a verdict
+  slot); and reference drift behind the code (small_multiples told the agent to hand-compose what its
+  own index forbids; the design-gallery catalogue omitted four real components; `modbox` had no
+  when-to-use trigger). Plus disambiguation tie-breakers (`hub_spoke`/`hub_spokes`, `scorecard`/
+  `kpi_card`) and every emitted lint code now documented.
 
 ## [3.7.0] — 2026-07-21
 
