@@ -1940,7 +1940,11 @@ critic round — full rationale in `references/design-principles.md`):
   kicker/eyebrow adds a section label, it doesn't echo a word the title already leads with. **The
   title CHROME itself is not one fixed template repeated on every slide** — an identical
   eyebrow + rule-under-the-title on all ~12 content slides is a template tell (creativity is a design
-  metric, not just correctness). Rotate **2–3 title treatments** across the deck (e.g. a classic
+  metric, not just correctness). **`lint_deck.py` now backstops the most common case deterministically —
+  `TITLE-RULE MONOCULTURE` fires when the same thin rule sits under the title at the same height on
+  >60% of content slides** (a `head()`-style helper that stamps one treatment deck-wide is exactly how
+  this regresses); the other treatments (tab/rail/ordinal) it can't measure stay on this self-check.
+  Rotate **2–3 title treatments** across the deck (e.g. a classic
   accent-rule · an eyebrow in a filled tab/pill · a left vertical accent bar · a section ordinal ·
   a motif mark) so no two adjacent slides share the exact chrome and no single treatment dominates —
   the eyebrow-ornament analogue of the skeleton-rotation floor (`references/design-intelligence-addendum.md`).

@@ -9,6 +9,18 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+### Added — `TITLE-RULE MONOCULTURE` lint (the title-chrome rotation rule is now GATED, not prose-only)
+- The render self-check has long said "the title CHROME is not one fixed template repeated on every
+  slide — rotate 2-3 treatments", but it lived only in prose and got missed (a `head()`-style build
+  helper that stamps one eyebrow+rule on all 12 content slides is exactly how it regresses; a critic
+  pass didn't catch it either). `scripts/lint_deck.py` now detects it deterministically: a per-slide
+  `title_rule_y` feature + a deck-level check that fires **`TITLE-RULE MONOCULTURE`** when the same thin
+  rule sits under the title at the same height on >60% of content slides (rules must CLUSTER at one
+  height, so a deck that rotates rule/tab/rail/ordinal never trips it; filled eyebrow tabs and vertical
+  accent rails are excluded by geometry). Mirrors the existing `BOTTOM-STRIP MONOCULTURE` gate. SKILL.md
+  render self-check "Titles" now references the backstop. Verified: fires 10/10 on an all-rule deck,
+  clean on a rotated one.
+
 ## [3.9.0] — 2026-07-22
 
 ### Security — hardened a docs API-key placeholder (no real key was ever present)

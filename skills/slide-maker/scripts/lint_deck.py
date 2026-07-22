@@ -642,6 +642,15 @@ def _slide_stats(slide, bx, sw, sh):
         "bottom_strip": any((s["solid"] or (s["text"] and s["fill"])) and not s["bg"]
                             and s["w"] >= 0.6 * sw
                             and s["t"] >= 0.70 * sh and 0.25 <= s["h"] <= 1.4 for s in bx),
+        # a thin horizontal RULE parked in the title band (the classic under-the-title frame-line).
+        # Fine on a couple of pages; the SAME rule at the SAME height on nearly every content slide is
+        # the fixed title-chrome template tell. y is returned as a fraction of sh so the deck-level
+        # check can test whether they cluster at one height (a filled eyebrow TAB is taller → excluded;
+        # a vertical accent RAIL is narrow → excluded; only true horizontal rules count).
+        "title_rule_y": next((round(s["t"] / sh, 3) for s in bx
+                              if s["solid"] and not s["text"] and not s["bg"] and not s.get("pic")
+                              and s["h"] <= 0.02 * sh and 0.04 * sw <= s["w"] <= 0.85 * sw
+                              and 0.16 * sh <= s["t"] <= 0.36 * sh), None),
         # how far down the canvas the content actually reaches. Excluded so they can't fake a
         # full page: bg plates; footer-band starts; footer-CLASS chrome (≤10.5pt text starting in
         # the bottom 1.2in — the same ≤10.5pt chrome convention used elsewhere); and skinny
@@ -1001,6 +1010,21 @@ def _print_stats(rows, mode, sw, sh, lums=None, static_ok=False):
                          f"band — one takeaway slot stamped deck-wide reads as a template; rotate the "
                          f"slot (side rail · inline under the figure · the headline itself · none) so no "
                          f"slot carries more than ~half the deck (architecture-rotation rule)")
+    # TITLE-RULE MONOCULTURE: the same thin frame-line under the title on nearly every content slide —
+    # the fixed title-chrome template tell (render self-check 'Titles'; design-intelligence-addendum
+    # title-treatment rotation). Detected only when the rules CLUSTER at one height (a single repeated
+    # treatment), so a deck that rotates rule/tab/rail/ordinal never trips it.
+    if n >= 6:
+        ry = [r.get("title_rule_y") for i, r in enumerate(rows) if 0 < i < n - 1]
+        present = [y for y in ry if y is not None]
+        interior_n = n - 2
+        if interior_n > 0 and len(present) > 0.6 * interior_n and (max(present) - min(present)) <= 0.04:
+            warns.append(f"TITLE-RULE MONOCULTURE: {len(present)} of {interior_n} content slides carry an "
+                         f"identical thin rule under the title at the same height — a fixed title-chrome "
+                         f"frame-line stamped deck-wide reads as a template. Rotate 2-3 title treatments "
+                         f"(accent rule · filled eyebrow tab · left accent bar · a large section ordinal) "
+                         f"so no single treatment carries more than ~half the deck (render self-check "
+                         f"'Titles': the system stays constant, the chrome treatment varies)")
     # ONE-OFF CANVAS FLIP: exactly ONE interior slide whose canvas value departs sharply from the
     # deck's median — a lone dark (or light) page mid-deck reads as an ERROR, not rhythm. Rhythm
     # events must recur (a divider family, bookends) or come from imagery strength, never a single
