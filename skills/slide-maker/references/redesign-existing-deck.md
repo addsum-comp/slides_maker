@@ -31,7 +31,7 @@ question in plain Codex chat.
   a colour scheme, a logo) they must keep, or it may be a blank-PowerPoint look they'd happily
   replace. *Keep* → their deck IS the template (`deckkit.open_template` preserves its
   masters/layouts/brand; pull its palette) and improve *within* it; this counts as a *provided*
-  template, so per SKILL.md's gate carve do NOT offer the 3-direction gate. *Redesign the look*
+  template, so per SKILL.md's gate carve do NOT offer the direction gate. *Redesign the look*
   → NOW ask Q1's four standard choices as the follow-up (registered / they provide one / design
   a clean one / generate with an image tool): "design a clean one" opens the direction gate per
   Q1's design-one branch; "generate with an image tool" runs `references/generated-template.md`

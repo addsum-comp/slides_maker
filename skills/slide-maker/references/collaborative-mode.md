@@ -13,7 +13,7 @@ after a finished deck. So collaborative mode front-loads the *subjective* calls 
 cheap approvals, then hands the bulk to the same engine as standard mode.
 
 Direction previews are an **HTML comparison page** — *one self-contained link* holding all
-2–3 directions, which the user opens in a browser to review side-by-side and pick from. It's
+2–4 directions, which the user opens in a browser to review side-by-side and pick from. It's
 fast (no LibreOffice round-trip) and shareable. The one risk of HTML is a *fidelity gap* to the
 real pptx; close it two ways so "approve == ship" still holds: **(1)** drive the HTML and the
 chosen `style.py` from the **same design tokens** (palette hexes, portable font families, motif)
@@ -37,12 +37,19 @@ direction*; the single real render confirms *fidelity*.
 > branch where the look is invented from nothing and the user has seen no options.
 1. From the interview (purpose/audience/style) offer **differentiated directions** — distinct design
    *languages*, not three shades of one idea. **Default: recommend the 3 best-fit REAL PRESETS** for
-   this topic from the 14-preset library (read each preset's `when` field in `scripts/presets.py`),
+   this topic from the 18-preset library (read each preset's `when` field in `scripts/presets.py`),
    and build the direction tokens with **`archetypes_html.preset_directions([names])`** so each
    preview carries the preset's real **DNA** (its signature motif), not just its palette. A preset is
-   a whole visual language — this is what stops the 3 options reading as "the same layout in three
+   a whole visual language — this is what stops the options reading as "the same layout in three
    colours". Synthesise a bespoke direction only for a topic no preset fits, or for the user's
-   "D — describe your own".
+   "describe your own" slot.
+   - **The DNA runs through EVERY preview slide, not just the cover.** `preset_directions` marks each
+     token with its `dna`; the cover shows the loud hero motif (`_dna_cover`) and every interior
+     archetype slide carries a quiet **ambient register signature** (`_dna_ambient` — a corner mark,
+     an edge rule, a faint grid/scanline). This is deliberate: a user reported a style that "只有
+     首尾页" (lived only on the first/last page). The gate must SHOW the register carrying the whole
+     deck, and the built `style.py` must do the same — see step 7 and `agents/slide-design.md`
+     (register-signature self-verify).
    🔴 **The rule is PAIRWISE and checkable: any two directions must differ on ≥2 of
    {palette mood · type attitude · density/scale · COMPOSITION ENVELOPE}.** Light-vs-dark and
    warm-vs-cool are *knobs on one design*; the composition envelope — WHERE the ink sits — is the
@@ -53,21 +60,34 @@ direction*; the single real render confirms *fidelity*.
    *Editorial* — serif, airy, gravitas; *Keynote* — dark, high-contrast, energetic;
    *Corporate* — light, crisp, institutional). Each direction is a **style module** with
    the standard interface (see `references/examples/style_example.py`).
-   - **How many:** when this gate fires because the user chose **"design a clean one" /
-     no template** (its recommended-default home), use **3** — the look is fully yours to
-     invent, so a fuller spread earns the pick. For the lighter "unsure / brand-defining"
-     opt-in offer, **2–3** is fine. Present the pick through the host's natural UI:
-     structured choices when available, or a short direct question in plain chat.
+   - **How many — the count rule is set by whether an image tool is in play:**
+     - *"design a clean one" / no image tool* (this gate's recommended-default home) → **4**
+       rendered directions: the **3 best-fit DNA presets** + **1 pure colour-scheme direction**
+       (a tasteful palette+type combo for the topic, NO motif — the classic clean look, itself a
+       legitimate style the user asked to keep on the menu). Build all four in one call —
+       `preset_directions(["p1","p2","p3", {colour_token}])`, where the 4th arg is a **dict**
+       passed through verbatim as a no-`dna` direction. Rendered as A/B/C/D; **describe-your-own is
+       the next slot (E)** — the own-letter is dynamic in `build_directions_html`, so a 4th rendered
+       direction never collides with it.
+     - *"generate a template with an image tool"* → the look runs through Q1(d)'s **style gate**
+       (generated-template.md), which shows **3** best-fit image-backed styles, not this HTML gate.
+     - The lighter "unsure / brand-defining" opt-in offer → **2–3** is fine.
+     Present the pick through the host's natural UI: structured choices when available, or a short
+     direct question in plain chat.
 2. Capture each direction as a small **design-token object** (`name`, `rationale`, the
    palette hexes `bg/ink/grey/mute/line/light/accent` + an `accents` list, `font_display`,
    `font_body`, `density`, **`cover`** (`centred | low-left | split-vertical | full-bleed-type`)
-   and **`skeleton`** (`statement | split | island | band | rail`) — the last two are the
-   composition axis, and an unknown value is a hard error rather than a silent fallback, so the
-   gate can never claim a composition it did not render) — and keep the **fonts portable** (Georgia, Arial/Helvetica,
-   'Times New Roman', Consolas, Verdana — present on macOS+Windows) so the preview and the
-   eventual pptx agree. This same token set seeds the chosen direction's `style.py` later, so
-   there's **one source of truth** and no HTML→pptx drift. Write the 2–3 directions to a
-   `directions.json` in a disposable `_directions/` subfolder of the deck folder.
+   and **`skeleton`** (the 8 canonical `statement | split | island | band | rail | dashboard |
+   full-bleed | gallery` — five render faithfully, the other three map to a nearest representative
+   FOR THE PREVIEW while the real token passes through unchanged) — the last two are the composition
+   axis, and an unknown value is a hard error rather than a silent fallback, so the gate can never
+   claim a composition it did not render. When a token comes from `preset_directions` it also carries
+   a **`dna`** marker (the preset name) that drives the cover hero motif + the ambient register on
+   every interior slide; a hand-built colour-scheme direction simply omits `dna`. Keep the **fonts
+   portable** (Georgia, Arial/Helvetica, 'Times New Roman', Consolas, Verdana — present on
+   macOS+Windows) so the preview and the eventual pptx agree. This same token set seeds the chosen
+   direction's `style.py` later, so there's **one source of truth** and no HTML→pptx drift. Write the
+   2–4 directions to a `directions.json` in a disposable `_directions/` subfolder of the deck folder.
 3. 🔴 **Check the divergence mechanically BEFORE building the link:**
    `python scripts/directions_diversity.py directions.json`. Exit 2 means a pair matched on ≥3 of
    the four axes — REDIVERGE it, or keep it and record the reason on the checkpoint's
@@ -80,20 +100,22 @@ direction*; the single real render confirms *fidelity*.
    — into a single self-contained HTML page: same content, only the style differs, so the
    comparison is apples-to-apples and shows how the user's *real* slide types will look, not
    just a pretty cover. (The page already bakes in the instructions and the "describe your
-   own — D" prompt.)
+   own" prompt, which is auto-lettered to the slot AFTER the rendered directions — **D** on a 3-up
+   gate, **E** on the 4-up no-image-tool gate.)
 5. **Give the user the link** — the `file://…/directions.html` path to copy into a browser.
-   Each direction has a **"Pick this one"** button (and a "D — describe your own" textarea); the
+   Each direction has a **"Pick this one"** button (and a describe-your-own textarea); the
    page copies a short **paste-back line** to the clipboard — `I pick direction B — Keynote`, or
-   `I pick D (my own): <text>` — which the user pastes back into chat (the page can't message the
-   session). Parse that line for the choice. Also collect **knobs** — density
+   `I pick <own-letter> (my own): <text>` — which the user pastes back into chat (the page can't
+   message the session). Parse that line for the choice. Also collect **knobs** — density
    (minimal/moderate/dense), accent colour, font pairing, light/dark.
-   - **Always include a final "D — describe your own" option.** The shown directions are only
-     your *opening proposals*; the author may have a look in their head you didn't guess. If
-     they pick D, they **type their intention** — a reference deck/site, a brand, a mood, a
-     colour, a constraint ("like our website", "warmer", "a serif on dark") — and you
-     **synthesize a new direction token-set from that description**, regenerate the HTML link,
-     and bring it back (step 5 loop). A blend ("B's palette with A's serif") is a valid D too.
-     Never force one of your three.
+   - **Always include a final "describe your own" option** (the last, auto-lettered slot). The shown
+     directions are only your *opening proposals*; the author may have a look in their head you
+     didn't guess. If they pick it, they **type their intention** — a reference deck/site, a brand, a
+     mood, a colour, a constraint ("like our website", "warmer", "a serif on dark") — and you
+     **synthesize a new direction token-set from that description**, regenerate the HTML link, and
+     bring it back (step 5 loop). A blend ("B's palette with A's serif") is a valid describe-your-own
+     too.
+     Never force one of your rendered directions.
    - *(Optional, when a host browser tool or headless Chrome is available, you may screenshot
      the page to show inline too — but the link is the deliverable the user reviews.)*
 6. Apply knobs — or a "D" free-text intention — by editing the **token-set** and re-running

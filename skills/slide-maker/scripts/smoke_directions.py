@@ -216,6 +216,28 @@ def main():
             assert "Swiss" in html and "Ink Wash" in html and "Memphis" in html
         ok("preset_directions carry real DNA (styles, not colour schemes)", _preset_directions_carry_dna)
 
+        def _style_runs_through_all_slides():
+            """The chosen style must carry through ALL pages, not just the cover (the "只有首尾页"
+            failure the user flagged). Every interior archetype slide (content, diagram, results)
+            carries the preset's ambient register signature (dna-amb-<preset>)."""
+            sys.path.insert(0, HERE)
+            import importlib, archetypes_html as ah, os
+            importlib.reload(ah)
+            for name in ("swiss", "terminal", "blueprint", "memphis", "ink_wash"):
+                S = ah._norm(ah.preset_directions([name])[0])
+                marker = "dna-amb-" + name
+                for fn in (ah._slide_bullets, ah._slide_diagram, ah._slide_data):
+                    assert marker in fn(S), "{}: {} missing ambient DNA".format(name, fn.__name__)
+            # a pure colour-scheme direction (no dna) carries NO ambient motif — its consistency is
+            # palette+type, which run deck-wide anyway; this is the no-AI gate's 4th option.
+            col = {"name": "Signal", "accent": "#4C86FF", "cover": "centred", "skeleton": "split"}
+            dirs = ah.preset_directions(["swiss", "blueprint", "terminal", col])
+            assert len(dirs) == 4 and dirs[3]["name"] == "Signal" and not dirs[3].get("dna"), \
+                "a dict passes through as a colour-scheme direction (4th option, no dna)"
+            Sc = ah._norm(dirs[3])
+            assert "dna-amb-" not in ah._slide_diagram(Sc), "colour direction must carry no ambient motif"
+        ok("style runs through ALL slides (ambient register) + colour 4th option", _style_runs_through_all_slides)
+
     print("smoke_directions: {} failure(s)".format(len(FAILS)))
     return 1 if FAILS else 0
 

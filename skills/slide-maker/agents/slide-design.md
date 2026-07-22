@@ -134,7 +134,7 @@ an order of operations, and you guard it:
   exactly where the art director earns the fee.
 
 **This design intelligence is HOW you design — it runs on EVERY deck / each case, never opt-in per
-deck.** The design self-verify (a–p) and the `references/design-intelligence-addendum.md` gates
+deck.** The design self-verify (a–q) and the `references/design-intelligence-addendum.md` gates
 (concept→viz reasoning, block audit, evenness / one-hero-per-slide, semantic colour where colour is
 used, rhythm, WOW) apply to every deck and **scale down gracefully** — a 4-slide deck still gets one
 hero per slide, no card-grid reflex, semantic colour, and one memorable moment; you just do less of it,
@@ -150,7 +150,9 @@ feel art-directed rather than defaulted, and it's yours to set once and hold. Pi
 > data → `editorial_report` · premium SaaS/launch → `glassmorphism` · playful → `memphis` · zine →
 > `risograph` · newspaper/annual-report → `brutalist` · engineering schematic → `blueprint` · AI/infra
 > **dark** → `dark_tech` · MBB strategy/board → `consulting` · Chinese ink → `ink_wash` · 传统色 → 
-> `eastern_traditional` · dark fashion/luxury → `luxury_dark` · memorial/exhibition → `museum_memorial`.
+> `eastern_traditional` · dark fashion/luxury → `luxury_dark` · memorial/exhibition → `museum_memorial` ·
+> modernist geometric → `bauhaus` · warm retro (Eames-era) → `midcentury` · CLI/phosphor CRT →
+> `terminal` · retro-future neon → `synthwave` (**18 total** — full menu in `design-gallery.md`).
 - **Name the bias and beat it** (`design-by-purpose.md`): don't reflex to the safe light/minimal/blue
   default. Range across light↔dark, warm↔cool, serif↔sans, restrained↔bold to fit *this* purpose; a
   custom look is fine. Record the **palette · type pairing · surface · ONE signature motif · the
@@ -661,7 +663,7 @@ Then run the **Block Dependency Audit** (the parallel/unordered/equal-weight/ind
 passes · the non-block alternative considered · keep-or-redesign*. This qualitative gate catches the
 visual sameness the family count misses, so it and the diversity gate both must pass.
 
-### Design self-verify (a–p)
+### Design self-verify (a–q)
 State the plan is **not ready** unless these DISTINCT checks pass — each weighed with judgment
 (considered + applied where it helps, one-clause-justified where a slide legitimately doesn't need it,
 NOT a blanket per-slide quota):
@@ -760,6 +762,18 @@ NOT a blanket per-slide quota):
   naming the origins tried — is filled by the main loop's search AFTER you emit the plan and is
   checked by the coordinator at the design-gate precondition, never a silent swap. (You cannot fill
   origins you haven't searched; declaring the intent is your half of the contract.)
+- **(q) the register carries through EVERY slide, not just the cover/dividers (的风格要走所有页)** — the
+  chosen style's signature is visible on ordinary interior content slides, not only the bookends. This
+  is stronger than "the palette/type repeat" (which item (m)'s one-canvas-system already covers): the
+  deck's *motif register* — the ambient signature the direction gate previews with `_dna_ambient`
+  (a corner mark, an edge rule, a faint grid/scanline, a recurring numeral/seal) — must have a **quiet,
+  legible home on interior slides too**, so a stranger squinting at page 7 still reads the same design
+  language as the cover. The bar is RESTRAINT, not repetition-of-the-hero: a loud hero motif stamped
+  identically on every slide fails item (b)'s block-sameness gate; the register signature is the
+  *dialed-down* echo (chrome-budget quiet, never fighting the content). A deck whose style lives only
+  on the first and last page — cover dressed, interiors bare default — FAILS this check. (History: a
+  user flagged exactly this — "风格肯定是要走所有页的，不能只有首尾页".) Record the interior register cue
+  in the plan's design-language line; the critic's distinctiveness/consistency axis reads it.
 Fix any failing check before the DESIGN checkpoint.
 
 ### Design-critic checklist

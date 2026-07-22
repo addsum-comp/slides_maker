@@ -9,6 +9,39 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+### Added — the chosen style now runs through EVERY slide, not just the cover (的风格要走所有页)
+- A user reported a style that "只有首尾页" — lived only on the first/last page. Root cause: the
+  direction-gate preview rendered each preset's DNA on the **cover only**; interior archetype slides
+  carried palette+type but no motif. **`archetypes_html._dna_ambient()`** now renders a quiet
+  **ambient register signature** (a corner mark, edge rule, faint grid/scanline, recurring numeral/
+  seal — the dialed-down echo of the cover's hero motif) on **every** interior preview slide, at
+  z-index:0 behind the content (interior blocks lifted to z-index:1 so nothing is covered). Verified
+  legible across all 18 presets, light and dark.
+- **`agents/slide-design.md` self-verify gains item (q)** — the built deck's motif register must have
+  a quiet, legible home on interior slides too (stronger than "palette/type repeat"): a deck whose
+  style lives only on the bookends FAILS the design checkpoint. Restraint, not repetition-of-the-hero
+  (a loud motif stamped on every slide fails the block-sameness gate). Wires the fix into a gate, per
+  the enforcement invariant.
+
+### Changed — direction-gate count is now branch-aware (no image tool → 4; with image tool → 3)
+- On the **no-image-tool / "design a clean one"** branch the gate now offers **4** rendered
+  directions: the 3 best-fit DNA presets **+ 1 pure colour-scheme direction** (a tasteful palette+type
+  combo with no motif — the classic clean look, itself a legitimate style the user asked to keep on
+  the menu). The **with-image-tool** branch (generated-template style gate) stays at **3**.
+- **`preset_directions()`** now accepts a **dict** in its list (passed through verbatim as a no-`dna`
+  colour direction), so all four build in one call: `preset_directions(["p1","p2","p3", {colour}])`.
+- **`build_directions_html()`** auto-letters the "describe your own" slot to the position AFTER the
+  rendered directions — **D** on a 3-up gate, **E** on the 4-up gate — fixing a latent collision where
+  a 4th rendered direction and the hardcoded describe-your-own were both "D". SKILL.md gate-line
+  grammar updated to `picked A/B/C/D/E of 4`; collaborative-mode Gate A "how many" rule rewritten.
+
+### Changed — generated imagery must FUSE the style AND stay topical (both, not either)
+- New 🔴 **FUSION gate** in `references/generated-template.md`: every generated hero/divider/plate must
+  be BOTH unmistakably on-style (the register named at the style gate) AND depict THIS deck's subject
+  (a stranger could name the topic from the picture) — a beautifully on-style but topically generic
+  image (abstract mesh, stock swoosh) now explicitly **fails** and is regenerated with the deck's own
+  subject motifs folded in (the REFERENT RULE).
+
 ### Changed — the direction gate is now PRESET-DRIVEN (real styles, not colour schemes)
 - The 3 directions shown at Gate A are now the **3 best-fit named presets** rendered with their own
   **DNA**, not three synthesised palette/font combos. A user reported the old gate "只是不同的颜色搭配"

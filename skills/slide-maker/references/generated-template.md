@@ -6,7 +6,7 @@ image tool** (a styled hero/divider illustration) and then **reproduce it native
 content block fits it. Use it for a *vivid, designed* deck — a product launch, a festival/event,
 a brand or culture deck, a playful pitch — where a clean default look isn't enough.
 
-This branch **decides the look up front**, so after it's confirmed you **skip the 3-direction
+This branch **decides the look up front**, so after it's confirmed you **skip the direction
 gate** and any LOOK question — the rest of the interview (purpose, audience, source, language,
 and Q4's density + tone, which the visual identity does not decide) still runs normally.
 
@@ -323,7 +323,7 @@ them, and show both. The content slide is essential: it proves the blocks actual
   unclear whether they mean a tweak or a new atmosphere, ask in one line before spending a generation.
 
 ### 5 — Continue the interview, then build to the template
-- The look is decided → **skip the 3-direction gate** and any LOOK question; the rest of the
+- The look is decided → **skip the direction gate** and any LOOK question; the rest of the
   normal interview still runs — purpose & audience & time, source material, language, AND Q4's
   density (text-per-point) and tone: those are content/register choices a generated visual
   identity does not decide (density stays an ALWAYS-surfaced choice per SKILL.md Q4).
@@ -410,6 +410,15 @@ them, and show both. The content slide is essential: it proves the blocks actual
       the 🔴 MUST interior shallow-background plate** (low-contrast, even-toned, **topic-related** — the
       deck's own subject motifs, never generic texture; skipped only for a
       deliberately minimal/flat style).
+- [ ] **🔴 FUSION gate — every generated image is BOTH on-style AND on-topic (both, not either):** looking
+      at the rendered hero/divider/plate, (1) the **chosen style register is unmistakable** — its palette,
+      motif vocabulary, and treatment are the ones named at the style gate, not a drifted generic look;
+      **and** (2) the image **depicts THIS deck's subject** — a stranger could name the topic from the
+      picture (an AI deck shows compute/networks/models, a garden brand shows botanicals), never
+      interchangeable filler (abstract mesh, random gradient, stock swoosh) that would sit under any deck.
+      An image that is beautifully on-style but topically generic **fails** — regenerate with the deck's
+      own subject motifs folded into the prompt (the REFERENT RULE, `image-generation.md`). This is the
+      user's requirement: 生成图要融合风格且与 topic/内容强相关.
 - [ ] `style.py` derived: palette **extracted from the image**, motif helpers, component helpers,
       fonts/chrome, a **`content_bg(slide)`** for the shallow interior background, and a
       **`brand(slide)`** logo helper if the deck is about a company/institution/product.

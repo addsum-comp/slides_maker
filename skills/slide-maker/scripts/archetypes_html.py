@@ -17,10 +17,12 @@ collaborative-mode.md "HTML preview link".)
 
 PICKING: each direction has a **"Pick this one"** button; clicking it highlights that
 direction and copies a short paste-back line to the clipboard — `I pick direction B —
-Keynote` (or, from the "D — describe your own" textarea, `I pick D (my own): <text>`). The
-page can't message the session, so the user pastes that line back into chat. Parse it to get
-the choice; on a "D" line, synthesize a new direction token-set from their text and
-regenerate this page.
+Keynote` (or, from the "describe your own" textarea, `I pick <own-letter> (my own): <text>`).
+The own-letter is the slot AFTER the rendered directions — **D** on a 3-up gate, **E** on the
+4-up no-image-tool gate (3 DNA presets + 1 colour-scheme direction) — so a 4th rendered
+direction never collides with it. The page can't message the session, so the user pastes that
+line back into chat. Parse it to get the choice; on a describe-your-own line, synthesize a new
+direction token-set from their text and regenerate this page.
 
 The 4 archetype slides per direction mirror archetypes.py exactly — cover, bullets+callout,
 diagram pipeline, data/figure — so the HTML comparison is apples-to-apples with what ships.
@@ -28,7 +30,7 @@ diagram pipeline, data/figure — so the HTML comparison is apples-to-apples wit
 USAGE
   python archetypes_html.py directions.json out.html ["Deck Title"]
 
-`directions.json` is a list of 2–3 direction objects. Each object (only `name` required;
+`directions.json` is a list of 2–4 direction objects. Each object (only `name` required;
 sensible defaults fill the rest):
   {
     "name": "Editorial",
@@ -109,7 +111,9 @@ def _is_dark(hexc):
 # ── preset → direction bridge: the direction gate picks real DNA styles, not synthesised colours ──
 # Each preset (scripts/presets.py) carries curated STYLE DNA (motif/treatment in its `surface`
 # field). preset_directions() turns chosen preset names into direction tokens so the gate offers
-# real styles; the `dna` marker tells _dna_cover() which signature motif to render in the preview.
+# real styles; the `dna` marker drives BOTH _dna_cover() (the loud hero motif on the cover) AND
+# _dna_ambient() (the quiet register signature on every interior slide) — so the style carries
+# through ALL preview pages, not just the cover.
 _PRESET_COMPOSITION = {          # a cover/skeleton that fits each preset's character
     "swiss": ("low-left", "statement"), "editorial_paper": ("low-left", "statement"),
     "consulting": ("low-left", "rail"), "brutalist": ("full-bleed-type", "statement"),
@@ -124,11 +128,17 @@ _PRESET_COMPOSITION = {          # a cover/skeleton that fits each preset's char
 
 
 def preset_directions(names):
-    """Turn a list of preset names into direction-token dicts with real DNA. Unknown names fall
-    through to a plain token so a synthesised direction can still be mixed in."""
+    """Turn a list of preset names into direction-token dicts with real DNA. Two escape hatches so
+    one call can build a MIXED set:
+      • an unknown NAME (str) falls through to a plain token (a synthesised direction);
+      • a DICT is passed through verbatim (normalised at render) — this is how the no-AI gate adds its
+        4th option: a pure COLOUR-SCHEME direction (no `dna`), whose consistency is palette+type, not a
+        motif. e.g. preset_directions(["swiss","blueprint","terminal", {"name":"Signal", ...}])."""
     import presets as _P
     out = []
     for n in names:
+        if isinstance(n, dict):
+            out.append(n); continue           # hand-built colour-scheme (or fully custom) direction
         p = _P.PRESETS.get(n)
         if not p:
             out.append({"name": n}); continue
@@ -231,6 +241,57 @@ def _dna_cover(S):
     return ""
 
 
+def _dna_ambient(S):
+    """The QUIET register signature that runs on EVERY interior slide — so the chosen style carries
+    through ALL pages, not just the cover (the "只有首尾页" failure). This is a restrained echo of the
+    hero motif in _dna_cover: corners / edges / backgrounds only, low opacity, z-index:0 behind the
+    content. A direction with no `dna` (a pure colour-scheme direction) returns nothing — its
+    consistency is palette + type, which already run deck-wide."""
+    d = S.get("dna")
+    if not d:
+        return ""
+    a = S["accent"]; accs = S.get("accents", [a])
+    def _c(i, fb): return accs[i] if i < len(accs) else fb
+    inner = ""
+    if d == "swiss":
+        inner = '<span class="amb-swiss-col"></span><span class="amb-swiss-num">&sect;</span>'
+    elif d == "brutalist":
+        inner = f'<span class="amb-brutal" style="background:{a}"></span>'
+    elif d in ("editorial_paper", "editorial_report", "luxury_dark", "museum_memorial"):
+        inner = f'<span class="amb-hair" style="background:{S["mute"]}"></span>'
+    elif d == "consulting":
+        inner = f'<span class="amb-topbar" style="background:{a}"></span>'
+    elif d == "ink_wash":
+        inner = f'<span class="amb-seal" style="background:{a}">&#21360;</span>'
+    elif d == "eastern_traditional":
+        inner = f'<span class="amb-frame" style="border-color:{a}"></span>'
+    elif d == "risograph":
+        inner = f'<span class="amb-halftone" style="color:{_c(1,a)}"></span>'
+    elif d == "memphis":
+        inner = (f'<span class="amb-dot" style="left:91%;top:13%;background:{_c(0,a)};border-radius:50%"></span>'
+                 f'<span class="amb-dot" style="left:5%;top:80%;background:{_c(1,a)};border-radius:0"></span>')
+    elif d == "glassmorphism":
+        inner = f'<span class="amb-glow" style="background:{_c(0,a)}"></span>'
+    elif d == "blueprint":
+        inner = f'<span class="amb-grid"></span><span class="amb-node" style="border-color:{a}"></span>'
+    elif d == "dark_tech":
+        inner = f'<span class="amb-grid amb-grid-faint"></span><span class="amb-tick" style="background:{a}"></span>'
+    elif d == "bauhaus":
+        inner = f'<span class="amb-bh" style="background:{a}"></span>'
+    elif d == "midcentury":
+        rays = "".join(f'<span class="amb-ray" style="background:{a};transform:rotate({r}deg)"></span>'
+                       for r in range(0, 180, 30))
+        inner = f'<span class="amb-burst">{rays}</span>'
+    elif d == "terminal":
+        inner = f'<span class="amb-scan"></span><span class="amb-prompt" style="color:{a}">&gt;</span>'
+    elif d == "synthwave":
+        lines = "".join(f'<span class="amb-gl" style="left:{50 + (i - 4) * 13}%"></span>' for i in range(9))
+        inner = f'<span class="amb-horizon">{lines}</span>'
+    if not inner:
+        return ""
+    return f'<div class="dna-amb dna-amb-{d}">{inner}</div>'
+
+
 def _slide_cover(S, deck_title="Deck Title"):
     name = S["name"]
     # Faithful cover: a DARK deck gets a dark cover (its bg + light ink title); a LIGHT deck gets
@@ -275,6 +336,7 @@ def _slide_bullets(S):
     map to a nearest representative for the PREVIEW (their real token is still carried into style.py),
     so the user picks a composition the deck will build, not a padding variation of one layout."""
     sk = _SKELETON_PREVIEW.get(S["skeleton"], S["skeleton"])   # preview render only; token stays exact
+    amb = _dna_ambient(S)                                       # quiet register signature — every slide
     tb = _title_bar(S, "How content slides read", "archetype")
     bl3 = "".join([
         _bullet_row(S, "Terse points", "a few words each"),
@@ -291,7 +353,7 @@ def _slide_bullets(S):
                 f'<div class="st-line" style="color:{S["ink"]}">One idea, stated at full size.</div>'
                 f'<div class="st-sub" style="color:{S["mute"]}">nothing else on the page</div>')
         return f'''<div class="slide sk-statement" style="background:{S['bg']}">
-      <div class="sk-body">{body}</div>
+      {amb}<div class="sk-body">{body}</div>
       {_footer(S, 2, "direction preview")}
     </div>'''
 
@@ -300,7 +362,7 @@ def _slide_bullets(S):
         body = (f'<div class="sp-l">{tb}<ul class="bullets">{bl3}</ul></div>'
                 f'<div class="sp-r">{fig}</div>')
         return f'''<div class="slide sk-split" style="background:{S['bg']}">
-      <div class="sk-body">{body}</div>
+      {amb}<div class="sk-body">{body}</div>
       {co}{_footer(S, 2, "direction preview")}
     </div>'''
 
@@ -311,7 +373,7 @@ def _slide_bullets(S):
                 f'<div class="is-note is-b" style="color:{S["ink"]};border-color:{S["accent"]};background:{S["bg"]}">orbits the figure</div>'
                 f'</div>')
         return f'''<div class="slide sk-island" style="background:{S['bg']}">
-      <div class="sk-body">{body}</div>
+      {amb}<div class="sk-body">{body}</div>
       {_footer(S, 2, "direction preview")}
     </div>'''
 
@@ -324,7 +386,7 @@ def _slide_bullets(S):
         body = (f'{tb}<div class="bd-axis" style="background:{S["line"]}"></div>'
                 f'<div class="bd-row">{chips}</div>')
         return f'''<div class="slide sk-band" style="background:{S['bg']}">
-      <div class="sk-body">{body}</div>
+      {amb}<div class="sk-body">{body}</div>
       {co}{_footer(S, 2, "direction preview")}
     </div>'''
 
@@ -336,7 +398,7 @@ def _slide_bullets(S):
             f'<div class="rl-cap" style="color:{S["mute"]}">stacked in the rail</div></div>')
     body = f'{rail}<div class="rl-main">{tb}<ul class="bullets">{bl3}</ul></div>'
     return f'''<div class="slide sk-rail" style="background:{S['bg']}">
-      <div class="sk-body">{body}</div>
+      {amb}<div class="sk-body">{body}</div>
       {co}{_footer(S, 2, "direction preview")}
     </div>'''
 
@@ -353,7 +415,7 @@ def _slide_diagram(S):
         if i < len(stages) - 1:
             chips.append(f'<div class="arrow" style="color:{S["accent"]}">&rarr;</div>')
     return f'''<div class="slide" style="background:{S['bg']}">
-      {_title_bar(S, "How a diagram reads", "archetype")}
+      {_dna_ambient(S)}{_title_bar(S, "How a diagram reads", "archetype")}
       <div class="pipe">{"".join(chips)}</div>
       {_footer(S, 3, "direction preview")}
     </div>'''
@@ -364,7 +426,7 @@ def _slide_data(S):
               + _bullet_simple(S, "Series A", "baseline")
               + _bullet_simple(S, "Series B", "proposed"))
     return f'''<div class="slide" style="background:{S['bg']}">
-      {_title_bar(S, "How a results slide reads", "archetype")}
+      {_dna_ambient(S)}{_title_bar(S, "How a results slide reads", "archetype")}
       <div class="data-row">
         <div class="figbox" style="background:{S['light']};border-color:{S['line']};color:{S['mute']}">
           [ your figure / chart, shown whole ]
@@ -645,13 +707,56 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-s
   transform-origin:bottom center}
 .dna-horizon::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;
   background:rgba(120,220,255,.6)}
+
+/* ───────── AMBIENT register signatures — the QUIET DNA that runs on EVERY interior slide ─────────
+   so the chosen style carries through ALL pages, not only the cover. The layer sits at z-index:0
+   (behind content); the three static interior blocks are lifted to z-index:1 so nothing is covered.
+   Skeleton slides already carry .sk-body at z-index:2, so they need no lift. */
+.dna-amb{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.tbar,.pipe,.data-row{position:relative;z-index:1}   /* keep interior content above the ambient layer */
+.amb-swiss-col{position:absolute;right:16%;top:0;bottom:0;width:1px;background:rgba(128,128,128,.16)}
+.amb-swiss-num{position:absolute;right:5%;top:6%;font:800 40px/1 Helvetica,Arial,sans-serif;
+  color:rgba(128,128,128,.10)}
+.amb-brutal{position:absolute;left:0;right:0;bottom:0;height:7px}
+.amb-hair{position:absolute;left:26px;right:26px;top:15px;height:1px;opacity:.5}
+.amb-topbar{position:absolute;left:0;right:0;top:0;height:4px;opacity:.85}
+.amb-seal{position:absolute;right:5%;bottom:9%;width:30px;height:30px;border-radius:4px;display:flex;
+  align-items:center;justify-content:center;color:#fff;font:700 15px/1 "Songti SC",serif;opacity:.85}
+.amb-frame{position:absolute;inset:11px;border:1px solid;opacity:.35}
+.amb-halftone{position:absolute;right:0;bottom:0;width:32%;height:44%;opacity:.13;
+  background-image:radial-gradient(currentColor 22%,transparent 24%);background-size:11px 11px}
+.amb-dot{position:absolute;width:15px;height:15px;opacity:.9}
+.amb-glow{position:absolute;right:-40px;bottom:-50px;width:170px;height:170px;border-radius:50%;
+  filter:blur(46px);opacity:.30}
+.amb-grid{position:absolute;inset:0;opacity:.30;
+  background-image:linear-gradient(#12365a 1px,transparent 1px),linear-gradient(90deg,#12365a 1px,transparent 1px);
+  background-size:34px 34px}
+.amb-grid-faint{opacity:.19;background-image:linear-gradient(#1b2b45 1px,transparent 1px),linear-gradient(90deg,#1b2b45 1px,transparent 1px)}
+.amb-node{position:absolute;right:7%;bottom:14%;width:44px;height:26px;border:1.2px solid;
+  border-radius:3px;opacity:.55}
+.amb-tick{position:absolute;left:26px;top:15px;width:14px;height:3px}
+.amb-bh{position:absolute;right:6%;top:13%;width:44px;height:44px;border-radius:50%;opacity:.9}
+.amb-burst{position:absolute;right:7%;top:16%;width:0;height:0}
+.amb-ray{position:absolute;width:30px;height:1.5px;transform-origin:0 50%;opacity:.7}
+.amb-scan{position:absolute;inset:0;opacity:.5;
+  background:repeating-linear-gradient(180deg,rgba(120,255,150,.05) 0 1px,transparent 1px 3px)}
+.amb-prompt{position:absolute;right:6%;bottom:9%;font:700 22px/1 ui-monospace,Consolas,monospace;opacity:.8}
+.amb-horizon{position:absolute;left:0;right:0;bottom:0;height:30%;
+  background:linear-gradient(180deg,transparent,rgba(120,40,180,.20))}
+.amb-horizon::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:rgba(120,220,255,.5)}
+.amb-gl{position:absolute;top:0;bottom:0;width:1px;background:rgba(120,220,255,.26)}
 """
 
 
 def build_directions_html(directions, out_path, deck_title="Your Deck"):
-    """Render 2–3 directions into ONE self-contained HTML file. Returns out_path."""
+    """Render 2–4 directions into ONE self-contained HTML file. Returns out_path.
+
+    The "describe your own" letter is the NEXT letter after the rendered directions (E when 4 are
+    shown, D when 3) — so a 4th rendered direction (the no-AI gate's colour-scheme option) never
+    collides with the own-your-own slot."""
     styles = [_norm(d) for d in directions]
     letters = ", ".join(chr(ord("A") + i) for i in range(len(styles)))
+    own = chr(ord("A") + len(styles))     # dynamic: the slot after the last rendered direction
     blocks = "\n".join(_direction_block(S, i, deck_title) for i, S in enumerate(styles))
     doc = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -662,16 +767,17 @@ def build_directions_html(directions, out_path, deck_title="Your Deck"):
   <div class="page-head">
     <h1>Choose a direction — {_esc(deck_title)}</h1>
     <p>Each direction below shows the <strong>same four slide types</strong> (cover, content,
-    diagram, results) so the comparison is apples-to-apples — only the <em>style</em> differs.
-    Review {letters}, then hit <strong>“Pick this one”</strong>
-    (<span class="pick">or describe your own — “D”</span> at the bottom). Your pick is copied to
+    diagram, results) so the comparison is apples-to-apples — only the <em>style</em> differs, and
+    each style runs through <em>every</em> slide, not just the cover. Review {letters}, then hit
+    <strong>“Pick this one”</strong>
+    (<span class="pick">or describe your own — “{own}”</span> at the bottom). Your pick is copied to
     the clipboard as a short line — <strong>paste it back to Claude</strong>. These are taste
     previews; once you pick, Claude renders one real slide in that style to confirm before
     building the full deck.</p>
   </div>
   {blocks}
   <div class="dsec">
-    <h2>D — describe your own</h2>
+    <h2>{own} — describe your own</h2>
     <p>None quite right? Type the look you have in mind — a reference deck/site, a brand, a mood,
     a colour, a constraint ("like our website", "warmer", "a serif on dark", "B's palette with A's
     serif"). Claude will build it and bring it back.</p>
@@ -711,7 +817,7 @@ def build_directions_html(directions, out_path, deck_title="Your Deck"):
     var t = (document.getElementById('ownText').value || '').trim();
     if (!t) {{ document.getElementById('ownText').focus(); return; }}
     document.querySelectorAll('.dir').forEach(function(d){{ d.classList.remove('selected'); }});
-    show('Copied — paste to Claude:', 'I pick D (my own): ' + t);
+    show('Copied — paste to Claude:', 'I pick {own} (my own): ' + t);
   }}
   </script>
 </body></html>'''

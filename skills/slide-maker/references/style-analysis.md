@@ -42,7 +42,7 @@ Build with `deckkit` but **override the defaults to the brief**: set the palette
 the fonts to its fonts, the title/footer treatment, corner style, bullet/rule/band motifs, and the
 table/figure/equation styling. Re-create the *system + decorations*, applied to the **user's** content.
 A Mode-A example decides the look the way a provided template does: even on a no-template
-(Q1 "design a clean one") deck, **skip the 3-direction gate** — the example IS the direction, and
+(Q1 "design a clean one") deck, **skip the direction gate** — the example IS the direction, and
 offering invented directions against it is a false gate. (Mode B stays gate-eligible: its
 palette/mood is re-chosen for the topic, so the lighter "unsure / brand-defining" offer remains
 legitimate there.)

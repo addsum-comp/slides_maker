@@ -174,8 +174,9 @@ few proposed images, for approval — **each row carries its source token**: `ge
 "wordmark" with no recorded search on a single-entity deck = incomplete, even as an auto-waiver FYI)
 **+ one required GATE line naming the look-choice that was made — `direction gate:` on the
 design-clean branch (c), `style gate:` on the generated-template branch (d).** Branch (c):
-`picked A/B/C/D of 3 (html: <path>) · diversity: <ok | flagged <pair> → rediverged | justified: <reason>>`
-— the mechanical-check verdict rides on the same line, so a collapsed set cannot be posted as a
+`picked A/B/C/D/E of 4 (html: <path>) · diversity: <ok | flagged <pair> → rediverged | justified: <reason>>`
+— **4 rendered directions (A–C = best-fit DNA presets, D = the colour-scheme option), E = describe-your-own**;
+the mechanical-check verdict rides on the same line, so a collapsed set cannot be posted as a
 choice without the collapse being spoken — or the named carve (e.g. `carve: user said just-go` /
 `carve: Mode-A mimic`). Branch (d): `picked <X> of 3 (gallery: <path>)`, **or**, when Auto/你决定
 skipped the gallery, `carve: auto-pick — ` **followed by all three candidate styles WITH the
@@ -334,10 +335,13 @@ full prompt. Scaling ≠ skipping — never infer purpose or content. Some answe
 batch: *a conference talk* → ask which venue, then research it; *a new template* → they
 hand over the file; *"design a clean one" (no template)* → run the **direction gate**
 (DEFAULT on this branch — see Q1's design-one branch for the named skip carves; a Q4 Mode-A
-mimic example decides the look and skips it) — show **3** rendered style directions to pick
-from before the full build; *"generate a template with an image tool"* → run the
-mini-interview + generation + feedback loop in `references/generated-template.md`, then **skip
-the direction gate** (the look is already decided). The four:
+mimic example decides the look and skips it) — show **4** rendered style directions to pick
+from before the full build (3 best-fit REAL-DNA presets + 1 pure colour-scheme direction —
+see Q1(c)); *"generate a template with an image tool"* → run the mini-interview + generation
++ feedback loop in `references/generated-template.md` (its style gate shows **3** best-fit
+image-backed styles), then **skip the direction gate** (the look is already decided).
+**The count rule, by branch: no image tool → 4 offered; with image tool → 3 offered.** The
+four template choices:
 
 1. **Template / brand.** First **check this user's registered templates** — the
    host-appropriate registry (`~/.codex/slide-templates/` in Codex, `~/.claude/slide-templates/`
@@ -386,24 +390,35 @@ the direction gate** (the look is already decided). The four:
      carves (skip ONLY when one applies, and say so in one clause at the design checkpoint):
      the user explicitly says "just design one and go / 你定"; a Q4 Mode-A mimic example
      decides the look; the deck reuses a registered template; or a tiny-ask (1–2 slide)
-     edit. Under a full per-deck AUTO WAIVER, still GENERATE the three directions, auto-pick
+     edit. Under a full per-deck AUTO WAIVER, still GENERATE the four directions, auto-pick
      the best fit, and post the rendered images + pick as the FYI (mirror of the Q1(d)
      image-tool hero checkpoint) — the waiver removes the stop, never the artifact.
-     - *Running the gate* → run **Gate A** of `references/collaborative-mode.md`. **The 3 directions
+     - *Running the gate* → run **Gate A** of `references/collaborative-mode.md`. **The directions
        are REAL STYLES, not synthesised colour schemes** — pick the **3 best-fit named presets** for
-       THIS topic/audience from the 14-preset library (read each preset's `when` field in
+       THIS topic/audience from the 18-preset library (read each preset's `when` field in
        `scripts/presets.py` / `references/design-gallery.md`; e.g. a technical talk → blueprint /
        dark_tech / swiss, a culture deck → memphis / risograph / editorial_paper, a Chinese-heritage
        deck → ink_wash / eastern_traditional / museum_memorial), then
        **`archetypes_html.preset_directions([names])`** turns them into direction tokens that carry
        each preset's real **DNA** (its signature motif — Swiss's ghost numeral, Memphis's scattered
        shapes, blueprint's schematic grid, ink_wash's seal chop), rendered by
-       `scripts/archetypes_html.py` into **ONE self-contained HTML page** showing all three in the
+       `scripts/archetypes_html.py` into **ONE self-contained HTML page** showing them in the
        **same** representative slides (cover / points+callout / diagram / data). This is the fix for
        "the 3 options were just different colours": a preset is a whole visual language, and the
-       preview now SHOWS it. *(A bespoke synthesised token-set is still allowed — for a topic no
-       preset fits, or when the user's "D — describe your own" needs it — but the DEFAULT is to
-       recommend the best-fit real styles and let the user pick.)*
+       preview now SHOWS it — **and the DNA runs through every preview slide, not just the cover**
+       (the ambient register signature; `_dna_ambient`), so the user sees a style that carries the
+       whole deck.
+       - 🔴 **On this no-image-tool branch, offer FOUR rendered directions, not three:** the 3
+         best-fit DNA presets (A/B/C) **plus a 4th "colour-scheme" direction (D)** — one tasteful
+         palette+type combination for THIS topic with **no motif**, the classic clean look (this is
+         itself a legitimate style; a user asked for it to stay on the menu). Build all four in one
+         call: `preset_directions(["p1","p2","p3", {colour_token}])` — a **dict** is passed through
+         verbatim as a no-`dna` colour direction (name it e.g. *"Signal — pure palette + type"*).
+         The HTML labels A–D as the four options and **E — describe your own** as the fifth slot (the
+         own-letter is dynamic, so no collision). *(With an image tool it's the OTHER branch — Q1(d)'s
+         style gate — which stays at 3.)* *(A bespoke synthesised token-set is still allowed for A–C
+         too — for a topic no preset fits, or when the user's "describe your own" needs it — but the
+         DEFAULT is to recommend the best-fit real styles + the one colour option and let them pick.)*
        - 🔴 **DIVERGENCE IS A PAIRWISE RULE, NOT AN EXHORTATION: any two directions must differ on
          ≥2 of four axes — {palette mood · type attitude · density/scale · COMPOSITION ENVELOPE}.**
          "Distinct light/dark, warm/cool, serif/sans" describes *knobs*; a dark version and a light
@@ -422,14 +437,14 @@ the direction gate** (the look is already decided). The four:
          pairing** · **density** · **composition** — and flags any pair matching on ≥3 of the 4. **Exit 2 is
          not an auto-kill** — REDIVERGE the flagged pair, or keep it and record the reason on the
          `direction gate:` line ("brand-locked accent — divergence moved to composition + type").
-         The check exists because the agent that writes the three directions is the same agent that
-         judges whether they differ; only an outside measurement catches three skins of one idea. **Hand the user the single `file://…
+         The check exists because the agent that writes the directions is the same agent that
+         judges whether they differ; only an outside measurement catches several skins of one idea. **Hand the user the single `file://…
        directions.html` link** to open in a browser, review side-by-side, and pick from — no
-       local pptx samples. Collect the pick + knobs. Present the pick as **A / B / C plus a
-       fourth "D — describe your own" option**: if the user picks D, they *type the look they
-       have in mind* (a reference, a brand, a mood, a constraint) and you **synthesize a fourth
-       direction from that description** — regenerate the HTML link and show it alongside
-       (iterate until they consent), rather than forcing one of your three guesses. The three
+       local pptx samples. Collect the pick + knobs. Present the pick as **A / B / C / D (the four
+       rendered directions) plus a final "E — describe your own" option**: if the user picks E, they
+       *type the look they have in mind* (a reference, a brand, a mood, a constraint) and you
+       **synthesize a new direction from that description** — regenerate the HTML link and show it
+       alongside (iterate until they consent), rather than forcing one of your four guesses. The four
        are only your opening proposals; the author's own intention always outranks them. On the
        pick, the chosen token-set becomes the deck's `style.py` **including its composition — the
        `cover` token is BUILT as the cover's actual layout, and the `skeleton` token becomes the
@@ -466,7 +481,7 @@ the direction gate** (the look is already decided). The four:
      > *(A request to change the **atmosphere/mood/style** ⇒ RE-generate the imagery to embody it — new
      > subject/composition/lighting/motifs — then re-derive `style.py`; don't just recolour the old plate.
      > A minor palette/contrast tweak is a `style.py`-only change. See `references/generated-template.md`.)*
-     Then **the look is decided — SKIP the 3-direction gate**, finish the interview normally, and build
+     Then **the look is decided — SKIP the direction gate**, finish the interview normally, and build
      (image cover/dividers with native title on top; content built natively in `style.py`. **🔴 MUST
      (this generated/image-tool template branch ONLY — not provided-template or "design a clean one" decks),
      not a default: also GENERATE a faint, TOPIC-RELATED interior-background PLATE (same style, the
@@ -644,9 +659,9 @@ the direction gate** (the look is already decided). The four:
    unsure; carry the choice into the plan (steps 1–2) and the build (step 4).
    - **Direction gate (when to show rendered options first).** Two cases call for it:
      (a) **"design a clean one" / no template** → it's the *recommended default* there —
-     offer 3 directions as described in Q1's design-one branch above; (b) any other case
-     where the user is **unsure on style** or it's a **brand-defining / high-stakes** deck →
-     offer **2–3 directions** as a lighter opt-in. Either way it's the same machinery
+     offer **4** directions as described in Q1's design-one branch above (3 best-fit DNA presets +
+     1 colour-scheme direction); (b) any other case where the user is **unsure on style** or it's a
+     **brand-defining / high-stakes** deck → offer **2–3 directions** as a lighter opt-in. Either way it's the same machinery
      (collaborative mode Gate A, `references/collaborative-mode.md` + `scripts/archetypes_html.py`):
      **one HTML link** showing the archetype slides per direction, which the user opens and picks
      from before the full build. **Scope differs by case, and the difference matters:** on case (a)
@@ -2366,9 +2381,11 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
 - `image_prompts.py` (build the prompt manifest) → `generate_images_codex.py` (no-key, Codex CLI) /
   `generate_images_openai.py` (**metered** API path — gated, see the BILLING GATE). `archetypes_html.py` (direction-gate previews as
   **one HTML link** — `preset_directions([names])` turns best-fit preset names into direction tokens
-  carrying each preset's real DNA, so the 3 options are STYLES not colour schemes; `_dna_cover`
-  renders each preset's signature motif; `archetypes.py` is the older pptx-render variant + the
-  post-pick one-slide fidelity confirm) · `assemble.py` (assemble a sectioned deck) · `export_notes.py` (notes →
+  carrying each preset's real DNA, so the options are STYLES not colour schemes (accepts a **dict** in
+  the list for the no-image-tool gate's 4th pure colour-scheme direction); `_dna_cover` renders each
+  preset's signature hero motif and `_dna_ambient` runs the quiet register signature on EVERY interior
+  preview slide so the style carries all pages, not just the cover; `archetypes.py` is the older
+  pptx-render variant + the post-pick one-slide fidelity confirm) · `assemble.py` (assemble a sectioned deck) · `export_notes.py` (notes →
   rehearsal script).
 - `icons.py` — fetch an open-licensed SVG icon (Tabler/Lucide/Phosphor incl. **6 weights + duotone**/
   Simple…), recolor OR **gradient-fill** to the deck palette, rasterize to a transparent PNG
