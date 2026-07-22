@@ -193,6 +193,29 @@ def main():
             assert dd.check(pair)["flagged"], "a 3-axis match must still flag"
         ok("script axes == prose axes (density measured, mode folded into palette)", _prose_and_script_agree)
 
+        def _preset_directions_carry_dna():
+            """The direction gate must offer STYLES, not colour schemes: preset_directions() turns
+            preset names into tokens that carry each preset's real DNA, and _dna_cover renders the
+            signature motif — the whole point of the preset-driven gate."""
+            sys.path.insert(0, HERE)
+            import importlib, archetypes_html as ah
+            importlib.reload(ah)
+            dirs = ah.preset_directions(["swiss", "ink_wash", "memphis"])
+            assert len(dirs) == 3 and all(d.get("dna") for d in dirs), "every preset direction carries a dna marker"
+            # each renders its signature motif on the cover
+            assert 'dna-ghost' in ah._dna_cover(ah._norm(dirs[0])), "swiss ghost numeral missing"
+            assert 'dna-seal' in ah._dna_cover(ah._norm(dirs[1])), "ink_wash seal missing"
+            assert 'dna-memphis' in ah._dna_cover(ah._norm(dirs[2])), "memphis motif missing"
+            # a plain (no-dna) direction renders no motif
+            assert ah._dna_cover(ah._norm({"name": "Plain"})) == "", "a dna-less direction must render nothing"
+            # the whole page builds and mentions each style name
+            import tempfile, os
+            out = os.path.join(d, "gate.html")
+            ah.build_directions_html(dirs, out, "T")
+            html = open(out, encoding="utf-8").read()
+            assert "Swiss" in html and "Ink Wash" in html and "Memphis" in html
+        ok("preset_directions carry real DNA (styles, not colour schemes)", _preset_directions_carry_dna)
+
     print("smoke_directions: {} failure(s)".format(len(FAILS)))
     return 1 if FAILS else 0
 

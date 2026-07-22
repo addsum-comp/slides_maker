@@ -35,8 +35,14 @@ direction*; the single real render confirms *fidelity*.
 > **Note:** Gate A is no longer collaborative-mode-only — on the Q1(c) *design-a-clean-one*
 > branch it runs BY DEFAULT (SKILL.md Q1(c); named carves there), because that is the one
 > branch where the look is invented from nothing and the user has seen no options.
-1. From the interview (purpose/audience/style) generate **differentiated directions** —
-   distinct design *languages*, not three shades of one idea.
+1. From the interview (purpose/audience/style) offer **differentiated directions** — distinct design
+   *languages*, not three shades of one idea. **Default: recommend the 3 best-fit REAL PRESETS** for
+   this topic from the 14-preset library (read each preset's `when` field in `scripts/presets.py`),
+   and build the direction tokens with **`archetypes_html.preset_directions([names])`** so each
+   preview carries the preset's real **DNA** (its signature motif), not just its palette. A preset is
+   a whole visual language — this is what stops the 3 options reading as "the same layout in three
+   colours". Synthesise a bespoke direction only for a topic no preset fits, or for the user's
+   "D — describe your own".
    🔴 **The rule is PAIRWISE and checkable: any two directions must differ on ≥2 of
    {palette mood · type attitude · density/scale · COMPOSITION ENVELOPE}.** Light-vs-dark and
    warm-vs-cool are *knobs on one design*; the composition envelope — WHERE the ink sits — is the

@@ -65,6 +65,7 @@ _DEFAULTS = {
     # converse (different hues, identical layout) is the "three colourways of one idea" failure.
     "cover": "centred",         # centred | low-left | split-vertical | full-bleed-type
     "skeleton": "statement",    # statement | split | island | band | rail
+    "dna": None,                # preset name → its signature motif in the cover preview
 }
 
 _COVERS = ("centred", "low-left", "split-vertical", "full-bleed-type")
@@ -104,6 +105,51 @@ def _is_dark(hexc):
     return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.45
 
 
+
+# ── preset → direction bridge: the direction gate picks real DNA styles, not synthesised colours ──
+# Each preset (scripts/presets.py) carries curated STYLE DNA (motif/treatment in its `surface`
+# field). preset_directions() turns chosen preset names into direction tokens so the gate offers
+# real styles; the `dna` marker tells _dna_cover() which signature motif to render in the preview.
+_PRESET_COMPOSITION = {          # a cover/skeleton that fits each preset's character
+    "swiss": ("low-left", "statement"), "editorial_paper": ("low-left", "statement"),
+    "consulting": ("low-left", "rail"), "brutalist": ("full-bleed-type", "statement"),
+    "ink_wash": ("low-left", "island"), "eastern_traditional": ("low-left", "band"),
+    "museum_memorial": ("centred", "statement"), "risograph": ("centred", "split"),
+    "memphis": ("centred", "split"), "glassmorphism": ("split-vertical", "island"),
+    "editorial_report": ("low-left", "band"), "blueprint": ("split-vertical", "band"),
+    "dark_tech": ("split-vertical", "split"), "luxury_dark": ("centred", "statement"),
+    "bauhaus": ("low-left", "statement"), "midcentury": ("centred", "split"),
+    "terminal": ("low-left", "rail"), "synthwave": ("centred", "statement"),
+}
+
+
+def preset_directions(names):
+    """Turn a list of preset names into direction-token dicts with real DNA. Unknown names fall
+    through to a plain token so a synthesised direction can still be mixed in."""
+    import presets as _P
+    out = []
+    for n in names:
+        p = _P.PRESETS.get(n)
+        if not p:
+            out.append({"name": n}); continue
+        def _h(v):
+            return "#%02X%02X%02X" % tuple(v[:3]) if not isinstance(v, str) else ("#" + v.lstrip("#"))
+        accs = [_h(a) for a in p["accents"]]
+        cov, sk = _PRESET_COMPOSITION.get(n, ("centred", "statement"))
+        out.append({
+            "name": n.replace("_", " ").title(),
+            "rationale": (p.get("when", "") or "").split(".")[0][:70],
+            "bg": _h(p["bg"]), "ink": _h(p["ink"]), "grey": _h(p.get("muted", [120, 120, 120])),
+            "mute": _h(p.get("muted", [140, 140, 140])),
+            "accent": accs[0], "accents": accs,
+            "font_display": p.get("display", "Helvetica Neue"),
+            "font_body": p.get("font", "Helvetica Neue"),
+            "density": "moderate", "cover": cov, "skeleton": sk, "dna": n,
+        })
+    return out
+
+
+
 # ── the 4 archetype slides, as HTML (mirrors scripts/archetypes.py) ──────────────────────
 
 def _title_bar(S, title, kicker):
@@ -118,6 +164,71 @@ def _footer(S, page, tag=""):
     t = f'<span>{_esc(tag)}</span>' if tag else "<span></span>"
     return (f'<div class="ftr" style="color:{S["mute"]};border-color:{S["line"]}">'
             f'{t}<span>{page}</span></div>')
+
+
+
+def _dna_cover(S):
+    """The signature motif that makes each preset recognisable at a glance — rendered as an overlay
+    on the cover so the direction gate shows a STYLE, not a colour scheme. Returns HTML; the
+    per-DNA CSS lives in _DNA_CSS. A direction with no `dna` returns nothing."""
+    d = S.get("dna")
+    if not d:
+        return ""
+    a = S["accent"]; accs = S.get("accents", [a])
+    def _c(i, fb): return accs[i] if i < len(accs) else fb
+    if d == "swiss":
+        return f'<div class="dna-ghost">01</div>'
+    if d == "brutalist":
+        return f'<div class="dna-brutal" style="background:{a}"></div>'
+    if d in ("editorial_paper", "editorial_report", "luxury_dark", "museum_memorial"):
+        return f'<div class="dna-hair" style="background:{a}"></div><div class="dna-hair2" style="background:{S["mute"]}"></div>'
+    if d == "consulting":
+        return f'<div class="dna-actionbar" style="background:{a}"></div>'
+    if d == "ink_wash":
+        return f'<div class="dna-seal" style="background:{a}">印</div>'
+    if d == "eastern_traditional":
+        return (f'<div class="dna-frame" style="border-color:{a}"></div>'
+                f'<div class="dna-cjknum" style="color:{a}">壹</div>')
+    if d == "risograph":
+        return (f'<div class="dna-halftone" style="color:{_c(1,a)}"></div>'
+                f'<div class="dna-riso" style="background:{_c(0,a)}"></div>')
+    if d == "memphis":
+        dots = "".join(
+            f'<span class="dna-m-dot" style="left:{lx}%;top:{ty}%;background:{_c(i%3,a)};'
+            f'border-radius:{"50%" if i%2 else "0"}"></span>'
+            for i, (lx, ty) in enumerate([(6, 12), (88, 8), (92, 82), (5, 84), (78, 90)]))
+        return f'<div class="dna-memphis">{dots}<span class="dna-m-zig" style="border-color:{_c(1,a)}"></span></div>'
+    if d == "glassmorphism":
+        return (f'<div class="dna-glow" style="background:{_c(0,a)}"></div>'
+                f'<div class="dna-glow dna-glow2" style="background:{_c(2 if len(accs)>2 else 0,a)}"></div>'
+                f'<div class="dna-glass"></div>')
+    if d == "blueprint":
+        return (f'<div class="dna-grid"></div>'
+                f'<div class="dna-bpframe" style="border-color:{a}"></div>'
+                f'<div class="dna-node" style="border-color:{a};left:12%"></div>'
+                f'<div class="dna-node" style="border-color:{a};left:40%"></div>'
+                f'<div class="dna-nline" style="background:{_c(1,a)}"></div>')
+    if d == "dark_tech":
+        return (f'<div class="dna-grid dna-grid-faint"></div>'
+                f'<div class="dna-tick" style="background:{a}"></div>'
+                f'<div class="dna-island"></div>')
+    if d == "bauhaus":
+        return (f'<span class="dna-bh-c" style="background:{a}"></span>'
+                f'<span class="dna-bh-t" style="border-bottom-color:{_c(1,a)}"></span>'
+                f'<span class="dna-bh-s" style="background:{_c(2,a)}"></span>')
+    if d == "midcentury":
+        rays = "".join(f'<span class="dna-ray" style="background:{a};transform:rotate({r}deg)"></span>'
+                       for r in range(0, 180, 22))
+        return (f'<div class="dna-starburst">{rays}</div>'
+                f'<span class="dna-atom" style="border-color:{_c(2,a)}"></span>')
+    if d == "terminal":
+        return (f'<div class="dna-scan"></div>'
+                f'<div class="dna-prompt" style="color:{a}">&gt;_</div>')
+    if d == "synthwave":
+        lines = "".join(f'<span class="dna-gl" style="left:{50 + (i - 5) * 11}%"></span>' for i in range(11))
+        return (f'<div class="dna-sun" style="background:linear-gradient(180deg,{_c(2,a)},{a})"></div>'
+                f'<div class="dna-horizon">{lines}</div>')
+    return ""
 
 
 def _slide_cover(S, deck_title="Deck Title"):
@@ -135,8 +246,9 @@ def _slide_cover(S, deck_title="Deck Title"):
         f'<div class="accentbar" style="background:{S["accent"]}"></div>')
     panel = (f'<div class="cover-panel" style="background:{S["accent"]}"></div>'
              if comp == "split-vertical" else "")
-    return f'''<div class="slide cover cov-{comp}" style="background:{cbg}">
-      {bar}{panel}
+    dna = _dna_cover(S)
+    return f'''<div class="slide cover cov-{comp} dna-{S.get("dna") or "none"}" style="background:{cbg}">
+      {dna}{bar}{panel}
       <div class="cover-body">
         <div class="cover-ttl" style="color:{tt}">{_esc(deck_title)}</div>
         <div class="cover-sub" style="color:{S['accent']}">a one-line subtitle in this direction</div>
@@ -473,6 +585,66 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-s
   padding:10px 16px;border-radius:7px;cursor:pointer;flex:0 0 auto}
 .cbar .copy:hover{background:#2f6fd6}
 .cbar .hint{flex-basis:100%;color:#8c949e;font-size:11.5px;margin-top:2px}
+
+/* ───────── DNA signature motifs — each preset's real style, rendered on the cover ───────── */
+.cover{position:relative;overflow:hidden}
+.dna-ghost{position:absolute;right:4%;top:2%;font:800 130px/.8 Helvetica,Arial,sans-serif;
+  color:rgba(255,255,255,.06);letter-spacing:-.04em;pointer-events:none}
+.dna-brutal{position:absolute;left:0;bottom:0;width:38%;height:14px}
+.dna-hair{position:absolute;left:26px;right:26px;top:52%;height:1px;opacity:.9}
+.dna-hair2{position:absolute;left:26px;width:60px;top:calc(52% + 8px);height:2px}
+.dna-actionbar{position:absolute;left:26px;bottom:20%;width:44%;height:3px}
+.dna-seal{position:absolute;right:8%;bottom:12%;width:56px;height:56px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  font:700 26px/1 "Songti SC",serif;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.dna-frame{position:absolute;inset:14px;border:1.5px solid;opacity:.5}
+.dna-cjknum{position:absolute;right:9%;top:12%;font:700 46px/1 "Songti SC",serif;opacity:.8}
+.dna-halftone{position:absolute;right:0;bottom:0;width:46%;height:70%;opacity:.22;
+  background-image:radial-gradient(currentColor 22%,transparent 24%);background-size:13px 13px}
+.dna-riso{position:absolute;left:-8px;top:22%;width:60px;height:60px;border-radius:50%;
+  mix-blend-mode:multiply;opacity:.85}
+.dna-memphis{position:absolute;inset:0;pointer-events:none}
+.dna-m-dot{position:absolute;width:22px;height:22px}
+.dna-m-zig{position:absolute;left:70%;top:14%;width:44px;height:16px;border-bottom:3px solid;
+  border-left:3px solid;transform:skewX(-12deg)}
+.dna-glow{position:absolute;width:200px;height:200px;border-radius:50%;filter:blur(46px);
+  opacity:.5;right:-30px;top:-40px}
+.dna-glow2{left:-40px;bottom:-60px;right:auto;top:auto;opacity:.4}
+.dna-glass{position:absolute;right:8%;top:26%;width:150px;height:96px;border-radius:14px;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px)}
+.dna-grid{position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(#12365a 1px,transparent 1px),linear-gradient(90deg,#12365a 1px,transparent 1px);
+  background-size:34px 34px}
+.dna-grid-faint{opacity:.28;background-image:linear-gradient(#1b2b45 1px,transparent 1px),linear-gradient(90deg,#1b2b45 1px,transparent 1px)}
+.dna-bpframe{position:absolute;inset:16px;border:1px solid;opacity:.6}
+.dna-node{position:absolute;bottom:16%;width:60px;height:34px;border:1.4px solid;border-radius:3px}
+.dna-nline{position:absolute;left:calc(12% + 60px);bottom:calc(16% + 15px);width:calc(40% - 12% - 60px);height:2px}
+.dna-tick{position:absolute;left:26px;top:44px;width:16px;height:3px}
+.dna-island{position:absolute;right:7%;top:30%;width:150px;height:96px;border-radius:8px;
+  background:#f6f8fb;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+/* bauhaus — primitive triad as anchors */
+.dna-bh-c{position:absolute;right:9%;top:12%;width:110px;height:110px;border-radius:50%}
+.dna-bh-t{position:absolute;right:30%;top:20%;width:0;height:0;border-left:38px solid transparent;
+  border-right:38px solid transparent;border-bottom:66px solid}
+.dna-bh-s{position:absolute;right:20%;top:6%;width:72px;height:72px;transform:rotate(45deg)}
+/* mid-century — starburst + atomic orbit */
+.dna-starburst{position:absolute;right:9%;top:16%;width:0;height:0}
+.dna-ray{position:absolute;width:56px;height:2px;transform-origin:0 50%;opacity:.85}
+.dna-atom{position:absolute;left:6%;bottom:12%;width:70px;height:34px;border:2px solid;
+  border-radius:50%;transform:rotate(-20deg);opacity:.7}
+/* terminal — scanlines + prompt */
+.dna-scan{position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(180deg,rgba(120,255,150,.05) 0 1px,transparent 1px 3px)}
+.dna-prompt{position:absolute;right:9%;bottom:12%;font:700 30px/1 ui-monospace,Consolas,monospace}
+/* synthwave — sun + perspective grid horizon */
+.dna-sun{position:absolute;left:50%;top:8%;width:120px;height:120px;margin-left:-60px;
+  border-radius:50%;opacity:.9;filter:blur(1px)}
+.dna-horizon{position:absolute;left:0;right:0;bottom:0;height:44%;overflow:hidden;
+  background:linear-gradient(180deg,transparent,rgba(120,40,180,.25))}
+.dna-gl{position:absolute;bottom:0;top:0;width:1px;background:rgba(120,220,255,.35);
+  transform-origin:bottom center}
+.dna-horizon::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+  background:rgba(120,220,255,.6)}
 """
 
 

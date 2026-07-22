@@ -9,6 +9,38 @@ section is a distilled summary — the full notes live on the
 
 ## [Unreleased]
 
+### Changed — the direction gate is now PRESET-DRIVEN (real styles, not colour schemes)
+- The 3 directions shown at Gate A are now the **3 best-fit named presets** rendered with their own
+  **DNA**, not three synthesised palette/font combos. A user reported the old gate "只是不同的颜色搭配"
+  (just different colour pairings) — true: it varied palette + fonts + composition but carried no
+  register motif, so Swiss and Bauhaus looked like the same slide in two colourways.
+- **`archetypes_html.preset_directions([names])`** — new bridge that converts preset names into
+  direction tokens carrying a `dna` marker; **`_dna_cover()`** renders each preset's signature motif
+  as an HTML overlay on the cover preview (Swiss ghost-numeral `01`, Ink-wash `印` seal, Memphis
+  scattered dots, Blueprint grid/nodes, Bauhaus primitive triad, Midcentury starburst/atom, Terminal
+  scanlines + `> _` prompt, Synthwave perspective-grid horizon + banded sunset). The gate now proves
+  the style, so a pick is a pick between *languages*, not hues.
+- **SKILL.md** direction-gate section + **collaborative-mode.md** Gate A rewritten to preset-driven
+  default: recommend the best-fit real presets, build tokens with `preset_directions`, render one HTML
+  preview, let the user pick A/B/C/D. `smoke_directions` gains a regression asserting the tokens carry
+  DNA (motif renders; a plain non-preset direction stays empty).
+
+### Added — 4 new native style presets (18 total; all code-only, no generated image)
+- **`bauhaus`** — modernist geometric: primary red/yellow/blue on off-white, ONE oversized primitive
+  (circle/square/triangle) as the hero shape, lowercase geometric sans. Guarded to the primary triad.
+- **`midcentury`** — warm retro (Eames-era): harvest palette (mustard/avocado/burnt-orange/teal on
+  cream), atomic/starburst/boomerang motifs, geometric-humanist type.
+- **`terminal`** — CLI / phosphor CRT: monospace throughout, phosphor-green (or amber) on near-black,
+  scanlines, `>`/`$` prompt bullets. For developer-tool / infra / hacker-CTF / release-notes decks.
+- **`synthwave`** — retro-future neon: neon magenta/cyan on indigo-black, a receding perspective-grid
+  horizon + banded sunset, glow chrome. For launch / gaming / music-culture registers.
+- Each carries full schema parity with the mature presets (`guard` register-floor, `when` selection
+  hint, `image_prompt`), so they are wired for the whole pipeline — designer selection, builder guard
+  enforcement, critic register check, and the direction gate — not just the preview. Added to the
+  `design-gallery.md` catalogue with when-to-use. Preset set chosen from a web-research sweep of design
+  movements; neubrutalism / Art-Deco / De-Stijl / vaporwave were rejected as re-skins of existing
+  presets or house-taste conflicts.
+
 ## [3.8.0] — 2026-07-22
 
 ### Added — native 2.5D isometric components (no generated image)

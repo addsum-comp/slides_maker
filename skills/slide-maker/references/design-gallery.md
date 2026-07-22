@@ -28,6 +28,10 @@ helper. The craft rules in `design-principles.md` still govern; this is the cata
 | `eastern_traditional` | 传统色 heritage | warm paper, ochre+sage, KaiTi, colour-as-content |
 | `luxury_dark` | dark fashion/luxury | near-black, ONE champagne accent, photography supplies colour |
 | `museum_memorial` | midnight memorial / exhibition | navy + brass gold, archival `duotone`, `year_badge`, serif gravitas |
+| `bauhaus` | modernist geometric | primary red/yellow/blue on off-white, ONE oversized primitive (circle/square/triangle) as the hero shape, lowercase geometric sans |
+| `midcentury` | warm retro (Eames-era) | harvest palette (mustard/avocado/burnt-orange/teal on cream), atomic/starburst/boomerang motifs, geometric-humanist type |
+| `terminal` | CLI / phosphor CRT | monospace throughout, phosphor-green (or amber) on near-black, scanlines, `>`/`$` prompt bullets |
+| `synthwave` | retro-future neon | neon magenta/cyan on indigo-black, a receding perspective-grid horizon + banded sunset, glow chrome |
 
 Pick the preset to the purpose+mood, then **vary it** — these are starting languages, not locks.
 The one exception: each preset carries a **`guard`** string (its 1–3 register-defining constraints,

@@ -253,6 +253,75 @@ PRESETS = {
                         "exhibition lighting, dignified, no text",
         "when": "memorial, history/heritage, museum exhibition, biography, retrospective decks.",
     },
+    "bauhaus": {
+        "mood": "Bauhaus modernism — the primitive triad (circle/square/triangle) as the layout's "
+                "structural actors, primary red/yellow/blue on white, lowercase geometric sans.",
+        "bg": [245, 243, 238], "ink": [26, 26, 26], "muted": [110, 108, 102],
+        "accents": [[213, 43, 30], [247, 181, 0], [0, 90, 168], [26, 26, 26]],
+        "font": "Century Gothic", "display": "Century Gothic", "mono": "Consolas",
+        "ea": "Heiti SC", "ea_display": "Heiti SC",
+        "surface": "oversized filled PRIMITIVES (circle/square/triangle) placed as compositional "
+                   "anchors behind/beside titles (deckkit.box round + freeform triangle); primary-"
+                   "triad fills, one primitive per slide as the hero shape; lowercase geometric sans, "
+                   "occasional 45° rotation; thick black rules; zero ornament, generous whitespace.",
+        "guard": "one hero primitive per slide, never a confetti of shapes (that is memphis); keep "
+                 "the triad pure — no tints or gradients on the primary fills.",
+        "image_prompt": "Bauhaus poster, primary red yellow blue and black on off-white, large "
+                        "geometric primitives, Moholy-Nagy composition, no text",
+        "when": "design, architecture, education, modernist brand, a bold geometric register.",
+    },
+    "midcentury": {
+        "mood": "Mid-century modern — warm harvest palette + atomic/starburst/boomerang motifs, "
+                "1950s-60s optimism; geometric-humanist type.",
+        "bg": [244, 237, 221], "ink": [42, 37, 30], "muted": [120, 108, 90],
+        "accents": [[197, 90, 42], [214, 160, 44], [74, 122, 106], [45, 78, 92]],
+        "font": "Futura", "display": "Futura", "mono": "Menlo",
+        "ea": "Songti SC", "ea_display": "Songti SC",
+        "surface": "harvest ramp (burnt orange · mustard · avocado/teal · cream); one signature motif "
+                   "per section — starburst (radial line-array from a point) · boomerang (two joined "
+                   "arcs) · atomic orbit (ellipse rings + dot nodes), drawn as thin-line vector; "
+                   "solid-fill + thin-line mix, rounded organic shapes, no texture.",
+        "guard": "the harvest palette is the identity — never pastel it up or add a fifth loud hue; "
+                 "one atomic/starburst motif per section, not per slide.",
+        "image_prompt": "mid-century modern illustration, mustard avocado burnt-orange teal on cream, "
+                        "atomic starburst motifs, 1950s optimism, no text",
+        "when": "culture, retro brand, lifestyle, a warm optimistic register; anything Eames-era.",
+    },
+    "terminal": {
+        "mood": "Terminal / monospace — phosphor-on-black CRT: fixed-width type throughout, a "
+                "command-line register for engineers.",
+        "bg": [10, 15, 10], "ink": [200, 240, 200], "muted": [90, 130, 90],
+        "accents": [[51, 255, 102], [255, 176, 0], [90, 200, 255], [255, 90, 90]],
+        "font": "Consolas", "display": "Consolas", "mono": "Consolas",
+        "ea": "Heiti SC", "ea_display": "Heiti SC",
+        "surface": "single MONOSPACE stack everywhere; phosphor-green (#33FF66) or amber (#FFB000) on "
+                   "near-black; faint scanline texture (thin horizontal rules at low alpha); list "
+                   "bullets are `>` / `$` prompt glyphs; a block cursor accent; boxed output panels "
+                   "with mono labels; keep it legible — phosphor on black is high-contrast by design.",
+        "guard": "mono for EVERY run including headings — a proportional face breaks the register; "
+                 "one phosphor accent, the others only for status (ok/warn/error).",
+        "image_prompt": "retro CRT terminal, phosphor green text on black, scanlines, monospace, "
+                        "command line, no real words",
+        "when": "developer-tool, CLI/infra, hacker/CTF, an eng-blog or release-notes register.",
+    },
+    "synthwave": {
+        "mood": "Synthwave / Outrun — retro-futurist neon: a receding perspective grid to a horizon, "
+                "sunset gradient, glow. Vivid and high-contrast.",
+        "bg": [18, 12, 38], "ink": [240, 235, 255], "muted": [150, 130, 190],
+        "accents": [[255, 45, 149], [64, 224, 255], [255, 138, 61], [150, 90, 255]],
+        "font": "Trebuchet MS", "display": "Trebuchet MS", "mono": "Consolas",
+        "ea": "Heiti SC", "ea_display": "Heiti SC",
+        "surface": "deep indigo/black ground; a receding perspective GRID horizon (converging lines to "
+                   "a vanishing point) as the signature backdrop; a banded sunset gradient (orange→"
+                   "magenta→purple) with a horizon sun; neon magenta/cyan accents with a soft glow "
+                   "(layered offset shadows); chrome/beveled display type. Vivid but keep text on a "
+                   "solid panel where it crosses the grid.",
+        "guard": "the neon glow is chrome, never on body text (it kills legibility); one grid horizon "
+                 "per divider/cover, not on every content slide.",
+        "image_prompt": "synthwave outrun, neon magenta cyan sunset grid horizon, 80s retro-future, "
+                        "glowing perspective grid, no text",
+        "when": "launch, gaming, music/culture, a bold retro-future register; audiences wanting energy.",
+    },
 }
 
 

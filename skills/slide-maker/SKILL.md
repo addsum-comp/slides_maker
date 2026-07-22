@@ -389,11 +389,21 @@ the direction gate** (the look is already decided). The four:
      edit. Under a full per-deck AUTO WAIVER, still GENERATE the three directions, auto-pick
      the best fit, and post the rendered images + pick as the FYI (mirror of the Q1(d)
      image-tool hero checkpoint) — the waiver removes the stop, never the artifact.
-     - *Running the gate* → run **Gate A** of `references/collaborative-mode.md`
-       with **3 *differentiated* directions**, each captured as a **design-token set** (palette +
-       portable fonts + motif + **composition**) and rendered by `scripts/archetypes_html.py` into
-       **ONE self-contained HTML page** showing all three in the **same** representative slides
-       (cover / points+callout / diagram / data).
+     - *Running the gate* → run **Gate A** of `references/collaborative-mode.md`. **The 3 directions
+       are REAL STYLES, not synthesised colour schemes** — pick the **3 best-fit named presets** for
+       THIS topic/audience from the 14-preset library (read each preset's `when` field in
+       `scripts/presets.py` / `references/design-gallery.md`; e.g. a technical talk → blueprint /
+       dark_tech / swiss, a culture deck → memphis / risograph / editorial_paper, a Chinese-heritage
+       deck → ink_wash / eastern_traditional / museum_memorial), then
+       **`archetypes_html.preset_directions([names])`** turns them into direction tokens that carry
+       each preset's real **DNA** (its signature motif — Swiss's ghost numeral, Memphis's scattered
+       shapes, blueprint's schematic grid, ink_wash's seal chop), rendered by
+       `scripts/archetypes_html.py` into **ONE self-contained HTML page** showing all three in the
+       **same** representative slides (cover / points+callout / diagram / data). This is the fix for
+       "the 3 options were just different colours": a preset is a whole visual language, and the
+       preview now SHOWS it. *(A bespoke synthesised token-set is still allowed — for a topic no
+       preset fits, or when the user's "D — describe your own" needs it — but the DEFAULT is to
+       recommend the best-fit real styles and let the user pick.)*
        - 🔴 **DIVERGENCE IS A PAIRWISE RULE, NOT AN EXHORTATION: any two directions must differ on
          ≥2 of four axes — {palette mood · type attitude · density/scale · COMPOSITION ENVELOPE}.**
          "Distinct light/dark, warm/cool, serif/sans" describes *knobs*; a dark version and a light
@@ -1022,7 +1032,8 @@ than the current working directory, so `python /path/to/build_<deck>.py` works f
   import; `set_palette` rewrites them for you) + a **role-based font pairing** (`DISPLAY` title face
   + `FONT` body + `MONO`; add `EADISPLAY`+`EAFONT` for CJK) to
   match — or adopt a one-switch **`scripts/presets.py`** `preset(name)` (e.g. glassmorphism / swiss /
-  editorial_paper / editorial_report / risograph / memphis — **14 total**, full catalogue with
+  editorial_paper / editorial_report / risograph / memphis / bauhaus / midcentury / terminal /
+  synthwave — **18 total**, full catalogue with
   when-to-use in `references/design-gallery.md`: palette + fonts + surface + image-prompt)
   and tune it — then do a quick web-search for current, well-regarded examples of *this kind* of
   deck and adapt concrete ideas. A status update should read as crisp and corporate,
@@ -2354,8 +2365,10 @@ A checkable red-flag list; if a draft does any of these, stop and fix it before 
   `references/design-gallery.md`).
 - `image_prompts.py` (build the prompt manifest) → `generate_images_codex.py` (no-key, Codex CLI) /
   `generate_images_openai.py` (**metered** API path — gated, see the BILLING GATE). `archetypes_html.py` (direction-gate previews as
-  **one HTML link**; `archetypes.py` is the older pptx-render variant + the post-pick one-slide
-  fidelity confirm) · `assemble.py` (assemble a sectioned deck) · `export_notes.py` (notes →
+  **one HTML link** — `preset_directions([names])` turns best-fit preset names into direction tokens
+  carrying each preset's real DNA, so the 3 options are STYLES not colour schemes; `_dna_cover`
+  renders each preset's signature motif; `archetypes.py` is the older pptx-render variant + the
+  post-pick one-slide fidelity confirm) · `assemble.py` (assemble a sectioned deck) · `export_notes.py` (notes →
   rehearsal script).
 - `icons.py` — fetch an open-licensed SVG icon (Tabler/Lucide/Phosphor incl. **6 weights + duotone**/
   Simple…), recolor OR **gradient-fill** to the deck palette, rasterize to a transparent PNG
